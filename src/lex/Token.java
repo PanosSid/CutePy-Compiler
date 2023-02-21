@@ -17,6 +17,10 @@ public class Token {
 	public String getRecognizedStr() {
 		return recognizedStr;
 	}
+	
+	public String getFamily() {
+		return family;
+	}
 
 	@Override
 	public int hashCode() {
