@@ -16,45 +16,64 @@ public class LexAnalyser {
 		processedStr = "";
 	}
 
-	public Token getToken() { // + gia ta cutepycomments!!!!!
+	public Token getToken() throws Exception { // + gia ta cutepycomments!!!!!
 		resetProcessedStr();
 		Character c = readChar();
-		try {
-			if (CharTypes.LETTERS.contains(c)) {
-				return getIdkOrKeywordToken();
-			} else if (CharTypes.DIGITS.contains(c)) {
-				return getNumberToken();
-			} else if (CharTypes.ADD_OPS.contains(c)) {
-				return getAddOperatorToken();
-			} else if (c.equals('*')) {
-				return getMulOperatorMultToken();
-			} else if (c.equals('/')) {
-				return getMulOperatorDivToken();
-			} else if (CharTypes.GROUP_SUMBOLS.contains(c)) {
-				return getGroupOperatorToken();
-			} else if (CharTypes.DELIMITERS.contains(c)) {
-				return getDelimiterOperatorToken();
-			} else if (c.equals('<')) {
-				return getRealOperatorSmallerToken();
-			} else if (c.equals('>')) {
-				return getRealOperatorSmallerToken();
-			} else if (c.equals('#')) { // TODO 3ekinaei comment i declare i anoigma block
-				return skipComment();
-			} else if (c.equals('=')) {
-				return getEqualOperatorToken();
-			} else if (c.equals(' ') || c.equals('\t')) {
-				return getToken();
-			} else if (isNewLine(c)) {
-				lineNum++;
-				return getToken();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage() + "panos");
-//			System.exit(-1);
+		if (CharTypes.LETTERS.contains(c)) {
+			return getIdkOrKeywordToken();
+		} else if (CharTypes.DIGITS.contains(c)) {
+			return getNumberToken();
+		} else if (CharTypes.ADD_OPS.contains(c)) {
+			return getAddOperatorToken();
+		} else if (CharTypes.GROUP_SUMBOLS.contains(c)) {
+			return getGroupOperatorToken();
+		} else if (CharTypes.DELIMITERS.contains(c)) {
+			return getDelimiterOperatorToken();
+		} else if (c.equals('*')) {
+			return getMulOperatorMultToken();
+		} else if (c.equals('/')) {
+			return getMulOperatorDivToken();
+		} else if (c.equals('<')) {
+			return getRealOperatorSmallerToken();
+		} else if (c.equals('>')) {
+			return getRealOperatorSmallerToken();
+		} else if (c.equals('#')) {
+			return getSharpToken();
+		} else if (c.equals('=')) {
+			return getEqualOperatorToken();
+		} else if (c.equals(' ') || c.equals('\t')) {
+			return getToken();
+		} else if (isNewLine(c)) {
+			lineNum++;
+			return getToken();
 		}
 
 		return null;
+	}
+	
+	private Token getSharpToken() throws Exception {
+		Character c = readChar();
+		if (c.equals('$')) {
+			unReadChar();
+			return skipComment();
+		} else if (c.equals('d')) {
+			return getDeclareToken();
+		} else if (c.equals('{')) {
+			return new Token(processedStr, "groupOperator", lineNum);
+		} else if (c.equals('}')) {
+			return new Token(processedStr, "groupOperator", lineNum);
+		}
+		return null;
+	}
+
+	private Token getDeclareToken() throws Exception {
+		String declare = "declare";
+		for (int i = 1; i < declare.length(); i++) {
+			if (readChar() != declare.charAt(i)) {
+				throw new Exception("Eror not declare but #"+declare.substring(i));
+			}
+		}
+		return new Token(processedStr, "keyword", lineNum);
 	}
 
 	private Token skipComment() throws Exception {
@@ -79,7 +98,6 @@ public class LexAnalyser {
 			
 		}
 		throw new Exception("Not implemented yet need to check for #declare");
-//		return getIdkOrKeywordToken();
 	}
 
 	private Character readChar() {
@@ -107,10 +125,10 @@ public class LexAnalyser {
 		return false;
 	}
 
-	private Token getIdkOrKeywordToken() throws Exception {	//TODO prepei na mpei sto paixnidi to #declare ktl
+	private Token getIdkOrKeywordToken() throws Exception {
 		Character c = readChar();
 		if (processedStr.length() <=30 &&
-				(Character.isAlphabetic(c) || Character.isDigit(c))) {
+				(Character.isAlphabetic(c) || Character.isDigit(c) || c.equals('_'))) {
 			return getIdkOrKeywordToken();
 		}
 		unReadChar();
@@ -139,11 +157,6 @@ public class LexAnalyser {
 	}
 
 	private Token getAddOperatorToken() throws Exception {
-//		Character c = readChar();
-//		if (CharTypes.ADD_OPS.contains(c)) {
-//			throw new Exception("[Error]: found consecutive addition operators");
-//		}
-//		unReadChar();
 		return new Token(processedStr, "addOperator", lineNum);
 	}
 
@@ -206,15 +219,14 @@ public class LexAnalyser {
 	}
 
 	public static void main(String args[]) {
-		char[] alphabet = "0123456789".toCharArray();
-		for (int i = 0; i < alphabet.length; i++) {
-			System.out.print("'" + alphabet[i] + "', ");
+		FileReader reader = new FileReader();
+		reader.setFileContents(" #$ : 547 ");
+		LexAnalyser lex = new LexAnalyser(reader);
+		try {
+			lex.getToken();
+		} catch (Exception e) {
+			
+		}
 
-		}
-		System.out.println();
-		char[] alphabet2 = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
-		for (int i = 0; i < alphabet2.length; i++) {
-			System.out.print("'" + alphabet2[i] + "', ");
-		}
 	}
 }

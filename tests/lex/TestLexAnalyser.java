@@ -1,8 +1,10 @@
 package lex;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
@@ -37,7 +39,6 @@ public class TestLexAnalyser {
 		reader.setFileContents("123");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("123", "number", 1), lex.getToken());	
-
 	}
 	
 	@Test
@@ -46,7 +47,6 @@ public class TestLexAnalyser {
 		reader.setFileContents("\n56");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("56", "number", 2), lex.getToken());	
-
 	}
 	
 	@Test
@@ -54,20 +54,9 @@ public class TestLexAnalyser {
 		FileReader reader = new FileReader();
 		reader.setFileContents("\r\n\t78");
 		LexAnalyser lex = new LexAnalyser(reader);
-		Assertions.assertEquals(new Token("78", "number", 2), lex.getToken());	
-		
+		Assertions.assertEquals(new Token("78", "number", 2), lex.getToken());			
 	}
-	
 
-//	@Test
-//	public void testRecognizeLetterAfterNumberException() throws Exception {
-//		FileReader reader = new FileReader();
-//		reader.setFileContents(" 14a");
-//		LexAnalyser lex = new LexAnalyser(reader);
-//		Assertions.assertThrows(null, null)
-//		Assertions.assertEquals(new Token("-14", "number", 1), lex.getToken());	
-//		
-//	}
 	
 	@Test
 	public void testReadNextWithNewLines() {
@@ -207,14 +196,122 @@ public class TestLexAnalyser {
 				});
 		
 		LexAnalyser lex = new LexAnalyser(reader);
-		List<Token> actualTokens =Arrays.asList(new Token[] {
-				lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(),
-				lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(),
-				lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(),
-				lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(),
-				lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken(), lex.getToken()}
-		);
+		List<Token> actualTokens = new ArrayList<Token>();
+		for (int i = 0; i < 25 ; i++) {
+			actualTokens.add(lex.getToken());
+		}
 		compareListOfTokens(expectedTokens, actualTokens);
 	}
+	
+	
+	@Test
+	public void testUnclosedCommentThrowsException() {
+		FileReader reader = new FileReader();
+		reader.setFileContents(" #$ : 547 ");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Exception thrown = assertThrows(Exception.class, () -> lex.getToken());
+		Assertions.assertTrue(thrown.getMessage().contentEquals("[Error] comment is not closed!!"));
+	}
+	
+	@Test
+	public void testRecognizeDeclare() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents("  #declare x");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Assertions.assertEquals(new Token("#declare", "keyword", 1), lex.getToken());	
+		Assertions.assertEquals(new Token("x", "identifier", 1), lex.getToken());	
+	}
+	
+	@Test
+	public void testCountDigitsMethod() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents(
+				  "def main_countdigits():\r\n"
+				+ "#{\r\n"
+				+ "	#declare x, count\r\n"
+				+ "	x = int(input());\r\n"
+				+ "	count = 0;\r\n"
+				+ "	while (x>0):\r\n"
+				+ "	#{\r\n"
+				+ "		x = x // 10;\r\n"
+				+ "		count = count + 1;\r\n"
+				+ "	#}\r\n"
+				+ "	print(count);\r\n"
+				+ "#}");
+		List<Token> expectedTokens = Arrays.asList(new Token[] {
+				new Token("def", "keyword", 1), 
+				new Token("main_countdigits", "identifier", 1),
+				new Token("(", "groupOperator", 1),
+				new Token(")", "groupOperator", 1),
+				new Token(":", "delimiter", 1),
+				
+				new Token("#{", "groupOperator", 2),
+				
+				new Token("#declare", "keyword", 3),
+				new Token("x", "identifier", 3),
+				new Token(",", "delimiter", 3),
+				new Token("count", "identifier", 3),
+				
+				new Token("x", "identifier", 4),
+				new Token("=", "assignment", 4),
+				new Token("int", "keyword", 4),
+				new Token("(", "groupOperator", 4),
+				new Token("input", "keyword", 4),
+				new Token("(", "groupOperator", 4),
+				new Token(")", "groupOperator", 4),
+				new Token(")", "groupOperator", 4),
+				new Token(";", "delimiter",4),
+				
+				new Token("count", "identifier", 5),
+				new Token("=", "assignment", 5),
+				new Token("0", "number", 5),
+				new Token(";", "delimiter",5),
+				
+				
+				new Token("while", "keyword", 6),
+				new Token("(", "groupOperator", 6),
+				new Token("x", "identifier", 6),
+				new Token(">", "relOperator", 6),
+				new Token("0", "number", 6),				
+				new Token(")", "groupOperator", 6),
+				new Token(":", "delimiter", 6),
+				
+				new Token("#{", "groupOperator", 7),
+				
+				new Token("x", "identifier", 8),
+				new Token("=", "assignment", 8),
+				new Token("x", "identifier", 8),
+				new Token("//", "mulOperator", 8),
+				new Token("10", "number", 8),		
+				new Token(";", "delimiter",8),
+				
+				
+				new Token("count", "identifier", 9),
+				new Token("=", "assignment", 9),
+				new Token("count", "identifier", 9),
+				new Token("+", "addOperator", 9),
+				new Token("1", "number", 9),
+				new Token(";", "delimiter", 9),
+				
+				new Token("#}", "groupOperator", 10),
+				
+				new Token("print", "keyword", 11),
+				new Token("(", "groupOperator", 11),
+				new Token("count", "identifier", 11),
+				new Token(")", "groupOperator", 11),
+				new Token(";", "delimiter",11),
+				
+				new Token("#}", "groupOperator", 12),
+
+				});
+		
+		LexAnalyser lex = new LexAnalyser(reader);
+		List<Token> actualTokens = new ArrayList<Token>();
+		for (int i = 0; i < 50 ; i++) {
+			actualTokens.add(lex.getToken());
+		}
+		compareListOfTokens(expectedTokens, actualTokens);
+	}
+
 
 }
