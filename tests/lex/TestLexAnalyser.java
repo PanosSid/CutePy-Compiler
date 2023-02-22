@@ -91,6 +91,22 @@ public class TestLexAnalyser {
 	}
 	
 	@Test
+	public void testUnderscoreName() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents(" __name__");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Assertions.assertEquals(new Token("__name__", "keyword", 1), lex.getToken());	
+	}
+	
+	@Test
+	public void testUnderscoreMain() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents(" \"__main__\"");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Assertions.assertEquals(new Token("\"__main__\"", "keyword", 1), lex.getToken());	
+	}
+	
+	@Test
 	public void testRecognizeMultipleTokens() throws Exception {
 		FileReader reader = new FileReader();
 		reader.setFileContents(
@@ -202,6 +218,8 @@ public class TestLexAnalyser {
 		}
 		compareListOfTokens(expectedTokens, actualTokens);
 	}
+	
+	
 	
 	
 	@Test

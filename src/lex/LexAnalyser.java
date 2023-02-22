@@ -6,7 +6,7 @@ import java.util.List;
 public class LexAnalyser {
 	public static final List<String> KEYWORDS = Arrays.asList("def", "if",
 			"else", "while", "print", "return", "int", "input", "#declare",
-			"or", "and", "not", "\"__name__\"", "\"__main__\"");	//TODO chek and add more if needed
+			"or", "and", "not", "__name__", "\"__main__\"");	//TODO chek and add more if needed
 	private FileReader sourceReader;
 	private String processedStr;
 	private int lineNum = 1;
@@ -43,14 +43,59 @@ public class LexAnalyser {
 			return getEqualOperatorToken();
 		} else if (c.equals(' ') || c.equals('\t')) {
 			return getToken();
+		} else if (c.equals('_')) {
+			return getUnderscoreToken();
+		} else if (c.equals('\"')) {
+			return getStrMainToken();
 		} else if (isNewLine(c)) {
 			lineNum++;
 			return getToken();
+		} else if (c.equals(FileReader.EOF)) {
+			return new EOFToken(lineNum);
 		}
-
-		return null;
+		
+		throw new Exception("[Error] found char '"+c+"' that doesnt belong in the CutePy alphabet");
+//		return null;
 	}
 	
+	private Token getStrMainToken() throws Exception { //TODO better error msgs
+		Character c = readChar();	
+		Character main[] = { '_', '_', 'm', 'a', 'i', 'n', '_', '_', '\"' };
+		for (int i = 0; i < main.length; i++) {
+			if (c.equals(main[i])) {
+				c = readChar();
+			} else {
+				throw new Exception("[Error: at line" + lineNum + "] expected '" + main[i] + "' but found '" + c + "'");
+			}
+		}
+		return new Token(processedStr, "keyword", lineNum);
+	}
+
+	private Token getUnderscoreToken() throws Exception {	//TODO check for trim
+		Character c = readChar();		
+		if (c.equals('_')) {
+			c = readChar();	
+			if (c.equals('n')) {
+				Character name[] = { 'a', 'm', 'e', '_', '_'};
+				c = readChar();	
+				for (int i = 0; i < name.length; i++) {
+					if (c.equals(name[i])) {
+						c = readChar();
+					} else {
+						throw new Exception(
+								"[Error: at line" + lineNum + "] expected '" + name[i] + "' but found '" + c + "' ");
+					}
+				}
+				return new Token(processedStr.trim(), "keyword", lineNum);
+			}
+			throw new Exception(
+					"[Error: at line" + lineNum + "] expected '__name__' but found '__" + c + "' ");
+		}
+		throw new Exception(
+				"[Error: at line" + lineNum + "] expected '__name__' or '\"__main__\"' but found '_" + c + "' ");
+
+	}
+
 	private Token getSharpToken() throws Exception {
 		Character c = readChar();
 		if (c.equals('$')) {
@@ -62,8 +107,9 @@ public class LexAnalyser {
 			return new Token(processedStr, "groupOperator", lineNum);
 		} else if (c.equals('}')) {
 			return new Token(processedStr, "groupOperator", lineNum);
+		} else {
+			throw new Exception("[Error: at line"+lineNum+"] expected '#declare' or '#{' or '#}' or '#$' but found '#"+c+"' ");
 		}
-		return null;
 	}
 
 	private Token getDeclareToken() throws Exception {
@@ -211,22 +257,11 @@ public class LexAnalyser {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
 		}
-		throw new Exception("[Error] found '=whitespace and a char tha is not a digit or letter");
+		throw new Exception("[Error: at line"+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
 	}
 
 	private void resetProcessedStr() {
 		processedStr = "";
 	}
 
-	public static void main(String args[]) {
-		FileReader reader = new FileReader();
-		reader.setFileContents(" #$ : 547 ");
-		LexAnalyser lex = new LexAnalyser(reader);
-		try {
-			lex.getToken();
-		} catch (Exception e) {
-			
-		}
-
-	}
 }

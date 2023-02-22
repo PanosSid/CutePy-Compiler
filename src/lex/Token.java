@@ -21,6 +21,14 @@ public class Token {
 	public String getFamily() {
 		return family;
 	}
+	
+	public int getLineNum() {
+		return lineNum;
+	}
+	
+	public boolean recognizedStrEquals(String otherRecognStr) {
+		return recognizedStr.equals(otherRecognStr);
+	}
 
 	@Override
 	public int hashCode() {
@@ -44,6 +52,8 @@ public class Token {
 	public String toString() {
 		return "Token [recognizedStr=" + recognizedStr + ", family=" + family + ", lineNum=" + lineNum + "]";
 	}
+
+	
 	
 	
 }

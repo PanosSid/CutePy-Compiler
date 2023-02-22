@@ -1,6 +1,7 @@
 package syntax;
 
 import lex.CharTypes;
+import lex.FileReader;
 import lex.LexAnalyser;
 import lex.Token;
 
@@ -33,118 +34,509 @@ public class SyntaxAnalyser {
 	}
 	
 	
-	private void startRule() {
+	private void startRule() throws Exception {
+		System.out.println("startRule() "+ currentToken.getRecognizedStr());
 		defMainPart();
 		callMainPart();
 	}
 	
-	private void defMainPart() {
-		// loop
+	private void defMainPart() throws Exception {
+		System.out.println("defMainPart() "+ currentToken.getRecognizedStr());
+		defMainFunction();
+		while (currentToken.recognizedStrEquals("def")) {
 			defMainFunction();
-		
+		}
 	}
-	
-	private void defMainFunction() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	private void defFunction() {
-		
-	}
-	
-	private void declarations() {
-		
-	}
-	
-	private void declerationLine() {
-		
-	}
-	
-	private void statement() {
-		
-	}
-	
-	private void statements() {
-		
-	}
-	
-	private void simpleStatement() {
-		
-	}
-	
-	private void structuredStatement() {
-		
-	}
-	
-	private void assignmentStat() {
-		
-	}
-	
-	private void printStat() {
-		
-	}
-	
-	private void returnStat() {
-		
-	}
-	
-	private void ifStat() {
-		
-	}
-	
-	private void whileStat() {
-		
-	}
-	
-	private void idList() {
-		
-	}
-	
-	private void expression() {
-		
-	}
-	
-	private void term() {
-		
-	}
-	
-	private void factor() {
-		
-	}
-	
-	private void idTail() {
-		
-	}
-	
-	private void actualParList() {
-		
-	}
-	
-	public void optionalSign() throws Exception {
-		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr())) {
+
+	private void defMainFunction() throws Exception { // TODO ERROR MSGS
+		System.out.println("defMainFunction() "+ currentToken.getRecognizedStr());
+		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
+			if (isID(currentToken)) {
+				loadNextTokenFromLex();
+				String args[] = {"(",")",":","#{"};
+				for (int i = 0; i < args.length; i++) {
+					if (currentToken.getRecognizedStr().equals(args[i])) {
+						loadNextTokenFromLex();
+					} else {
+						throw new Exception("Error expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+					}
+				}
+				declarations();
+				while (currentToken.recognizedStrEquals("def")) {
+					defFunction();
+				}
+				statements();
+				
+				if (currentToken.getRecognizedStr().equals("#}")) {
+					loadNextTokenFromLex();
+				} else {
+					throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+				}
+			}
+		}
+		
+	}
+	
+	private void defFunction() throws Exception {	// TODO ERROR MSGS
+		System.out.println("defFunction() "+ currentToken.getRecognizedStr());
+		if (currentToken.getRecognizedStr().equals("def")) {
+			loadNextTokenFromLex();
+			if (isID(currentToken)) {
+				loadNextTokenFromLex();
+				if (currentToken.recognizedStrEquals("(")) {
+					loadNextTokenFromLex();
+					idList();
+					String args[] = {")",":","#{"};
+					for (int i = 0; i < args.length; i++) {
+						if (currentToken.getRecognizedStr().equals(args[i])) {
+							loadNextTokenFromLex();
+						} else {
+							throw new Exception("Error expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+						}
+					}
+					declarations();
+					while (currentToken.recognizedStrEquals("def")) {
+						defFunction();
+					}
+					statements();
+					
+					if (currentToken.getRecognizedStr().equals("#}")) {
+						loadNextTokenFromLex();
+					} else {
+						throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+					}
+				} else { 
+					throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+				}
+			} else {
+				throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+			}
+		} else {
+			throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
 		}
 	}
 	
-	private void condition() {
+	private void declarations() throws Exception {
+		System.out.println("declarations() "+ currentToken.getRecognizedStr());
+		while (currentToken.recognizedStrEquals("#declare")) {
+			loadNextTokenFromLex();
+			declerationLine();
+		}
+//		loadNextTokenFromLex();
+	}
+	
+	private void declerationLine() throws Exception {
+		System.out.println("declerationLine() "+ currentToken.getRecognizedStr());
+		idList();
+	}
+	
+	private void statement() throws Exception {
+		System.out.println("statement() "+ currentToken.getRecognizedStr());
+		if (isSimpleStatement()) {
+			simpleStatement();
+		} else if (isStructuredStatement()) {
+			structuredStatement();			
+		} else {
+			throw new Exception("lathos stin statement");
+		}
 		
 	}
 	
-	private void boolTerm() {
-		
+	private void statements() throws Exception {	//TODO kathorismos pote teleionei to loop
+		System.out.println("statements() "+ currentToken.getRecognizedStr());
+		statement();
+		while (isStatement()) {
+			statement();
+		}
 	}
 	
-	private void boolFactor() {
-		
+	private boolean isStatement() {
+		return isSimpleStatement() || isStructuredStatement();
 	}
 	
-	private void callMainPart() {
+	private void simpleStatement() throws Exception {
+		System.out.println("simpleStatement() "+ currentToken.getRecognizedStr());
+		if (isID(currentToken)) {
+			loadNextTokenFromLex();
+			assignmentStat();
+		} else if (currentToken.recognizedStrEquals("print")) {
+			printStat();
+		} else if (currentToken.recognizedStrEquals("return")) {
+			returnStat();
+		}
+	}
+	
+	private boolean isSimpleStatement() {
+		return isID(currentToken) || currentToken.recognizedStrEquals("print")
+				|| currentToken.recognizedStrEquals("return");
+	}
+	
+	private void structuredStatement() throws Exception {
+		System.out.println("structuredStatement() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("if")) {
+			loadNextTokenFromLex();
+			ifStat();
+		} else if (currentToken.recognizedStrEquals("while")) {
+			loadNextTokenFromLex();
+			whileStat();
+		}
+	}
+	
+	private boolean isStructuredStatement() {
+		return currentToken.recognizedStrEquals("if") || 
+				currentToken.recognizedStrEquals("while");
+	}
+	
+	private void assignmentStat() throws Exception {
+		System.out.println("assignmentStat() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("=")) {
+			loadNextTokenFromLex();
+			if (isExpression()) {
+//				loadNextTokenFromLex();
+				expression();
+				if (currentToken.recognizedStrEquals(";")) {
+					loadNextTokenFromLex();
+				}
+			} else if (currentToken.recognizedStrEquals("int")) {
+				loadNextTokenFromLex();
+				String nextTks[] = {"(", "input", "(", ")", ")", ";"};
+				for (int i = 0; i < nextTks.length; i++) {
+					if (currentToken.recognizedStrEquals(nextTks[i])) {
+						loadNextTokenFromLex();
+					} else {
+						throw new Exception("Error expected '"+nextTks[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+					}
+				}
+			} else {
+				throw new Exception("[Error] expected '= integer' or '= int(input());' but found '="+currentToken.getRecognizedStr()+"'");
+			}
+		}
+	}
+
+	private boolean isExpression() {
+		return CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))||
+				isFactor();
+	}
+	
+	private boolean isFactor() {
+		return isInteger(currentToken.getRecognizedStr()) ||
+				currentToken.recognizedStrEquals("(") || isID(currentToken);
+	}
+	
+	private void printStat() throws Exception {
+		System.out.println("printStat() "+ currentToken.getRecognizedStr());
+		String args1[] = {"print", "("};
+		for (int i = 0; i < args1.length; i++) {
+			if (currentToken.recognizedStrEquals(args1[i])) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("Error expected '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}
+		}
+		expression();
+		String args2[] = {")", ";"};
+		for (int i = 0; i < args1.length; i++) {
+			if (currentToken.recognizedStrEquals(args2[i])) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("Error expected '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}	
+		}
+	}
+	
+	private void returnStat() throws Exception {
+		System.out.println("returnStat() "+ currentToken.getRecognizedStr());
+		String args1[] = {"return", "("};
+		for (int i = 0; i < args1.length; i++) {
+			if (currentToken.recognizedStrEquals(args1[i])) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("Error expected '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}
+		}
+		expression();
+		String args2[] = {")", ";"};
+		for (int i = 0; i < args1.length; i++) {
+			if (currentToken.recognizedStrEquals(args2[i])) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("Error expected '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}	
+		}
+	}
+	
+	private void ifStat() throws Exception {	//TODO add error messages
+		System.out.println("ifStat() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("(")) {
+			loadNextTokenFromLex();
+			condition();
+			if (currentToken.recognizedStrEquals(")")) {
+				loadNextTokenFromLex();
+				if (currentToken.recognizedStrEquals(":")) {
+					loadNextTokenFromLex();
+					if (currentToken.recognizedStrEquals("#{")) {
+						loadNextTokenFromLex();
+						statements();
+						if (currentToken.recognizedStrEquals("}#")) {
+							loadNextTokenFromLex();
+							elsePart();
+						} else {
+							throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+						}
+					} else if (isStatement()) {
+						statement();
+					} else {
+						throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+					}
+				} else {
+					throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+				}
+			} else {
+				throw new Exception("[Error] expected ')' but found "+currentToken.getRecognizedStr());
+			}
+		}
+	}
+	
+	private void elsePart() throws Exception { //TODO add error messages
+		System.out.println("elsePart() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("else")) {
+			loadNextTokenFromLex();
+			if (currentToken.recognizedStrEquals(":")) {
+				loadNextTokenFromLex();
+				if (currentToken.recognizedStrEquals("#{")) {
+					loadNextTokenFromLex();
+					statements();
+					if (currentToken.recognizedStrEquals("}#")) {
+						loadNextTokenFromLex();
+					} else {
+						throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+					}
+				} else if (isStatement()) {
+					statement();
+				} else {
+					throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+				}
+			} else {
+				throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+			}
+		}
 		
 	}
 
+	private void whileStat() throws Exception {
+		System.out.println("whileStat() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("(")) {
+			loadNextTokenFromLex();
+			condition();
+			if (currentToken.recognizedStrEquals(")")) {
+				loadNextTokenFromLex();
+				if (currentToken.recognizedStrEquals(":")) {
+					loadNextTokenFromLex();
+					if (currentToken.recognizedStrEquals("#{")) {
+						loadNextTokenFromLex();
+						statements();
+						if (currentToken.recognizedStrEquals("#}")) {
+							loadNextTokenFromLex();
+						} else {
+							throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+						}
+					} else if (isStatement()) {
+						statement();
+					} else {
+						throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+					}
+				} else {
+					throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+				}
+			} else {
+				throw new Exception("[Error] expected ')' but found "+currentToken.getRecognizedStr());
+			}
+		} else {
+			throw new Exception("[Error] expected '(' but found "+currentToken.getRecognizedStr());
+		}
+	}
+	
+	private void idList() throws Exception {
+		System.out.println("idList() "+ currentToken.getRecognizedStr());
+		if (isID(currentToken)) {
+			loadNextTokenFromLex();
+			while (currentToken.recognizedStrEquals(",")) {
+				loadNextTokenFromLex();
+				if (isID(currentToken)) {
+					loadNextTokenFromLex();
+				} else {
+					throw new Exception("[Error] expected identifier after ',' but found "+currentToken.getRecognizedStr());
+				}
+			}
+		}
+	}
+	
+	private void expression() throws Exception {
+		System.out.println("expression() "+ currentToken.getRecognizedStr());
+		optionalSign();
+		term();
+		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
+			loadNextTokenFromLex();
+			term();
+		}
+	}
+	
+	private void term() throws Exception {
+		System.out.println("term() "+ currentToken.getRecognizedStr());
+		factor();
+		while (CharTypes.MUL_OPS.contains(currentToken.getRecognizedStr())) {
+			loadNextTokenFromLex();
+			factor();
+		}
+	}
+	
+	private void factor() throws Exception {
+		System.out.println("factor() "+ currentToken.getRecognizedStr());
+		if (isInteger(currentToken.getRecognizedStr())) {
+			loadNextTokenFromLex();
+		} else if (currentToken.recognizedStrEquals("(")) {
+			loadNextTokenFromLex();
+			expression();
+			if (currentToken.recognizedStrEquals(")")) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("[Error:"+currentToken.getLineNum()+"] expected ')' found '"+currentToken.getRecognizedStr()+"'");
+			}
+		} else if (isID(currentToken)) {
+			loadNextTokenFromLex();
+			idTail();
+		} else {
+			throw new Exception("[Error:"+currentToken.getLineNum()+"] at factor !"); 	//TODO make this message more useful
+		}
+	}
+	
+	private boolean isInteger(String str) {
+		System.out.println("isInteger() "+ currentToken.getRecognizedStr());
+		try {
+			Integer.parseInt(str);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	private void idTail() throws Exception {
+		System.out.println("idTail() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("(")) {
+			loadNextTokenFromLex();
+			actualParList();
+			if (currentToken.recognizedStrEquals(")")) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ')' found '"
+						+ currentToken.getRecognizedStr() + "'");
+			}
+		}
+	}
+	
+	private void actualParList() throws Exception {
+		System.out.println("actualParList() "+ currentToken.getRecognizedStr());
+		expression();
+		while (currentToken.recognizedStrEquals(",")) {
+			loadNextTokenFromLex();
+			expression();
+		}
+	}
+	
+	public void optionalSign() throws Exception {	// TODO MAYBE ITS WRONG?
+		System.out.println("optionalSign "+ currentToken.getRecognizedStr());
+		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
+			loadNextTokenFromLex();
+		}
+//		loadNextTokenFromLex();
+	}
+	
+	private void condition() throws Exception {
+		System.out.println("condition() "+ currentToken.getRecognizedStr());
+		if (isBoolFactor()) {
+//			loadNextTokenFromLex();
+			boolTerm();
+		} else if (currentToken.recognizedStrEquals("or")) {
+			while (currentToken.recognizedStrEquals("or")) {
+				loadNextTokenFromLex();
+				boolFactor();
+			}
+		} else {
+			throw new Exception("[Error:"+currentToken.getLineNum()+"] expected 'not' or 'or' found '"+currentToken.getRecognizedStr()+"'");
+		}
+		
+	}
+	
+	private boolean isBoolFactor() {
+		return  currentToken.recognizedStrEquals("[") ||
+				currentToken.recognizedStrEquals("not") || 
+				isExpression();
+	}
+	
+	private void boolTerm() throws Exception {
+		System.out.println("boolTerm() "+ currentToken.getRecognizedStr());
+		boolFactor();
+		while (currentToken.recognizedStrEquals("and")) {
+			loadNextTokenFromLex();
+			boolFactor();
+		}
+	}
+	
+	private void boolFactor() throws Exception {
+		System.out.println("boolFactor() "+ currentToken.getRecognizedStr());
+		if (currentToken.recognizedStrEquals("not")) {
+			loadNextTokenFromLex();
+			if (currentToken.recognizedStrEquals("[")) {
+				loadNextTokenFromLex();
+				condition();
+				if (currentToken.recognizedStrEquals("]")) {
+					loadNextTokenFromLex();
+				} else {
+					throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ']' found '"
+							+ currentToken.getRecognizedStr() + "'");
+				}
+			} throw new Exception("[Error:" + currentToken.getLineNum() + "] expected '[' found '"+ currentToken.getRecognizedStr() + "'");
+			
+		} else if (currentToken.recognizedStrEquals("[")) {
+			loadNextTokenFromLex();
+			condition();
+			if (currentToken.recognizedStrEquals("]")) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ']' found '"
+						+ currentToken.getRecognizedStr() + "'");
+			}
+		} else if (isExpression()) {
+			expression();
+			if (CharTypes.REL_OPS.contains((currentToken.getRecognizedStr()))) {
+				loadNextTokenFromLex();
+			} else {
+				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected relation operator but found '"+ currentToken.getRecognizedStr() + "'");
+			} 
+			expression();
+		}
+	}
+	
+	private void callMainPart() throws Exception {
+		if (!currentToken.getRecognizedStr().equals(FileReader.EOF)) {
+			String args[] = {"if", "__name__", "==", "\"__main__\"", ":"};
+			for (int i = 0; i < args.length; i++) {
+				if (currentToken.getRecognizedStr().equals(args[i])) {
+					loadNextTokenFromLex();
+				} else {
+					throw new Exception("[Error] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
+				}
+			}
+			mainFunctionCall();
+			while (isID(currentToken)) {
+				mainFunctionCall();
+			}			
+		}
+	}
+
 	public void mainFunctionCall() throws Exception {
-		loadNextTokenFromLex();
+//		loadNextTokenFromLex();
 		if (isID(currentToken)) {
 			loadNextTokenFromLex();
 			String args[] = {"(",")",";"};
@@ -161,6 +553,7 @@ public class SyntaxAnalyser {
 	}
 	
 	public boolean isID(Token token) {
+		System.out.println("isID() "+ currentToken.getRecognizedStr());
 		return token.getFamily().equals("identifier");
 	}
 
