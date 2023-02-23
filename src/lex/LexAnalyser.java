@@ -34,9 +34,9 @@ public class LexAnalyser {
 		} else if (c.equals('/')) {
 			return getMulOperatorDivToken();
 		} else if (c.equals('<')) {
-			return getRealOperatorSmallerToken();
+			return getRelOperatorSmallerToken();
 		} else if (c.equals('>')) {
-			return getRealOperatorSmallerToken();
+			return getRelOperatorLargerToken();
 		} else if (c.equals('#')) {
 			return getSharpToken();
 		} else if (c.equals('=')) {
@@ -196,11 +196,22 @@ public class LexAnalyser {
 		return new Token(processedStr, "mulOperator", lineNum);
 	}
 	
-	private Token getRealOperatorSmallerToken() throws Exception {
+	private Token getRelOperatorSmallerToken() throws Exception {
 		Character c = readChar();
 		if (c.equals('<')) {
 			throw new Exception("[Error]: found '<<' must be < or <> or <=");
 		} else if (c.equals('>') || c.equals('=')) {
+			return new Token(processedStr, "relOperator", lineNum);
+		}
+		unReadChar();
+		return new Token(processedStr, "relOperator", lineNum);
+	}
+	
+	private Token getRelOperatorLargerToken() throws Exception {
+		Character c = readChar();
+		if (c.equals('>') || c.equals('<')) {
+			throw new Exception("[Error]: found '>"+c+"' must be > or >=");
+		} else if (c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
 		}
 		unReadChar();

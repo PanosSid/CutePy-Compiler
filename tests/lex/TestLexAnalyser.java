@@ -269,6 +269,15 @@ public class TestLexAnalyser {
 	}
 	
 	@Test
+	public void testRelOperatorLarger() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents("  >= >");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Assertions.assertEquals(new Token(">=", "relOperator", 1), lex.getToken());	
+		Assertions.assertEquals(new Token(">", "relOperator", 1), lex.getToken());	
+	}
+	
+	@Test
 	public void testCountDigitsMethod() throws Exception {
 		FileReader reader = new FileReader();
 		reader.setFileContents(

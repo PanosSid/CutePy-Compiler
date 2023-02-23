@@ -25,8 +25,13 @@ public class SyntaxAnalyser {
 	
 	public void analyzeSyntax() throws Exception {
 		loadNextTokenFromLex();
-		startRule();
-		System.out.println("Compilation successfully completed");
+		try {
+			startRule();
+			System.out.println("Compilation successfully completed");
+		} catch (Exception e) {
+			System.out.println("Compilation FAILED");
+
+		}
 	}
 	
 	
@@ -441,7 +446,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	public void optionalSign() throws Exception {
+	private void optionalSign() throws Exception {
 		System.out.println("optionalSign "+ currentToken.getRecognizedStr());
 		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			loadNextTokenFromLex();
