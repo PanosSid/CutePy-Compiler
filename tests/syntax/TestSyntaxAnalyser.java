@@ -69,7 +69,6 @@ public class TestSyntaxAnalyser {
 				+ "if __name__ == \"__main__\":\r\n"
 				+ "\t mainFunc1();\r\n"
 				);
-//		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
 		Token expectedPrevTk = new Token(";", "delimiter", 10);
@@ -77,7 +76,6 @@ public class TestSyntaxAnalyser {
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
 	
-//	@Ignore
 	@Test
 	public void testMain_CountDigits() throws Exception {
 		setUpSyntaxAnalyser(""
@@ -179,6 +177,232 @@ public class TestSyntaxAnalyser {
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
 	
+	@Test
+	public void testMainPrimes() throws Exception {
+		setUpSyntaxAnalyser(""
+				+"def main_primes():\r\n"
+				+ "#{\r\n"
+				+ "	#declare i\r\n"
+				+ "\r\n"
+				+ "	def isPrime(x):\r\n"
+				+ "	#{\r\n"
+				+ "		#declare i\r\n"
+				+ "\r\n"
+				+ "		def divides(x,y):\r\n"
+				+ "		#{\r\n"
+				+ "			if (y == (y//x) * x):\r\n"
+				+ "				return (1);\r\n"
+				+ "			else:\r\n"
+				+ "				return (0);\r\n"
+				+ "		#}\r\n"
+				+ "\r\n"
+				+ "		i = 2;\r\n"
+				+ "		while (i<x):\r\n"
+				+ "		#{\r\n"
+				+ "			if (divides(i,x)==1):\r\n"
+				+ "				return (0);\r\n"
+				+ "			i = i + 1;\r\n"
+				+ "		#}\r\n"
+				+ "	return (1);\r\n"
+				+ "\r\n"
+				+ "	#}\r\n"
+				+ "	#$ body of main_primes #$\r\n"
+				+ "	i = 2;\r\n"
+				+ "	while (i<=30):\r\n"
+				+ "		if (isPrime(i)==1):\r\n"
+				+ "			print(i);\r\n"
+				+ "	i = i + 1;\r\n"
+				+ "\r\n"
+				+ "#}\r\n"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "");
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(39);
+		Token expectedPrevTk = new Token(";", "delimiter", 38);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	
+	@Test
+	public void testIfStat() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "\tif (x == 5):\r\n"
+				+ "\t#{\r\n"
+				+ "\t\tx = 2 * 5;\r\n"
+				+ "\t\tprint(x);\r\n"
+				+ "\t#}\n"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(11);
+		Token expectedPrevTk = new Token(";", "delimiter", 10);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testIfElseMultipleStat() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "\tif (x == 5):\r\n"
+				+ "\t#{\r\n"
+				+ "\t\tx = 2 * 5;\r\n"
+				+ "\t\tprint(x);\r\n"
+				+ "\t#}\n"
+				+ "\telse:\r\n"
+				+ "\t#{\r\n"
+				+ "\t\treturn(0);\r\n"
+				+ "\t#}"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+//		syntax.setCurrentToken();
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(14);
+		Token expectedPrevTk = new Token(";", "delimiter", 13);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testIfElseOneStat() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "if (x == 5):\r\n"
+				+ "\tx = 2 * 5;\r\n"
+				+ "else:\r\n"
+				+ "\treturn(0);\r\n"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(10);
+		Token expectedPrevTk = new Token(";", "delimiter", 9);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testIfMultipleStatElseOne() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "if (x == 5):\r\n"
+				+ "\t#{\r\n"
+				+ "\t\tx = 2 * 5;\r\n"
+				+ "\t#}\n"
+				+ "else:\r\n"
+				+ "\treturn(0);\r\n"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(12);
+		Token expectedPrevTk = new Token(";", "delimiter", 11);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testBoolTerms() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "\tif ( not [x > 0] and [x == 0] or [x <= 0]):\r\n"
+				+ "\t\treturn(-1);"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(7);
+		Token expectedPrevTk = new Token(";", "delimiter", 6);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testBoolTermSmall() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "\tif ([x == 0] or [x <= 0]):\r\n"
+				+ "\t\treturn(-1);"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(7);
+		Token expectedPrevTk = new Token(";", "delimiter", 6);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+
+	@Test
+	public void testMultipleFunctionCalls() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def mainFunc1():\n"
+				+ "#{\n"
+				+ "\treturn(1);"
+				+ "#}\n"
+				+ "def mainFunc2():\n"
+				+ "#{\n"
+				+ "\treturn(2);"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				+ "\t mainFunc2();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(10);
+		Token expectedPrevTk = new Token(";", "delimiter", 9);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
+	
+	@Test
+	public void testDefFunctions() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_primes():\r\n"
+				+ "#{\r\n"
+				+ "	#declare i\r\n"
+				+ "\r\n"
+				+ "	def isPrime(x):\r\n"
+				+ "	#{\r\n"
+				+ "		i = 2;\r\n"
+				+ "		i = i + 2;\r\n"
+				+ "	#}\r\n"
+				+ "\r\n"
+				+ "	i = i * 1;\r\n"
+				+ "\r\n"
+				+ "#}\r\n"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "	"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(18);
+		Token expectedPrevTk = new Token(";", "delimiter",17);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+	}
 	
 	
 }

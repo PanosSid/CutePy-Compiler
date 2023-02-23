@@ -103,7 +103,7 @@ public class LexAnalyser {
 	private Token skipComment() throws Exception {
 		Character c = readChar();
 		if (c.equals('$')) {
-			while (readChar() != '#') {
+			while (c != '#') {
 				c = readChar();
 				if (c.equals(FileReader.EOF)) {
 					throw new Exception("[Error] comment is not closed!!");
@@ -112,7 +112,7 @@ public class LexAnalyser {
 					lineNum++;
 				}
 			}
-			while (readChar() != '$') {
+			while (c != '$') {
 				c = readChar();
 				if (c.equals(FileReader.EOF)) {
 					throw new Exception("[Error] comment is not closed!!");
@@ -121,7 +121,7 @@ public class LexAnalyser {
 			return getToken();
 			
 		}
-		throw new Exception("Not implemented yet need to check for #declare");
+		throw new Exception("Not implemented yet need to check for #declare");	// TODO fix this error
 	}
 
 	private Character readChar() {

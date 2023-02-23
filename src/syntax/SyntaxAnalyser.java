@@ -9,18 +9,14 @@ public class SyntaxAnalyser {
 	private LexAnalyser lex;
 	private Token currentToken;
 	private Token prevToken;
+	private String recognisedCode =""; 	// used for debugging
 	
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
-
 	}
 		
 	public Token getCurrentToken() {
 		return currentToken;
-	}
-	
-	public void setCurrentToken(Token currenToken) {
-		this.currentToken = currenToken;
 	}
 
 	public Token getPrevToken() {
@@ -104,16 +100,16 @@ public class SyntaxAnalyser {
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+						throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected '#}' but found '" +  currentToken.getRecognizedStr()+ "' ");
 					}
 				} else { 
-					throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+					throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected '(' but found '" +  currentToken.getRecognizedStr()+ "' ");
 				}
 			} else {
-				throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+				throw new Exception("Error expected identifier but found '"+currentToken.getRecognizedStr()+"'");
 			}
 		} else {
-			throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+			throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected 'def' but found '" +  currentToken.getRecognizedStr()+ "' ");
 		}
 	}
 	
@@ -123,7 +119,6 @@ public class SyntaxAnalyser {
 			loadNextTokenFromLex();
 			declerationLine();
 		}
-//		loadNextTokenFromLex();
 	}
 	
 	private void declerationLine() throws Exception {
@@ -193,7 +188,6 @@ public class SyntaxAnalyser {
 		if (currentToken.recognizedStrEquals("=")) {
 			loadNextTokenFromLex();
 			if (isExpression()) {
-//				loadNextTokenFromLex();
 				expression();
 				if (currentToken.recognizedStrEquals(";")) {
 					loadNextTokenFromLex();
@@ -265,8 +259,8 @@ public class SyntaxAnalyser {
 			}	
 		}
 	}
-	
-	private void ifStat() throws Exception {	//TODO add error messages
+
+	private void ifStat() throws Exception {	//TODO  write tests and add error messages 
 		System.out.println("ifStat() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -278,7 +272,7 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals("#{")) {
 						loadNextTokenFromLex();
 						statements();
-						if (currentToken.recognizedStrEquals("}#")) {
+						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 							elsePart();
 						} else {
@@ -286,6 +280,9 @@ public class SyntaxAnalyser {
 						}
 					} else if (isStatement()) {
 						statement();
+						if (currentToken.recognizedStrEquals("else")) {
+							elsePart();
+						}
 					} else {
 						throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 					}
@@ -297,8 +294,8 @@ public class SyntaxAnalyser {
 			}
 		}
 	}
-	
-	private void elsePart() throws Exception { //TODO add error messages
+
+	private void elsePart() throws Exception { //TODO add error messages + check name of method
 		System.out.println("elsePart() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("else")) {
 			loadNextTokenFromLex();
@@ -307,7 +304,7 @@ public class SyntaxAnalyser {
 				if (currentToken.recognizedStrEquals("#{")) {
 					loadNextTokenFromLex();
 					statements();
-					if (currentToken.recognizedStrEquals("}#")) {
+					if (currentToken.recognizedStrEquals("#}")) {
 						loadNextTokenFromLex();
 					} else {
 						throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
@@ -435,7 +432,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void actualParList() throws Exception {
+	private void actualParList() throws Exception {	// TODO write tests
 		System.out.println("actualParList() "+ currentToken.getRecognizedStr());
 		expression();
 		while (currentToken.recognizedStrEquals(",")) {
@@ -444,46 +441,38 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	public void optionalSign() throws Exception {	// TODO MAYBE ITS WRONG?
+	public void optionalSign() throws Exception {
 		System.out.println("optionalSign "+ currentToken.getRecognizedStr());
 		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			loadNextTokenFromLex();
 		}
-//		loadNextTokenFromLex();
 	}
 	
-	private void condition() throws Exception {
+	private void condition() throws Exception { 
 		System.out.println("condition() "+ currentToken.getRecognizedStr());
-		if (isBoolFactor()) {
-//			loadNextTokenFromLex();
-			boolTerm();
-		} else if (currentToken.recognizedStrEquals("or")) {
-			while (currentToken.recognizedStrEquals("or")) {
-				loadNextTokenFromLex();
-				boolFactor();
-			}
-		} else {
-			throw new Exception("[Error:"+currentToken.getLineNum()+"] expected 'not' or 'or' found '"+currentToken.getRecognizedStr()+"'");
-		}
-		
+		boolTerm();
+		while (currentToken.recognizedStrEquals("or")) {
+			loadNextTokenFromLex();
+			boolFactor();
+		}		
 	}
 	
-	private boolean isBoolFactor() {
-		return  currentToken.recognizedStrEquals("[") ||
-				currentToken.recognizedStrEquals("not") || 
-				isExpression();
-	}
+//	private boolean isBoolFactor() {
+//		return  currentToken.recognizedStrEquals("[") ||
+//				currentToken.recognizedStrEquals("not") || 
+//				isExpression();
+//	}
 	
 	private void boolTerm() throws Exception {
 		System.out.println("boolTerm() "+ currentToken.getRecognizedStr());
-		boolFactor();
+		boolFactor();	//isos kati edo paizei
 		while (currentToken.recognizedStrEquals("and")) {
 			loadNextTokenFromLex();
 			boolFactor();
 		}
 	}
 	
-	private void boolFactor() throws Exception {
+	private void boolFactor() throws Exception { 	// TODO write tests
 		System.out.println("boolFactor() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("not")) {
 			loadNextTokenFromLex();
@@ -496,7 +485,9 @@ public class SyntaxAnalyser {
 					throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ']' found '"
 							+ currentToken.getRecognizedStr() + "'");
 				}
-			} throw new Exception("[Error:" + currentToken.getLineNum() + "] expected '[' found '"+ currentToken.getRecognizedStr() + "'");
+			} else {
+				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected '[' found '"+ currentToken.getRecognizedStr() + "'");
+			}
 			
 		} else if (currentToken.recognizedStrEquals("[")) {
 			loadNextTokenFromLex();
@@ -515,11 +506,13 @@ public class SyntaxAnalyser {
 				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected relation operator but found '"+ currentToken.getRecognizedStr() + "'");
 			} 
 			expression();
+		} else {
+			throw new Exception("[Error:" + currentToken.getLineNum() + "] 'not[condition]' or '[condition]' or 'expression relOp expression' but found '"+ currentToken.getRecognizedStr() + "'");
 		}
 	}
 	
 	private void callMainPart() throws Exception {
-		if (!currentToken.getRecognizedStr().equals(FileReader.EOF)) {
+		if (!currentToken.getRecognizedStr().equals(FileReader.EOF.toString())) {
 			String args[] = {"if", "__name__", "==", "\"__main__\"", ":"};
 			for (int i = 0; i < args.length; i++) {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
@@ -536,7 +529,6 @@ public class SyntaxAnalyser {
 	}
 
 	public void mainFunctionCall() throws Exception {
-//		loadNextTokenFromLex();
 		if (isID(currentToken)) {
 			loadNextTokenFromLex();
 			String args[] = {"(",")",";"};
@@ -560,6 +552,8 @@ public class SyntaxAnalyser {
 	private void loadNextTokenFromLex() throws Exception {
 		prevToken = currentToken;
 		currentToken = lex.getToken();
+		recognisedCode += currentToken.getRecognizedStr()+"\n";
+		System.out.println(recognisedCode);
 	}
 	
 }
