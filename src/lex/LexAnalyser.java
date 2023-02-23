@@ -16,7 +16,7 @@ public class LexAnalyser {
 		processedStr = "";
 	}
 
-	public Token getToken() throws Exception { // + gia ta cutepycomments!!!!!
+	public Token getToken() throws Exception { 
 		resetProcessedStr();
 		Character c = readChar();
 		if (CharTypes.LETTERS.contains(c)) {
@@ -44,7 +44,7 @@ public class LexAnalyser {
 		} else if (c.equals(' ') || c.equals('\t')) {
 			return getToken();
 		} else if (c.equals('_')) {
-			return getUnderscoreToken();
+			return getUnderscoreNameToken();
 		} else if (c.equals('\"')) {
 			return getStrMainToken();
 		} else if (isNewLine(c)) {
@@ -53,49 +53,25 @@ public class LexAnalyser {
 		} else if (c.equals(FileReader.EOF)) {
 			return new EOFToken(lineNum);
 		}
-		
 		throw new Exception("[Error] found char '"+c+"' that doesnt belong in the CutePy alphabet");
-//		return null;
 	}
 	
-	private Token getStrMainToken() throws Exception { //TODO better error msgs
-		Character c = readChar();	
-		Character main[] = { '_', '_', 'm', 'a', 'i', 'n', '_', '_', '\"' };
-		for (int i = 0; i < main.length; i++) {
-			if (c.equals(main[i])) {
-				c = readChar();
-			} else {
-				throw new Exception("[Error: at line" + lineNum + "] expected '" + main[i] + "' but found '" + c + "'");
-			}
-		}
-		unReadChar();
-		return new Token(processedStr, "keyword", lineNum);
+	private Token getStrMainToken() throws Exception { 
+		return getTokenAfterRecognisingConsecutiveChars("__main__\"" ,"keyword");
 	}
 
-	private Token getUnderscoreToken() throws Exception {
-		Character c = readChar();		
-		if (c.equals('_')) {
-			c = readChar();	
-			if (c.equals('n')) {
-				Character name[] = { 'a', 'm', 'e', '_', '_'};
-				c = readChar();	
-				for (int i = 0; i < name.length; i++) {
-					if (c.equals(name[i])) {
-						c = readChar();
-					} else {
-						throw new Exception(
-								"[Error: at line" + lineNum + "] expected '" + name[i] + "' but found '" + c + "' ");
-					}
-				}
-				unReadChar();
-				return new Token(processedStr, "keyword", lineNum);
+	private Token getUnderscoreNameToken() throws Exception {
+		return getTokenAfterRecognisingConsecutiveChars("_name__" ,"keyword");
+	}
+	
+	private Token getTokenAfterRecognisingConsecutiveChars(String reconStr,
+			String tokenToBeReconFamily) throws Exception {
+		for (int i = 0; i < reconStr.length(); i++) {
+			if (readChar() != reconStr.charAt(i)) {
+				throw new Exception("[Error: at line" + lineNum + "] expected '" + reconStr + "' but found '" +  reconStr.charAt(i) + "' "); //TODO better error msgs
 			}
-			throw new Exception(
-					"[Error: at line" + lineNum + "] expected '__name__' but found '__" + c + "' ");
 		}
-		throw new Exception(
-				"[Error: at line" + lineNum + "] expected '__name__' or '\"__main__\"' but found '_" + c + "' ");
-
+		return new Token(processedStr, "keyword", lineNum);
 	}
 
 	private Token getSharpToken() throws Exception {
