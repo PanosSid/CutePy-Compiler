@@ -143,7 +143,7 @@ public class SyntaxAnalyser {
 		
 	}
 	
-	private void statements() throws Exception {	//TODO kathorismos pote teleionei to loop
+	private void statements() throws Exception {
 		System.out.println("statements() "+ currentToken.getRecognizedStr());
 		statement();
 		while (isStatement()) {

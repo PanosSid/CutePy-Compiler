@@ -24,11 +24,13 @@ public class TestSyntaxAnalyser {
 	
 	@Test
 	public void testMainFunctionCall() throws Exception {
-		setUpSyntaxAnalyser(" main_func();");
-//		syntax.setCurrentToken();
-		syntax.mainFunctionCall();
-		Token expectedCurrentTk = new EOFToken(1);
-		Token expectedPrevTk = new Token(";", "delimiter", 1);
+		setUpSyntaxAnalyser(""
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFuncCall();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(3);
+		Token expectedPrevTk = new Token(";", "delimiter", 2);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -41,11 +43,14 @@ public class TestSyntaxAnalyser {
 				+ "#}\n"
 				+ "def mainFunc2():\n"
 				+ "#{ statement2\n"
-				+ "#}\n");
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
 //		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(7);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 6);
+		Token expectedCurrentTk = new EOFToken(9);
+		Token expectedPrevTk = new Token(";", "delimiter", 8);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -60,11 +65,14 @@ public class TestSyntaxAnalyser {
 				+ "\tx1 = y1 + y2\n"
 				+ "\tprint(x1);\n"
 				+ "\treturn(-x1);\n"
-				+ "#}\n");
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t mainFunc1();\r\n"
+				);
 //		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(9);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 8);
+		Token expectedCurrentTk = new EOFToken(11);
+		Token expectedPrevTk = new Token(";", "delimiter", 10);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -84,10 +92,13 @@ public class TestSyntaxAnalyser {
 				+ "		count = count + 1;\r\n"
 				+ "	#}\r\n"
 				+ "	print(count);\r\n"
-				+ "#}\n");
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_countdigits();\r\n"
+				);
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(13);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 12);
+		Token expectedCurrentTk = new EOFToken(15);
+		Token expectedPrevTk = new Token(";", "delimiter", 14);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -104,10 +115,13 @@ public class TestSyntaxAnalyser {
 				+ "		z = y // 10;\r\n"
 				+ "		count = count + 1;\r\n"
 				+ "	print(count);\r\n"
-				+ "#}\n");
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_countdigits();\r\n"
+				);
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(10);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 9);
+		Token expectedCurrentTk = new EOFToken(12);
+		Token expectedPrevTk = new Token(";", "delimiter", 11);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -122,10 +136,13 @@ public class TestSyntaxAnalyser {
 				+ "		x = x // 10;\r\n"
 				+ "		count = count + 1;\r\n"
 				+ "	#}\r\n"
-				+ "#}\n");
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_countdigits();\r\n"
+				);
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(9);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 8);
+		Token expectedCurrentTk = new EOFToken(11);
+		Token expectedPrevTk = new Token(";", "delimiter", 10);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}
@@ -153,12 +170,11 @@ public class TestSyntaxAnalyser {
 				+ "#}\n"
 				+ "\r\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "#$ call of main functions #$\r\n"
 				+ "main_factorial();\r\n"
 				+ "\r\n");
 		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(19);
-		Token expectedPrevTk = new Token("#}", "groupOperator", 18);
+		Token expectedCurrentTk = new EOFToken(23);
+		Token expectedPrevTk = new Token(";", "delimiter", 21);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}

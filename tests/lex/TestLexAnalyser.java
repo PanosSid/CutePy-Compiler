@@ -99,6 +99,34 @@ public class TestLexAnalyser {
 	}
 	
 	@Test
+	public void testIfNameEqualsMain() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents(""
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "\tmain_factorial();\r\n");
+		LexAnalyser lex = new LexAnalyser(reader);
+		List<Token> expectedTokens = Arrays.asList(new Token[] {
+				new Token("if", "keyword", 1),
+				new Token("__name__", "keyword", 1),
+				new Token("==", "relOperator", 1),
+				new Token("\"__main__\"", "keyword", 1),
+				new Token(":", "delimiter", 1),
+				new Token("main_factorial", "identifier", 3),
+				new Token("(", "groupOperator", 3),
+				new Token(")", "groupOperator", 3),
+				new Token(";", "delimiter", 3)
+		});
+
+		List<Token> actualTokens = new ArrayList<Token>();
+		for (int i = 0; i < expectedTokens.size(); i++) {
+			actualTokens.add(lex.getToken());
+		}
+		compareListOfTokens(expectedTokens, actualTokens);
+	}
+	
+	
+	@Test
 	public void testUnderscoreMain() throws Exception {
 		FileReader reader = new FileReader();
 		reader.setFileContents(" \"__main__\"");

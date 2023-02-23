@@ -68,10 +68,11 @@ public class LexAnalyser {
 				throw new Exception("[Error: at line" + lineNum + "] expected '" + main[i] + "' but found '" + c + "'");
 			}
 		}
+		unReadChar();
 		return new Token(processedStr, "keyword", lineNum);
 	}
 
-	private Token getUnderscoreToken() throws Exception {	//TODO check for trim
+	private Token getUnderscoreToken() throws Exception {
 		Character c = readChar();		
 		if (c.equals('_')) {
 			c = readChar();	
@@ -86,7 +87,8 @@ public class LexAnalyser {
 								"[Error: at line" + lineNum + "] expected '" + name[i] + "' but found '" + c + "' ");
 					}
 				}
-				return new Token(processedStr.trim(), "keyword", lineNum);
+				unReadChar();
+				return new Token(processedStr, "keyword", lineNum);
 			}
 			throw new Exception(
 					"[Error: at line" + lineNum + "] expected '__name__' but found '__" + c + "' ");
