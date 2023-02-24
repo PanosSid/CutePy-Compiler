@@ -105,4 +105,5 @@ if __name__ == "__main__":
 	main_fibonacci();
 	main_countdigits();
 	main_primes();
+	main_factorial2();
 	

@@ -40,8 +40,8 @@ public class TestAcceptancePhase1 {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
-		Token expectedCurrentTk = new EOFToken(108);
-		Token expectedPrevTk = new Token(";", "delimiter", 107);
+		Token expectedCurrentTk = new EOFToken(109);
+		Token expectedPrevTk = new Token(";", "delimiter", 108);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
 	}

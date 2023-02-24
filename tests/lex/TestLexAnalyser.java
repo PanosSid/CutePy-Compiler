@@ -247,16 +247,36 @@ public class TestLexAnalyser {
 		compareListOfTokens(expectedTokens, actualTokens);
 	}
 	
+	@Test
+	public void testCommentThatContainsHashTag() throws Exception {
+		FileReader reader = new FileReader();
+		reader.setFileContents(""
+				+ "#$ body of \r\n"
+				+ "	main_factorial2 # panos\r\n"
+				+ " sid3_#ou!os22 #$ \r\n"
+				+ "def\r\n");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Assertions.assertEquals(new Token("def", "keyword", 4), lex.getToken());	
+	}
 	
-	
+	@Test
+	public void testUnclossedCommentThatContainsHashTag() {
+		FileReader reader = new FileReader();
+		reader.setFileContents(""
+				+ "#$ body of \r\n"
+				+ "	primes2 # panos $\r\n");
+		LexAnalyser lex = new LexAnalyser(reader);
+		Exception thrown = assertThrows(Exception.class, () -> lex.getToken());
+		Assertions.assertEquals("[Error: at line 2] comment is not closed!!", thrown.getMessage());	
+	}
 	
 	@Test
 	public void testUnclosedCommentThrowsException() {
 		FileReader reader = new FileReader();
-		reader.setFileContents(" #$ : 547 ");
+		reader.setFileContents(" #$ : 547 \n");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(Exception.class, () -> lex.getToken());
-		Assertions.assertTrue(thrown.getMessage().contentEquals("[Error] comment is not closed!!"));
+		Assertions.assertEquals("[Error: at line 1] comment is not closed!!", thrown.getMessage());	
 	}
 	
 	@Test

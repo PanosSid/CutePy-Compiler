@@ -1,7 +1,9 @@
 package lex;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CharTypes {
 	
@@ -22,16 +24,20 @@ public class CharTypes {
 	
 	public static final List<String> REL_OPS = Arrays.asList(new String[] { "<", "<=", ">", ">=", "<>", "=="});
 	
-//	public static final List<List<Character>> ALL_TYPES = new ArrayList<>();
-//	
-//	public static void initListWithAllCharTypes() {
-//		ALL_TYPES.add(ADD_OPS);
-//		ALL_TYPES.add(DELIMITERS);
-//		ALL_TYPES.add(GROUP_SUMBOLS);
-//		ALL_TYPES.add(ASGN);
-//		ALL_TYPES.add(SMALLER);
-//		ALL_TYPES.add(LARGER);
-//		ALL_TYPES.add(LETTERS);
-//		ALL_TYPES.add(DIGITS);
-//	}
+	public static boolean isNotInAlphabet(Character c) {
+		Set<Character> CUTEPY_ALPHABET = new HashSet<Character>();
+		CUTEPY_ALPHABET.addAll(ADD_OPS);
+		CUTEPY_ALPHABET.addAll(DELIMITERS);
+		CUTEPY_ALPHABET.addAll(GROUP_SUMBOLS);
+		CUTEPY_ALPHABET.addAll(ASGN);
+		CUTEPY_ALPHABET.addAll(SMALLER);
+		CUTEPY_ALPHABET.addAll(LARGER);
+		CUTEPY_ALPHABET.addAll(LETTERS);
+		CUTEPY_ALPHABET.addAll(DIGITS);
+		CUTEPY_ALPHABET.addAll(UNDERCORE);
+		CUTEPY_ALPHABET.add('*');
+		CUTEPY_ALPHABET.add('<');
+		CUTEPY_ALPHABET.add('>');
+		return !CUTEPY_ALPHABET.contains(c);
+	}
 }
