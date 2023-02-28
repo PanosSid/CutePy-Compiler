@@ -1,4 +1,4 @@
-package syntax;
+package acceptance;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,10 +7,14 @@ import lex.EOFToken;
 import lex.FileReader;
 import lex.LexAnalyser;
 import lex.Token;
+import syntax.SyntaxAnalyser;
 
+/*
+ * Acceptance testing for Lex and Syntax analyzer
+ */
 public class TestAcceptancePhase1 {
 	
-	private String TEST_FILES_PATH = "D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\tests\\syntax\\"; 
+	private String TEST_FILES_PATH = "D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\tests\\acceptance\\"; 
 	
 	@Test
 	public void testAllFunctions() {

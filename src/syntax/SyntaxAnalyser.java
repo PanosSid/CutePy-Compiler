@@ -25,13 +25,15 @@ public class SyntaxAnalyser {
 	
 	public void analyzeSyntax() throws Exception {
 		loadNextTokenFromLex();
-		try {
-			startRule();
-			System.out.println("Compilation successfully completed");
-		} catch (Exception e) {
-			System.out.println("Compilation FAILED");
-
-		}
+		startRule();
+		
+//		try {
+//			startRule();
+//			System.out.println("Compilation successfully completed");
+//		} catch (Exception e) {
+//			System.out.println("Compilation FAILED");
+//
+//		}
 	}
 	
 	
@@ -560,5 +562,5 @@ public class SyntaxAnalyser {
 		recognisedCode += currentToken.getRecognizedStr()+"\n";
 		System.out.println(recognisedCode);
 	}
-	
+
 }

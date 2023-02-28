@@ -57,23 +57,13 @@ public class LexAnalyser {
 	}
 	
 	private Token getStrMainToken() throws Exception { 
-		return getTokenAfterRecognisingConsecutiveChars("__main__\"" ,"keyword");
+		return getTokenAfterRecognisingConsecutiveChars("\"__main__\"" ,"keyword");
 	}
 
 	private Token getUnderscoreNameToken() throws Exception {
-		return getTokenAfterRecognisingConsecutiveChars("_name__" ,"keyword");
+		return getTokenAfterRecognisingConsecutiveChars("__name__" ,"keyword");
 	}
 	
-	private Token getTokenAfterRecognisingConsecutiveChars(String reconStr,
-			String tokenToBeReconFamily) throws Exception {
-		for (int i = 0; i < reconStr.length(); i++) {
-			if (readChar() != reconStr.charAt(i)) {
-				throw new Exception("[Error: at line" + lineNum + "] expected '" + reconStr + "' but found '" +  reconStr.charAt(i) + "' ");
-			}
-		}
-		return new Token(processedStr, "keyword", lineNum);
-	}
-
 	private Token getSharpToken() throws Exception {
 		Character c = readChar();
 		if (c.equals('$')) {
@@ -90,10 +80,16 @@ public class LexAnalyser {
 	}
 
 	private Token getDeclareToken() throws Exception {
-		String declare = "declare";
-		for (int i = 1; i < declare.length(); i++) {
-			if (readChar() != declare.charAt(i)) {
-				throw new Exception("Eror not declare but #"+declare.substring(i));
+		return getTokenAfterRecognisingConsecutiveChars("declare" ,"keyword");
+	}
+	
+	private Token getTokenAfterRecognisingConsecutiveChars(String reconStr,
+			String tokenToBeReconFamily) throws Exception {
+		unReadChar();
+		for (int i = 0; i < reconStr.length(); i++) {
+			Character c = readChar();
+			if (c != reconStr.charAt(i)) {
+				throw new Exception("[Error: at line " + lineNum + "] expected '" + reconStr + "' but found '" +  processedStr + "' ");
 			}
 		}
 		return new Token(processedStr, "keyword", lineNum);
@@ -157,28 +153,35 @@ public class LexAnalyser {
 		unReadChar();
 		if (KEYWORDS.contains(processedStr)) {
 			return new Token(processedStr, "keyword", lineNum);
-		} else if (!processedStr.startsWith("#")) {
-			return new Token(processedStr, "identifier", lineNum);			
-		} else if (CharTypes.isNotInAlphabet(c)){
-			throw new Exception("[Error at line:"+lineNum+"] found char '"+c+"' that doesnt belong in the CutePy alphabet");
 		}
-		throw new Exception("System Error: at line"+lineNum+" "); //TODO pio kalo minima;
+		return new Token(processedStr, "identifier", lineNum);
 	}
 
 	private Token getNumberToken() throws Exception {
 		Character c = readChar();
 		if (Character.isAlphabetic(c)) {
-			throw new Exception("[Error: at line"+lineNum+"] found letter after character on line:" + lineNum);
+			throw new Exception("[Error: at line"+lineNum+"] found letter after character on line: " + lineNum);
 		} else if (Character.isDigit(c)) {
 			return getNumberToken();
 		}
 		unReadChar();
-		if (Integer.parseInt(processedStr) < (-Math.pow(2, 32) - 1)
-				|| Integer.parseInt(processedStr) > (Math.pow(2, 32) - 1)) {
+		if (isNumberOutOfBounds()) {
 			throw new Exception("[Error: at line"+lineNum+"] found integer with value outside of the limits");
 		}
 		return new Token(processedStr, "number", lineNum);
 	}
+	
+	// TODO parsed number is integer so the negative check is not needed
+	private boolean isNumberOutOfBounds() {
+		try {
+			Integer parsedNum = Integer.parseInt(processedStr);
+			return (parsedNum < (-Math.pow(2, 32) - 1)
+					|| parsedNum > (Math.pow(2, 32) - 1));
+		} catch (NumberFormatException e) { 
+			return true;
+		}
+	}
+	
 
 	private Token getAddOperatorToken() throws Exception {
 		return new Token(processedStr, "addOperator", lineNum);
@@ -191,7 +194,7 @@ public class LexAnalyser {
 	private Token getMulOperatorDivToken() throws Exception {
 		Character c = readChar();
 		if (!c.equals('/')) {
-			throw new Exception("[Error: at line"+lineNum+"]: Char after division char '/' is "+c+" not '/");
+			throw new Exception("[Error: at line "+lineNum+"]: Char after division char '/' is "+c+" not '/'. The division operator is '//'.");
 		}
 		return new Token(processedStr, "mulOperator", lineNum);
 	}
@@ -199,7 +202,7 @@ public class LexAnalyser {
 	private Token getRelOperatorSmallerToken() throws Exception {
 		Character c = readChar();
 		if (c.equals('<')) {
-			throw new Exception("[Error: at line"+lineNum+"]: found '<<' must be < or <> or <=");
+			throw new Exception("[Error: at line "+lineNum+"]: found '<<' must be < or <> or <=");
 		} else if (c.equals('>') || c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
 		}
@@ -210,7 +213,7 @@ public class LexAnalyser {
 	private Token getRelOperatorLargerToken() throws Exception {
 		Character c = readChar();
 		if (c.equals('>') || c.equals('<')) {
-			throw new Exception("[Error: at line"+lineNum+"]: found '>"+c+"' must be > or >=");
+			throw new Exception("[Error: at line "+lineNum+"]: found '>"+c+"' must be > or >=");
 		} else if (c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
 		}
@@ -236,7 +239,7 @@ public class LexAnalyser {
 		} else if (c.equals(' ') || c.equals('\t')) {
 			return getAssignmentWithSpace();
 		} else {
-			throw new Exception("[Error: at line"+lineNum+"]: found ''=");					
+			throw new Exception("[Error: at line"+lineNum+"]: found '='. Relation operator is '==', ...>");					
 		}
 	}
 	
@@ -246,7 +249,7 @@ public class LexAnalyser {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
 		}
-		throw new Exception("[Error: at line"+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
+		throw new Exception("[Error: at line "+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
 	}
 
 	private void resetProcessedStr() {
