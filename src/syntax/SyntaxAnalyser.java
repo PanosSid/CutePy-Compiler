@@ -8,7 +8,6 @@ import lex.Token;
 public class SyntaxAnalyser {
 	private LexAnalyser lex;
 	private Token currentToken;
-	private Token prevToken;
 	private String recognisedCode =""; 	// used for debugging
 	
 	public SyntaxAnalyser(LexAnalyser lex) {
@@ -19,23 +18,10 @@ public class SyntaxAnalyser {
 		return currentToken;
 	}
 
-	public Token getPrevToken() {
-		return prevToken;
-	}
-	
 	public void analyzeSyntax() throws Exception {
 		loadNextTokenFromLex();
 		startRule();
-		
-//		try {
-//			startRule();
-//			System.out.println("Compilation successfully completed");
-//		} catch (Exception e) {
-//			System.out.println("Compilation FAILED");
-//
-//		}
 	}
-	
 	
 	private void startRule() throws Exception {
 		System.out.println("startRule() "+ currentToken.getRecognizedStr());
@@ -210,7 +196,7 @@ public class SyntaxAnalyser {
 					}
 				}
 			} else {
-				throw new Exception("[Error] expected '= integer' or '= int(input());' but found '="+currentToken.getRecognizedStr()+"'");
+				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '= integer' or '= int(input());' but found '="+currentToken.getRecognizedStr()+"'");
 			}
 		}
 	}
@@ -283,7 +269,7 @@ public class SyntaxAnalyser {
 							loadNextTokenFromLex();
 							elsePart();
 						} else {
-							throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+							throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 						}
 					} else if (isStatement()) {
 						statement();
@@ -291,13 +277,13 @@ public class SyntaxAnalyser {
 							elsePart();
 						}
 					} else {
-						throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else {
-					throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error] expected ')' but found "+currentToken.getRecognizedStr());
+				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
 			}
 		}
 	}
@@ -314,15 +300,15 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else if (isStatement()) {
 					statement();
 				} else {
-					throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 			}
 		}
 		
@@ -343,21 +329,21 @@ public class SyntaxAnalyser {
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 						} else {
-							throw new Exception("[Error] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+							throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 						}
 					} else if (isStatement()) {
 						statement();
 					} else {
-						throw new Exception("[Error] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else {
-					throw new Exception("[Error] expected ':' but found "+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error] expected ')' but found "+currentToken.getRecognizedStr());
+				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
 			}
 		} else {
-			throw new Exception("[Error] expected '(' but found "+currentToken.getRecognizedStr());
+			throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());
 		}
 	}
 	
@@ -370,7 +356,7 @@ public class SyntaxAnalyser {
 				if (isID(currentToken)) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error] expected identifier after ',' but found "+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected identifier after ',' but found "+currentToken.getRecognizedStr());
 				}
 			}
 		}
@@ -464,12 +450,7 @@ public class SyntaxAnalyser {
 		}		
 	}
 	
-//	private boolean isBoolFactor() {
-//		return  currentToken.recognizedStrEquals("[") ||
-//				currentToken.recognizedStrEquals("not") || 
-//				isExpression();
-//	}
-	
+
 	private void boolTerm() throws Exception {
 		System.out.println("boolTerm() "+ currentToken.getRecognizedStr());
 		boolFactor();	//isos kati edo paizei
@@ -525,7 +506,7 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
 				}
 			}
 			mainFunctionCall();
@@ -543,11 +524,11 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
+					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
 				}
 			}
 		} else {
-			throw new Exception("[Error] expected identifier but was "+ currentToken.getRecognizedStr());			
+			throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected identifier but was "+ currentToken.getRecognizedStr());			
 		}
 	}
 	
@@ -557,7 +538,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void loadNextTokenFromLex() throws Exception {
-		prevToken = currentToken;
 		currentToken = lex.getToken();
 		recognisedCode += currentToken.getRecognizedStr()+"\n";
 		System.out.println(recognisedCode);

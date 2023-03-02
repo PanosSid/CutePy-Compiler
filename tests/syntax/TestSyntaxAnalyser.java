@@ -19,8 +19,6 @@ public class TestSyntaxAnalyser {
 		syntax = new SyntaxAnalyser(lex);
 	}
 
-	
-	
 	@Test
 	public void testMainFunctionCall() throws Exception {
 		setUpSyntaxAnalyser(""
@@ -29,9 +27,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(3);
-		Token expectedPrevTk = new Token(";", "delimiter", 2);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -46,12 +43,10 @@ public class TestSyntaxAnalyser {
 				+ "if __name__ == \"__main__\":\r\n"
 				+ "\t mainFunc1();\r\n"
 				);
-//		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(9);
-		Token expectedPrevTk = new Token(";", "delimiter", 8);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -70,9 +65,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
-		Token expectedPrevTk = new Token(";", "delimiter", 10);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -95,9 +89,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(15);
-		Token expectedPrevTk = new Token(";", "delimiter", 14);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	
@@ -118,9 +111,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(12);
-		Token expectedPrevTk = new Token(";", "delimiter", 11);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -139,9 +131,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
-		Token expectedPrevTk = new Token(";", "delimiter", 10);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -171,9 +162,8 @@ public class TestSyntaxAnalyser {
 				+ "\r\n");
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(23);
-		Token expectedPrevTk = new Token(";", "delimiter", 21);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -220,9 +210,8 @@ public class TestSyntaxAnalyser {
 				+ "");
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(39);
-		Token expectedPrevTk = new Token(";", "delimiter", 38);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	
@@ -242,9 +231,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
-		Token expectedPrevTk = new Token(";", "delimiter", 10);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -268,9 +256,8 @@ public class TestSyntaxAnalyser {
 //		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(14);
-		Token expectedPrevTk = new Token(";", "delimiter", 13);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -288,9 +275,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(10);
-		Token expectedPrevTk = new Token(";", "delimiter", 9);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -310,9 +296,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(12);
-		Token expectedPrevTk = new Token(";", "delimiter", 11);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -328,9 +313,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(7);
-		Token expectedPrevTk = new Token(";", "delimiter", 6);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -346,9 +330,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(7);
-		Token expectedPrevTk = new Token(";", "delimiter", 6);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 
@@ -369,9 +352,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(10);
-		Token expectedPrevTk = new Token(";", "delimiter", 9);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	@Test
@@ -398,9 +380,8 @@ public class TestSyntaxAnalyser {
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(18);
-		Token expectedPrevTk = new Token(";", "delimiter",17);
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		Assertions.assertEquals(expectedPrevTk, syntax.getPrevToken());
+		
 	}
 	
 	

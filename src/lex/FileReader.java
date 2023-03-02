@@ -10,42 +10,28 @@ public class FileReader {
 	private String fileContents;	//doent contain an EOF Char
 	private int filePointer;
 	private String fileName;
-	public static final Character EOF = '%';
+	public static final Character EOF = '~';
 	
 	public FileReader() {
 		new CharTypes();
 		this.filePointer = 0;
 	}
 	
-	public FileReader(String fileName) {
-		super();
+	public void initFileContents2(String fileName) {
 		this.fileName = fileName;
-		this.filePointer = 0;
-		initFileContents();
+		try {
+			byte[] content = Files.readAllBytes(Paths.get(fileName));
+			fileContents = new String(content) +EOF;
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 	
-	public void initFileContents2(String fileName) {
-		try {
-			byte[] content = Files.readAllBytes(Paths.get(fileName));
-			fileContents = new String(content) +EOF;
-		} catch (IOException e) {
-			e.printStackTrace();
-//			System.out.println(e.getMessage());
-			System.exit(-1);
-		}
+	public String getFileName() {
+		return fileName;
 	}
-
-	private void initFileContents() {
-		try {
-			byte[] content = Files.readAllBytes(Paths.get(fileName));
-			fileContents = new String(content) +EOF;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
-			System.exit(-1);
-		}
-	}
-
+	
 	public String getFileContents() {
 		return fileContents;
 	}
@@ -81,9 +67,5 @@ public class FileReader {
 		}
 		backtrackFilePointer();
 	}
-	
-	
-	public static void main(String args[]) {
-			
-	}
+
 }
