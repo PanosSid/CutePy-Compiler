@@ -85,7 +85,7 @@ def main_factorial2():
 		fact = fact * i;
 		i = i + 1;
 	#}
-	if (x> 10):
+	if ([(a+b)+d>5 and x>5]):
 	#{
 		print(fact);
 	#}

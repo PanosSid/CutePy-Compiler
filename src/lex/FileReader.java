@@ -23,6 +23,17 @@ public class FileReader {
 		this.filePointer = 0;
 		initFileContents();
 	}
+	
+	public void initFileContents2(String fileName) {
+		try {
+			byte[] content = Files.readAllBytes(Paths.get(fileName));
+			fileContents = new String(content) +EOF;
+		} catch (IOException e) {
+			e.printStackTrace();
+//			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+	}
 
 	private void initFileContents() {
 		try {
