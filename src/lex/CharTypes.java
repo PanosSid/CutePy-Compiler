@@ -22,7 +22,7 @@ public class CharTypes {
 	
 	public static final List<Character> UNDERCORE = Arrays.asList(new Character[] { '_' });
 	
-	public static final List<String> REL_OPS = Arrays.asList(new String[] { "<", "<=", ">", ">=", "<>", "=="});
+	public static final List<String> REL_OPS = Arrays.asList(new String[] { "<", "<=", ">", ">=", "!=", "=="});
 	
 	public static boolean isNotInAlphabet(Character c) {
 		Set<Character> CUTEPY_ALPHABET = new HashSet<Character>();
@@ -38,6 +38,7 @@ public class CharTypes {
 		CUTEPY_ALPHABET.add('*');
 		CUTEPY_ALPHABET.add('<');
 		CUTEPY_ALPHABET.add('>');
+		CUTEPY_ALPHABET.add('!');
 		return !CUTEPY_ALPHABET.contains(c);
 	}
 }

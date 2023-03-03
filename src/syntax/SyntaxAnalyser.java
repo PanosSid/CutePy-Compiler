@@ -1,5 +1,6 @@
 package syntax;
 
+import exceptions.CutePyException;
 import lex.CharTypes;
 import lex.FileReader;
 import lex.LexAnalyser;
@@ -18,18 +19,19 @@ public class SyntaxAnalyser {
 		return currentToken;
 	}
 
-	public void analyzeSyntax() throws Exception {
+	public void analyzeSyntax() throws CutePyException {
 		loadNextTokenFromLex();
 		startRule();
 	}
 	
-	private void startRule() throws Exception {
+	
+	private void startRule() throws CutePyException {
 		System.out.println("startRule() "+ currentToken.getRecognizedStr());
 		defMainPart();
 		callMainPart();
 	}
 	
-	private void defMainPart() throws Exception {
+	private void defMainPart() throws CutePyException {
 		System.out.println("defMainPart() "+ currentToken.getRecognizedStr());
 		defMainFunction();
 		while (currentToken.recognizedStrEquals("def")) {
@@ -37,7 +39,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void defMainFunction() throws Exception { // TODO ERROR MSGS
+	private void defMainFunction() throws CutePyException { // TODO ERROR MSGS
 		System.out.println("defMainFunction() "+ currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
@@ -48,7 +50,7 @@ public class SyntaxAnalyser {
 					if (currentToken.getRecognizedStr().equals(args[i])) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("Error expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+						throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
 					}
 				}
 				declarations();
@@ -60,14 +62,16 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals("#}")) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("Error expected '#}' found '"+currentToken.getRecognizedStr()+"'");
+					throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected '#}' found '"+currentToken.getRecognizedStr()+"'");
 				}
-			}
+			}	// TODO edo thelei exception ??
+		} else {
+			throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected 'def' found '"+currentToken.getRecognizedStr()+"'");
 		}
 		
 	}
 	
-	private void defFunction() throws Exception {	// TODO ERROR MSGS
+	private void defFunction() throws CutePyException {	// TODO ERROR MSGS
 		System.out.println("defFunction() "+ currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
@@ -81,7 +85,7 @@ public class SyntaxAnalyser {
 						if (currentToken.getRecognizedStr().equals(args[i])) {
 							loadNextTokenFromLex();
 						} else {
-							throw new Exception("Error expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+							throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected '"+args[i]+"' found '"+currentToken.getRecognizedStr()+"'");
 						}
 					}
 					declarations();
@@ -93,20 +97,20 @@ public class SyntaxAnalyser {
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected '#}' but found '" +  currentToken.getRecognizedStr()+ "' ");
+						throw new CutePyException("[Error in line" + currentToken.getLineNum()+ "] expected '#}' but found '" +  currentToken.getRecognizedStr()+ "' ");
 					}
 				} else { 
-					throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected '(' but found '" +  currentToken.getRecognizedStr()+ "' ");
+					throw new CutePyException("[Error in line" + currentToken.getLineNum()+ "] expected '(' but found '" +  currentToken.getRecognizedStr()+ "' ");
 				}
 			} else {
-				throw new Exception("Error expected identifier but found '"+currentToken.getRecognizedStr()+"'");
+				throw new CutePyException("[Error in line" + currentToken.getLineNum()+ "] expected identifier but found '"+currentToken.getRecognizedStr()+"'");
 			}
 		} else {
-			throw new Exception("[Error: at line" + currentToken.getLineNum()+ "] expected 'def' but found '" +  currentToken.getRecognizedStr()+ "' ");
+			throw new CutePyException("[Error in line" + currentToken.getLineNum()+ "] expected 'def' but found '" +  currentToken.getRecognizedStr()+ "' ");
 		}
 	}
 	
-	private void declarations() throws Exception {
+	private void declarations() throws CutePyException {
 		System.out.println("declarations() "+ currentToken.getRecognizedStr());
 		while (currentToken.recognizedStrEquals("#declare")) {
 			loadNextTokenFromLex();
@@ -114,24 +118,24 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void declerationLine() throws Exception {
+	private void declerationLine() throws CutePyException {
 		System.out.println("declerationLine() "+ currentToken.getRecognizedStr());
 		idList();
 	}
 	
-	private void statement() throws Exception {
+	private void statement() throws CutePyException {
 		System.out.println("statement() "+ currentToken.getRecognizedStr());
 		if (isSimpleStatement()) {
 			simpleStatement();
 		} else if (isStructuredStatement()) {
 			structuredStatement();			
 		} else {
-			throw new Exception("lathos stin statement");
+			throw new CutePyException("[Error in line " + currentToken.getLineNum()+ "] there must be at least one simple or structured statement " );
 		}
 		
 	}
 	
-	private void statements() throws Exception {
+	private void statements() throws CutePyException {
 		System.out.println("statements() "+ currentToken.getRecognizedStr());
 		statement();
 		while (isStatement()) {
@@ -143,7 +147,7 @@ public class SyntaxAnalyser {
 		return isSimpleStatement() || isStructuredStatement();
 	}
 	
-	private void simpleStatement() throws Exception {
+	private void simpleStatement() throws CutePyException {
 		System.out.println("simpleStatement() "+ currentToken.getRecognizedStr());
 		if (isID(currentToken)) {
 			loadNextTokenFromLex();
@@ -152,6 +156,9 @@ public class SyntaxAnalyser {
 			printStat();
 		} else if (currentToken.recognizedStrEquals("return")) {
 			returnStat();
+		} else {
+			throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected <identifier> or"
+					+ " 'print' or 'return' but found '"+currentToken.getRecognizedStr()+"'");
 		}
 	}
 	
@@ -160,7 +167,7 @@ public class SyntaxAnalyser {
 				|| currentToken.recognizedStrEquals("return");
 	}
 	
-	private void structuredStatement() throws Exception {
+	private void structuredStatement() throws CutePyException {
 		System.out.println("structuredStatement() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("if")) {
 			loadNextTokenFromLex();
@@ -168,6 +175,8 @@ public class SyntaxAnalyser {
 		} else if (currentToken.recognizedStrEquals("while")) {
 			loadNextTokenFromLex();
 			whileStat();
+		} else {
+			throw new CutePyException("[Error in line" + currentToken.getLineNum()+ "] expected a stuctured statement 'if' or 'while' but found '" +  currentToken.getRecognizedStr()+ "' ");
 		}
 	}
 	
@@ -176,7 +185,7 @@ public class SyntaxAnalyser {
 				currentToken.recognizedStrEquals("while");
 	}
 	
-	private void assignmentStat() throws Exception {
+	private void assignmentStat() throws CutePyException {
 		System.out.println("assignmentStat() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("=")) {
 			loadNextTokenFromLex();
@@ -192,11 +201,12 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals(nextTks[i])) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("Error expected '"+nextTks[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+						throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '"+nextTks[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+						
 					}
 				}
 			} else {
-				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '= integer' or '= int(input());' but found '="+currentToken.getRecognizedStr()+"'");
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '= expresion' or '= int(input());' but found '="+currentToken.getRecognizedStr()+"'");
 			}
 		}
 	}
@@ -211,14 +221,14 @@ public class SyntaxAnalyser {
 				currentToken.recognizedStrEquals("(") || isID(currentToken);
 	}
 	
-	private void printStat() throws Exception {
+	private void printStat() throws CutePyException {
 		System.out.println("printStat() "+ currentToken.getRecognizedStr());
 		String args1[] = {"print", "("};
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args1[i])) {
 				loadNextTokenFromLex();
-			} else {
-				throw new Exception("Error expected '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}  else {
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
 			}
 		}
 		expression();
@@ -227,19 +237,19 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args2[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("Error expected '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
-			}	
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}
 		}
 	}
 	
-	private void returnStat() throws Exception {
+	private void returnStat() throws CutePyException {
 		System.out.println("returnStat() "+ currentToken.getRecognizedStr());
 		String args1[] = {"return", "("};
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args1[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("Error expected '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] '"+args1[i]+"' found '"+currentToken.getRecognizedStr()+"'");
 			}
 		}
 		expression();
@@ -248,12 +258,12 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args2[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("Error expected '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
-			}	
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] '"+args2[i]+"' found '"+currentToken.getRecognizedStr()+"'");
+			}
 		}
 	}
 
-	private void ifStat() throws Exception {	//TODO  write tests and add error messages 
+	private void ifStat() throws CutePyException {	//TODO  write tests and add error messages 
 		System.out.println("ifStat() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -269,7 +279,7 @@ public class SyntaxAnalyser {
 							loadNextTokenFromLex();
 							elsePart();
 						} else {
-							throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+							throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 						}
 					} else if (isStatement()) {
 						statement();
@@ -277,18 +287,20 @@ public class SyntaxAnalyser {
 							elsePart();
 						}
 					} else {
-						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+						throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
 			}
 		}
+//		throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());
+//		TODO edo exoume error pou prepei na yparxei kanonika
 	}
 
-	private void elsePart() throws Exception { //TODO add error messages + check name of method
+	private void elsePart() throws CutePyException { //TODO add error messages + check name of method
 		System.out.println("elsePart() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("else")) {
 			loadNextTokenFromLex();
@@ -300,21 +312,23 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+						throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else if (isStatement()) {
 					statement();
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 			}
 		}
+//		throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected 'else' but found "+currentToken.getRecognizedStr());
+//		TODO edo exoume error pou prepei na yparxei kanonika
 		
 	}
 
-	private void whileStat() throws Exception {
+	private void whileStat() throws CutePyException {
 		System.out.println("whileStat() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -329,25 +343,25 @@ public class SyntaxAnalyser {
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 						} else {
-							throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
+							throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 						}
 					} else if (isStatement()) {
 						statement();
 					} else {
-						throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
+						throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#{' or a statement but found "+currentToken.getRecognizedStr());
 					}
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 				}
 			} else {
-				throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
 			}
 		} else {
-			throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());
+			throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());
 		}
 	}
 	
-	private void idList() throws Exception {
+	private void idList() throws CutePyException {
 		System.out.println("idList() "+ currentToken.getRecognizedStr());
 		if (isID(currentToken)) {
 			loadNextTokenFromLex();
@@ -356,13 +370,14 @@ public class SyntaxAnalyser {
 				if (isID(currentToken)) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected identifier after ',' but found "+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected identifier after ',' but found "+currentToken.getRecognizedStr());
 				}
 			}
 		}
+		// doesnt need to throw exception here
 	}
 	
-	private void expression() throws Exception {
+	private void expression() throws CutePyException {
 		System.out.println("expression() "+ currentToken.getRecognizedStr());
 		optionalSign();
 		term();
@@ -372,7 +387,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void term() throws Exception {
+	private void term() throws CutePyException {
 		System.out.println("term() "+ currentToken.getRecognizedStr());
 		factor();
 		while (CharTypes.MUL_OPS.contains(currentToken.getRecognizedStr())) {
@@ -381,7 +396,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void factor() throws Exception {
+	private void factor() throws CutePyException {
 		System.out.println("factor() "+ currentToken.getRecognizedStr());
 		if (isInteger(currentToken.getRecognizedStr())) {
 			loadNextTokenFromLex();
@@ -391,13 +406,13 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("[Error:"+currentToken.getLineNum()+"] expected ')' found '"+currentToken.getRecognizedStr()+"'");
+				throw new CutePyException("[Error in line "+currentToken.getLineNum()+"] expected ')' found '"+currentToken.getRecognizedStr()+"'");
 			}
 		} else if (isID(currentToken)) {
 			loadNextTokenFromLex();
 			idTail();
 		} else {
-			throw new Exception("[Error:"+currentToken.getLineNum()+"] at factor !"); 	//TODO make this message more useful
+			throw new CutePyException("[Error in line "+currentToken.getLineNum()+"] at factor !"); 	//TODO make this message more useful
 		}
 	}
 	
@@ -411,7 +426,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void idTail() throws Exception {
+	private void idTail() throws CutePyException {
 		System.out.println("idTail() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -419,13 +434,13 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ')' found '"
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ')' found '"
 						+ currentToken.getRecognizedStr() + "'");
 			}
 		}
 	}
 	
-	private void actualParList() throws Exception {	// TODO write tests
+	private void actualParList() throws CutePyException {	// TODO write tests
 		System.out.println("actualParList() "+ currentToken.getRecognizedStr());
 		expression();
 		while (currentToken.recognizedStrEquals(",")) {
@@ -434,14 +449,14 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void optionalSign() throws Exception {
+	private void optionalSign() throws CutePyException {
 		System.out.println("optionalSign "+ currentToken.getRecognizedStr());
 		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			loadNextTokenFromLex();
 		}
 	}
 	
-	private void condition() throws Exception { 
+	private void condition() throws CutePyException { 
 		System.out.println("condition() "+ currentToken.getRecognizedStr());
 		boolTerm();
 		while (currentToken.recognizedStrEquals("or")) {
@@ -451,7 +466,7 @@ public class SyntaxAnalyser {
 	}
 	
 
-	private void boolTerm() throws Exception {
+	private void boolTerm() throws CutePyException {
 		System.out.println("boolTerm() "+ currentToken.getRecognizedStr());
 		boolFactor();	//isos kati edo paizei
 		while (currentToken.recognizedStrEquals("and")) {
@@ -460,7 +475,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void boolFactor() throws Exception { 	// TODO write tests
+	private void boolFactor() throws CutePyException { 	// TODO write tests
 		System.out.println("boolFactor() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("not")) {
 			loadNextTokenFromLex();
@@ -470,11 +485,11 @@ public class SyntaxAnalyser {
 				if (currentToken.recognizedStrEquals("]")) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ']' found '"
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ']' found '"
 							+ currentToken.getRecognizedStr() + "'");
 				}
 			} else {
-				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected '[' found '"+ currentToken.getRecognizedStr() + "'");
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '[' found '"+ currentToken.getRecognizedStr() + "'");
 			}
 			
 		} else if (currentToken.recognizedStrEquals("[")) {
@@ -483,7 +498,7 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals("]")) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected ']' found '"
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ']' found '"
 						+ currentToken.getRecognizedStr() + "'");
 			}
 		} else if (isExpression()) {
@@ -491,22 +506,22 @@ public class SyntaxAnalyser {
 			if (CharTypes.REL_OPS.contains((currentToken.getRecognizedStr()))) {
 				loadNextTokenFromLex();
 			} else {
-				throw new Exception("[Error:" + currentToken.getLineNum() + "] expected relation operator but found '"+ currentToken.getRecognizedStr() + "'");
+				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected relation operator but found '"+ currentToken.getRecognizedStr() + "'");
 			} 
 			expression();
 		} else {
-			throw new Exception("[Error:" + currentToken.getLineNum() + "] 'not[condition]' or '[condition]' or 'expression relOp expression' but found '"+ currentToken.getRecognizedStr() + "'");
+			throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] 'not[condition]' or '[condition]' or 'expression relOp expression' but found '"+ currentToken.getRecognizedStr() + "'");
 		}
 	}
 	
-	private void callMainPart() throws Exception {
+	private void callMainPart() throws CutePyException {
 		if (!currentToken.getRecognizedStr().equals(FileReader.EOF.toString())) {
 			String args[] = {"if", "__name__", "==", "\"__main__\"", ":"};
 			for (int i = 0; i < args.length; i++) {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
 				}
 			}
 			mainFunctionCall();
@@ -516,7 +531,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	public void mainFunctionCall() throws Exception {
+	public void mainFunctionCall() throws CutePyException {
 		if (isID(currentToken)) {
 			loadNextTokenFromLex();
 			String args[] = {"(",")",";"};
@@ -524,11 +539,11 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
+					throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '"+args[i]+"' but was '"+currentToken.getRecognizedStr());
 				}
 			}
 		} else {
-			throw new Exception("[Error: at line " + currentToken.getLineNum() + "] expected identifier but was "+ currentToken.getRecognizedStr());			
+			throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected identifier but was "+ currentToken.getRecognizedStr());			
 		}
 	}
 	
@@ -537,7 +552,7 @@ public class SyntaxAnalyser {
 		return token.getFamily().equals("identifier");
 	}
 
-	private void loadNextTokenFromLex() throws Exception {
+	private void loadNextTokenFromLex() throws CutePyException {
 		currentToken = lex.getToken();
 		recognisedCode += currentToken.getRecognizedStr()+"\n";
 		System.out.println(recognisedCode);

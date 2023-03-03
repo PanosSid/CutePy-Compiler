@@ -1,5 +1,6 @@
 package view;
 
+import exceptions.CutePyException;
 import lex.FileReader;
 import lex.LexAnalyser;
 import syntax.SyntaxAnalyser;
@@ -16,12 +17,11 @@ public class CutePyCompiler {
 	}
 	
 	public void compile(String filePath) {
-		reader.initFileContents2(filePath);
+		reader.initFileContents2(filePath);	
 		try {
 			syntaxAnalyzer.analyzeSyntax();
 			System.out.println("Compilation successfully completed");
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (CutePyException e) {
 			System.out.println("Compilation FAILED");
 			System.out.println(e.getMessage());
 		}
@@ -31,7 +31,8 @@ public class CutePyCompiler {
 	public static void main(String[] args) {
 		String TEST_FILES_PATH = "D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\tests\\acceptance\\";
 		CutePyCompiler cpyCompiler = new CutePyCompiler();
-		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy");
+		cpyCompiler.compile(TEST_FILES_PATH+"allFuncs.cpy");
+//		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy");
 //		cpyCompiler.compile(args[1]);
 		
 		

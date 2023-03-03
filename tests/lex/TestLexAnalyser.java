@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions;
 
 
 public class TestLexAnalyser {
+	private FileReader reader = new FileReader();
 	
 	@Test
 	public void testRecognizeNumber() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(" \t 123 4 \n56	\r\n\t78 \n910");
 		LexAnalyser lex = new LexAnalyser(reader);
 		List<Token> expectedTokens = Arrays.asList(new Token[] {
@@ -35,7 +35,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeSimpleNumber() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("123");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("123", "number", 1), lex.getToken());	
@@ -43,7 +42,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeNumberBug() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("\n56");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("56", "number", 2), lex.getToken());	
@@ -51,7 +49,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeNumberBug2() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("\r\n\t78");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("78", "number", 2), lex.getToken());			
@@ -60,7 +57,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testReadNextWithNewLines() {
-		FileReader reader = new FileReader();
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertTrue(!lex.isNewLine('5'));
 		Assertions.assertTrue(lex.isNewLine('\n'));
@@ -76,7 +72,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeKeyword() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("def");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("def", "keyword", 1), lex.getToken());	
@@ -84,7 +79,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeIdentifier() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("divides");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("divides", "identifier", 1), lex.getToken());	
@@ -92,7 +86,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testUnderscoreName() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(" __name__");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("__name__", "keyword", 1), lex.getToken());	
@@ -100,7 +93,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testIfNameEqualsMain() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(""
 				+ "if __name__ == \"__main__\":\r\n"
 				+ "#$ call of main functions #$\r\n"
@@ -128,7 +120,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testUnderscoreMain() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(" \"__main__\"");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("\"__main__\"", "keyword", 1), lex.getToken());	
@@ -136,7 +127,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeMultipleTokens() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(
 				"def adds(x1,y1):\n"
 				+"\ta = x1 + 1\n");
@@ -166,7 +156,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeWithComments() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(
 				"def adds(x1,y1):\n"
 				+"\t#$a = x1 + 1#$\n"
@@ -197,7 +186,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRecognizeWithCommentsBigTest() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(
 				"def add2PosNums(x1,y1):\r\n"
 				+ "\r\n"
@@ -249,7 +237,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testCommentThatContainsHashTag() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(""
 				+ "#$ body of \r\n"
 				+ "	main_factorial2 # panos\r\n"
@@ -261,27 +248,24 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testUnclossedCommentThatContainsHashTag() {
-		FileReader reader = new FileReader();
 		reader.setFileContents(""
 				+ "#$ body of \r\n"
 				+ "	primes2 # panos $\r\n");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(Exception.class, () -> lex.getToken());
-		Assertions.assertEquals("[Error: at line 2] comment is not closed!!", thrown.getMessage());	
+		Assertions.assertEquals("[Error in line 2] comment is not closed!!", thrown.getMessage());	
 	}
 	
 	@Test
 	public void testUnclosedCommentThrowsException() {
-		FileReader reader = new FileReader();
 		reader.setFileContents(" #$ : 547 \n");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(Exception.class, () -> lex.getToken());
-		Assertions.assertEquals("[Error: at line 1] comment is not closed!!", thrown.getMessage());	
+		Assertions.assertEquals("[Error in line 1] comment is not closed!!", thrown.getMessage());	
 	}
 	
 	@Test
 	public void testRecognizeDeclare() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("  #declare x");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token("#declare", "keyword", 1), lex.getToken());	
@@ -290,7 +274,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testRelOperatorLarger() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents("  >= >");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Assertions.assertEquals(new Token(">=", "relOperator", 1), lex.getToken());	
@@ -299,7 +282,6 @@ public class TestLexAnalyser {
 	
 	@Test
 	public void testCountDigitsMethod() throws Exception {
-		FileReader reader = new FileReader();
 		reader.setFileContents(
 				  "def main_countdigits():\r\n"
 				+ "#{\r\n"

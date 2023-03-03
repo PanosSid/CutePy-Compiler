@@ -3,6 +3,8 @@ package lex;
 import java.util.Arrays;
 import java.util.List;
 
+import exceptions.CutePyException;
+
 public class LexAnalyser {
 	public static final List<String> KEYWORDS = Arrays.asList("def", "if",
 			"else", "while", "print", "return", "int", "input", "#declare",
@@ -16,7 +18,7 @@ public class LexAnalyser {
 		processedStr = "";
 	}
 
-	public Token getToken() throws Exception { 
+	public Token getToken() throws CutePyException { 
 		resetProcessedStr();
 		Character c = readChar();
 		if (CharTypes.LETTERS.contains(c)) {
@@ -45,6 +47,8 @@ public class LexAnalyser {
 			return getToken();
 		} else if (c.equals('_')) {
 			return getUnderscoreNameToken();
+		} else if (c.equals('!')) {
+			return getNotEqualToOperator();
 		} else if (c.equals('\"')) {
 			return getStrMainToken();
 		} else if (isNewLine(c)) {
@@ -53,18 +57,27 @@ public class LexAnalyser {
 		} else if (c.equals(FileReader.EOF)) {
 			return new EOFToken(lineNum);
 		}
-		throw new Exception("[Error at line:"+lineNum+"] found char '"+c+"' that doesnt belong in the CutePy alphabet");
+		throw new CutePyException("[Error at line:"+lineNum+"] found char '"+c+"' that doesnt belong in the CutePy alphabet");
 	}
 	
-	private Token getStrMainToken() throws Exception { 
+	private Token getNotEqualToOperator() throws CutePyException {
+		Character c = readChar();
+		if (c.equals('=')) {
+			return new Token(processedStr, "relOperator", lineNum);
+		} else {
+			throw new CutePyException("[Error in line "+lineNum+"]: found '!"+c+"' must be '!='");			
+		}
+	}
+
+	private Token getStrMainToken() throws CutePyException { 
 		return getTokenAfterRecognisingConsecutiveChars("\"__main__\"" ,"keyword");
 	}
 
-	private Token getUnderscoreNameToken() throws Exception {
+	private Token getUnderscoreNameToken() throws CutePyException {
 		return getTokenAfterRecognisingConsecutiveChars("__name__" ,"keyword");
 	}
 	
-	private Token getSharpToken() throws Exception {
+	private Token getSharpToken() throws CutePyException {
 		Character c = readChar();
 		if (c.equals('$')) {
 			return skipComment();
@@ -75,27 +88,27 @@ public class LexAnalyser {
 		} else if (c.equals('}')) {
 			return new Token(processedStr, "groupOperator", lineNum);
 		} else {
-			throw new Exception("[Error: at line "+lineNum+"] expected '#declare' or '#{' or '#}' or '#$' but found '#"+c+"' ");
+			throw new CutePyException("[Error in line "+lineNum+"] expected '#declare' or '#{' or '#}' or '#$' but found '#"+c+"' ");
 		}
 	}
 
-	private Token getDeclareToken() throws Exception {
+	private Token getDeclareToken() throws CutePyException {
 		return getTokenAfterRecognisingConsecutiveChars("declare" ,"keyword");
 	}
 	
 	private Token getTokenAfterRecognisingConsecutiveChars(String reconStr,
-			String tokenToBeReconFamily) throws Exception {
+			String tokenToBeReconFamily) throws CutePyException {
 		unReadChar();
 		for (int i = 0; i < reconStr.length(); i++) {
 			Character c = readChar();
 			if (c != reconStr.charAt(i)) {
-				throw new Exception("[Error: at line " + lineNum + "] expected '" + reconStr + "' but found '" +  processedStr + "' ");
+				throw new CutePyException("[Error in line " + lineNum + "] expected '" + reconStr + "' but found '" +  processedStr + "' ");
 			}
 		}
 		return new Token(processedStr, "keyword", lineNum);
 	}
 
-	private Token skipComment() throws Exception {
+	private Token skipComment() throws CutePyException {
 		skipCharsUntilHashTag();
 		Character c = readChar();
 		while (c != '$') {
@@ -105,11 +118,11 @@ public class LexAnalyser {
 		return getToken();
 	}
 
-	private Character skipCharsUntilHashTag() throws Exception {
+	private Character skipCharsUntilHashTag() throws CutePyException {
 		Character c = readChar();
 		while (c != '#') {
 			if (c.equals(FileReader.EOF)) {
-				throw new Exception("[Error: at line " + (lineNum-1) +"] comment is not closed!!");
+				throw new CutePyException("[Error in line " + (lineNum-1) +"] comment is not closed!!");
 			}
 			if (isNewLine(c)) {
 				lineNum++;
@@ -144,7 +157,7 @@ public class LexAnalyser {
 		return false;
 	}
 
-	private Token getIdkOrKeywordToken() throws Exception {
+	private Token getIdkOrKeywordToken() throws CutePyException {
 		Character c = readChar();
 		if (processedStr.length() <=30 &&
 				(Character.isAlphabetic(c) || Character.isDigit(c) || c.equals('_'))) {
@@ -157,16 +170,16 @@ public class LexAnalyser {
 		return new Token(processedStr, "identifier", lineNum);
 	}
 
-	private Token getNumberToken() throws Exception {
+	private Token getNumberToken() throws CutePyException {
 		Character c = readChar();
 		if (Character.isAlphabetic(c)) {
-			throw new Exception("[Error: at line"+lineNum+"] found letter after character on line: " + lineNum);
+			throw new CutePyException("[Error in line"+lineNum+"] found letter after character on line: " + lineNum);
 		} else if (Character.isDigit(c)) {
 			return getNumberToken();
 		}
 		unReadChar();
 		if (isNumberOutOfBounds()) {
-			throw new Exception("[Error: at line"+lineNum+"] found integer with value outside of the limits");
+			throw new CutePyException("[Error in line"+lineNum+"] found integer with value outside of the limits");
 		}
 		return new Token(processedStr, "number", lineNum);
 	}
@@ -183,7 +196,7 @@ public class LexAnalyser {
 	}
 	
 
-	private Token getAddOperatorToken() throws Exception {
+	private Token getAddOperatorToken() throws CutePyException {
 		return new Token(processedStr, "addOperator", lineNum);
 	}
 
@@ -191,29 +204,29 @@ public class LexAnalyser {
 		return new Token(processedStr, "mulOperator", lineNum);
 	}
 	
-	private Token getMulOperatorDivToken() throws Exception {
+	private Token getMulOperatorDivToken() throws CutePyException {
 		Character c = readChar();
 		if (!c.equals('/')) {
-			throw new Exception("[Error: at line "+lineNum+"]: Char after division char '/' is "+c+" not '/'. The division operator is '//'.");
+			throw new CutePyException("[Error in line "+lineNum+"]: Char after division char '/' is "+c+" not '/'. The division operator is '//'.");
 		}
 		return new Token(processedStr, "mulOperator", lineNum);
 	}
 	
-	private Token getRelOperatorSmallerToken() throws Exception {
+	private Token getRelOperatorSmallerToken() throws CutePyException {
 		Character c = readChar();
 		if (c.equals('<')) {
-			throw new Exception("[Error: at line "+lineNum+"]: found '<<' must be < or <> or <=");
-		} else if (c.equals('>') || c.equals('=')) {
+			throw new CutePyException("[Error in line "+lineNum+"]: found '<<' must be < or <=");
+		} else if (c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
 		}
 		unReadChar();
 		return new Token(processedStr, "relOperator", lineNum);
 	}
 	
-	private Token getRelOperatorLargerToken() throws Exception {
+	private Token getRelOperatorLargerToken() throws CutePyException {
 		Character c = readChar();
 		if (c.equals('>') || c.equals('<')) {
-			throw new Exception("[Error: at line "+lineNum+"]: found '>"+c+"' must be > or >=");
+			throw new CutePyException("[Error in line "+lineNum+"]: found '>"+c+"' must be > or >=");
 		} else if (c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
 		}
@@ -229,7 +242,7 @@ public class LexAnalyser {
 		return new Token(processedStr, "delimiter", lineNum);
 	}
 
-	private Token getEqualOperatorToken() throws Exception {
+	private Token getEqualOperatorToken() throws CutePyException {
 		Character c = readChar();
 		if (c.equals('=')) {
 			return new Token(processedStr, "relOperator", lineNum);
@@ -239,17 +252,17 @@ public class LexAnalyser {
 		} else if (c.equals(' ') || c.equals('\t')) {
 			return getAssignmentWithSpace();
 		} else {
-			throw new Exception("[Error: at line"+lineNum+"]: found '='. Relation operator is '==', ...>");					
+			throw new CutePyException("[Error in line"+lineNum+"]: found '='. Relation operator is '==', ...>");					
 		}
 	}
 	
-	private Token getAssignmentWithSpace() throws Exception {
+	private Token getAssignmentWithSpace() throws CutePyException {
 		Character c = readChar();
 		if (Character.isAlphabetic(c) || Character.isDigit(c)) {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
 		}
-		throw new Exception("[Error: at line "+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
+		throw new CutePyException("[Error in line "+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
 	}
 
 	private void resetProcessedStr() {

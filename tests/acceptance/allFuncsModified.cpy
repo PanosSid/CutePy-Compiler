@@ -76,11 +76,13 @@ def main_factorial2():
 	#declare i,fact
 
 	#$ body of 
-	main_factorial2 # panos #$
+		main_factorial2 # panos 
+		%^&(
+	#$
 	x = int(input());
 	fact =1;
 	i = 1;
-	while ([i<=x] and [x<>0] or not [i == -x] ):
+	while ([i<=x] and [x == 0] or not [i != -x] ):
 	#{
 		fact = fact * i;
 		i = i + 1;
