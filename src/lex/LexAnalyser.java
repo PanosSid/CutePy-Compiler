@@ -179,7 +179,7 @@ public class LexAnalyser {
 		}
 		unReadChar();
 		if (isNumberOutOfBounds()) {
-			throw new CutePyException("[Error in line"+lineNum+"] found integer with value outside of the limits");
+			throw new CutePyException("[Error in line "+lineNum+"] found integer : '"+processedStr+"' with value outside of the limits");
 		}
 		return new Token(processedStr, "number", lineNum);
 	}
@@ -262,7 +262,7 @@ public class LexAnalyser {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
 		}
-		throw new CutePyException("[Error in line "+lineNum+"] found '=whitespace and a char that is not a digit or letter found '= "+c+"'");
+		throw new CutePyException("[Error in line "+lineNum+"] expected '= <identifier> or <integer>' but found '= "+c+"'");
 	}
 
 	private void resetProcessedStr() {

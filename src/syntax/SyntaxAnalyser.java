@@ -39,7 +39,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void defMainFunction() throws CutePyException { // TODO ERROR MSGS
+	private void defMainFunction() throws CutePyException { 
 		System.out.println("defMainFunction() "+ currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
@@ -64,14 +64,14 @@ public class SyntaxAnalyser {
 				} else {
 					throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected '#}' found '"+currentToken.getRecognizedStr()+"'");
 				}
-			}	// TODO edo thelei exception ??
+			}	
 		} else {
 			throw new CutePyException("[Error in line "+currentToken.getLineNum()+ "] expected 'def' found '"+currentToken.getRecognizedStr()+"'");
 		}
 		
 	}
 	
-	private void defFunction() throws CutePyException {	// TODO ERROR MSGS
+	private void defFunction() throws CutePyException {	
 		System.out.println("defFunction() "+ currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
@@ -302,7 +302,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void elsePart() throws CutePyException { //TODO add error messages + check name of method
+	private void elsePart() throws CutePyException { 
 		System.out.println("elsePart() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("else")) {
 			loadNextTokenFromLex();
@@ -414,7 +414,7 @@ public class SyntaxAnalyser {
 			loadNextTokenFromLex();
 			idTail();
 		} else {
-			throw new CutePyException("[Error in line "+currentToken.getLineNum()+"] at factor !"); 	//TODO make this message more useful
+			throw new CutePyException("[Error in line "+currentToken.getLineNum()+"] expected <identifier> or <integer> or '(' but found '"+currentToken.getRecognizedStr()+"'"); 
 		}
 	}
 	
@@ -442,7 +442,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void actualParList() throws CutePyException {	// TODO write tests
+	private void actualParList() throws CutePyException {	
 		System.out.println("actualParList() "+ currentToken.getRecognizedStr());
 		expression();
 		while (currentToken.recognizedStrEquals(",")) {
@@ -477,7 +477,7 @@ public class SyntaxAnalyser {
 		}
 	}
 	
-	private void boolFactor() throws CutePyException { 	// TODO write tests
+	private void boolFactor() throws CutePyException { 	
 		System.out.println("boolFactor() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("not")) {
 			loadNextTokenFromLex();

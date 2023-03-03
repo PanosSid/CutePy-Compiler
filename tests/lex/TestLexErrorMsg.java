@@ -24,7 +24,7 @@ public class TestLexErrorMsg {
 		reader.setFileContents(" 4294967296 \n");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(CutePyException.class, () -> lex.getToken());
-		Assertions.assertEquals("[Error in line" + 1 + "] found integer with value outside of the limits",
+		Assertions.assertEquals("[Error in line 1] found integer : '4294967296' with value outside of the limits",
 				thrown.getMessage());
 	}
 
@@ -92,7 +92,7 @@ public class TestLexErrorMsg {
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(CutePyException.class, () -> lex.getToken());
 		Assertions.assertEquals(
-				"[Error in line " + 1 + "] found '=whitespace and a char that is not a digit or letter found '= !'",
+				"[Error in line 1] expected '= <identifier> or <integer>' but found '= !'",
 				thrown.getMessage());
 	}
 

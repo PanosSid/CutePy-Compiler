@@ -1,8 +1,8 @@
-def main_factorial():
+ main_factorial():
 #{
 	#$ declarations #$
 	#declare x
-	#dec7Êlare i,fact
+	#declare i,fact
 
 	#$ body of main_factorial #$
 	x = int(input());
@@ -14,6 +14,12 @@ def main_factorial():
 		i = i + 1;
 	#}
 	print(fact);
+
+#}
+
+ main_factorial():
+#{
+	c = 1
 
 #}
 

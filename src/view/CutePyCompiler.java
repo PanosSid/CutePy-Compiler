@@ -31,8 +31,8 @@ public class CutePyCompiler {
 	public static void main(String[] args) {
 		String TEST_FILES_PATH = "D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\tests\\acceptance\\";
 		CutePyCompiler cpyCompiler = new CutePyCompiler();
-		cpyCompiler.compile(TEST_FILES_PATH+"allFuncs.cpy");
-//		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy");
+//		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy");
+		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy");
 //		cpyCompiler.compile(args[1]);
 		
 		
