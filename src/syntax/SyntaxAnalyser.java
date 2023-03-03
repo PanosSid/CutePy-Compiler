@@ -263,7 +263,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void ifStat() throws CutePyException {	//TODO  write tests and add error messages 
+	private void ifStat() throws CutePyException {	
 		System.out.println("ifStat() "+ currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -277,7 +277,9 @@ public class SyntaxAnalyser {
 						statements();
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
-							elsePart();
+							if (currentToken.recognizedStrEquals("else")) {
+								elsePart();
+							}
 						} else {
 							throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '#}' or a statement but found "+currentToken.getRecognizedStr());
 						}
@@ -295,9 +297,9 @@ public class SyntaxAnalyser {
 			} else {
 				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ')' but found "+currentToken.getRecognizedStr());
 			}
+		} else {
+			throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());			
 		}
-//		throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected '(' but found "+currentToken.getRecognizedStr());
-//		TODO edo exoume error pou prepei na yparxei kanonika
 	}
 
 	private void elsePart() throws CutePyException { //TODO add error messages + check name of method
@@ -322,9 +324,9 @@ public class SyntaxAnalyser {
 			} else {
 				throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected ':' but found "+currentToken.getRecognizedStr());
 			}
+		} else {
+			throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected 'else' but found "+currentToken.getRecognizedStr());
 		}
-//		throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] expected 'else' but found "+currentToken.getRecognizedStr());
-//		TODO edo exoume error pou prepei na yparxei kanonika
 		
 	}
 

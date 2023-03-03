@@ -32,4 +32,31 @@ public class TestSyntaxErrors {
 		Assertions.assertEquals("[Error in line " +3+ "] there must be at least one simple or structured statement ", thrown.getMessage());	
 		
 	}
+	
+	@Test
+	public void testBug() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_factorial():\r\n"
+				+ "#{\r\n"
+				+ "	#$ declarations #$\r\n"
+				+ "	#declare x\r\n"
+				+ "	#declare i,fact\r\n"
+				+ "\r\n"
+				+ "	#$ body of main_factorial #$\r\n"
+				+ " if x>1:\n"
+				+ "	x = int(input());\r\n"
+				+ "	fact = 1;\r\n"
+				+ "	i = 1;\r\n"
+				+ "\r\n"
+				+ "#}"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "	"
+				);
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line " +8+ "] expected '(' but found x", thrown.getMessage());	
+		
+	}
 }

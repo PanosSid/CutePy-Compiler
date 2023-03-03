@@ -387,32 +387,7 @@ public class TestSyntaxAnalyser {
 		
 	}
 	
-	@Test
-	public void testBug() throws Exception {
-		setUpSyntaxAnalyser(""
-				+ "def main_factorial():\r\n"
-				+ "#{\r\n"
-				+ "	#$ declarations #$\r\n"
-				+ "	#declare x\r\n"
-				+ "	#declare i,fact\r\n"
-				+ "\r\n"
-				+ "	#$ body of main_factorial #$\r\n"
-				+ "	x = int(input());\r\n"
-				+ "	fact = 1;\r\n"
-				+ "	i = 1;\r\n"
-				+ "\r\n"
-				+ "#}"
-				+ "\r\n"
-				+ "if __name__ == \"__main__\":\r\n"
-				+ "#$ call of main functions #$\r\n"
-				+ "	main_primes();\r\n"
-				+ "	"
-				);
-		syntax.analyzeSyntax();
-		Token expectedCurrentTk = new EOFToken(16);
-		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
-		
-	}
+	
 	
 	
 }
