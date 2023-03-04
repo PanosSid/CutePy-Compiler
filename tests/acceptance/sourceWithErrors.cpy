@@ -1,4 +1,4 @@
- main_factorial():
+def main_factorial():
 #{
 	#$ declarations #$
 	#declare x

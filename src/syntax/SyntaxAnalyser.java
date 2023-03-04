@@ -49,7 +49,7 @@ public class SyntaxAnalyser {
 					if (currentToken.getRecognizedStr().equals(args[i])) {
 						loadNextTokenFromLex();
 					} else {
-						throwCutePyException(args[i]);
+						throw new CutePyException(getErrorMsg(args[i]));
 					}
 				}
 				declarations();
@@ -61,15 +61,18 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals("#}")) {
 					loadNextTokenFromLex();
 				} else {
-					throwCutePyException("#}");
+					throw new CutePyException(getErrorMsg("#}"));
 				}
+			} else {
+				throw new CutePyException(getErrorMsg("<identifier>"));
 			}
 		} else {
-			throwCutePyException("def");
+			throw new CutePyException(getErrorMsg("def"));
+
 		}
 
 	}
-
+	
 	private void defFunction() throws CutePyException {
 		System.out.println("defFunction() " + currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
@@ -84,7 +87,7 @@ public class SyntaxAnalyser {
 						if (currentToken.getRecognizedStr().equals(args[i])) {
 							loadNextTokenFromLex();
 						} else {
-							throwCutePyException(args[i]);
+							throw new CutePyException(getErrorMsg(args[i]));
 						}
 					}
 					declarations();
@@ -96,16 +99,16 @@ public class SyntaxAnalyser {
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throwCutePyException("#}");
+						throw new CutePyException(getErrorMsg("#}"));
 					}
 				} else {
-					throwCutePyException("(");
+					throw new CutePyException(getErrorMsg("("));
 				}
 			} else {
-				throwCutePyException("<identifier>");
+				throw new CutePyException(getErrorMsg("<identifier>"));
 			}
 		} else {
-			throwCutePyException("def");
+			throw new CutePyException(getErrorMsg("def"));
 		}
 	}
 
@@ -129,7 +132,7 @@ public class SyntaxAnalyser {
 		} else if (isStructuredStatement()) {
 			structuredStatement();
 		} else {
-			throwCutePyException("at least one simple or structured statement");
+			throw new CutePyException(getErrorMsg("at least one simple or structured statement"));
 		}
 
 	}
@@ -156,7 +159,8 @@ public class SyntaxAnalyser {
 		} else if (currentToken.recognizedStrEquals("return")) {
 			returnStat();
 		} else {
-			throwCutePyException("<identifier> or 'print' or 'return'");
+			// TODO will never be reached ?
+			throw new CutePyException(getErrorMsg("<identifier> or 'print' or 'return'"));
 		}
 	}
 
@@ -174,7 +178,7 @@ public class SyntaxAnalyser {
 			loadNextTokenFromLex();
 			whileStat();
 		} else {
-			throwCutePyException("expected a stuctured statement 'if' or 'while'");
+			throw new CutePyException(getErrorMsg("expected a stuctured statement 'if' or 'while'"));
 		}
 	}
 
@@ -198,12 +202,14 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals(nextTks[i])) {
 						loadNextTokenFromLex();
 					} else {
-						throwCutePyException(nextTks[i]);
+						throw new CutePyException(getErrorMsg(nextTks[i]));
 					}
 				}
 			} else {
-				throwCutePyException("'= expresion' or '= int(input());'");
+				throw new CutePyException(getErrorMsg("'= expresion' or '= int(input());'"));
 			}
+		} else {
+			throw new CutePyException(getErrorMsg("="));
 		}
 	}
 
@@ -223,7 +229,7 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args1[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(args1[i]);
+				throw new CutePyException(getErrorMsg(args1[i]));
 			}
 		}
 		expression();
@@ -232,7 +238,7 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args2[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(args2[i]);
+				throw new CutePyException(getErrorMsg(args2[i]));
 			}
 		}
 	}
@@ -244,7 +250,7 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args1[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(args1[i]);
+				throw new CutePyException(getErrorMsg(args1[i]));
 			}
 		}
 		expression();
@@ -253,7 +259,7 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(args2[i])) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(args2[i]);
+				throw new CutePyException(getErrorMsg(args2[i]));
 			}
 		}
 	}
@@ -276,7 +282,7 @@ public class SyntaxAnalyser {
 								elsePart();
 							}
 						} else {
-							throwCutePyException("#}");
+							throw new CutePyException(getErrorMsg("#}"));
 						}
 					} else if (isStatement()) {
 						statement();
@@ -284,16 +290,16 @@ public class SyntaxAnalyser {
 							elsePart();
 						}
 					} else {
-						throwCutePyException("#{");
+						throw new CutePyException(getErrorMsg("#{"));
 					}
 				} else {
-					throwCutePyException(":");
+					throw new CutePyException(getErrorMsg(":"));
 				}
 			} else {
-				throwCutePyException(")");
+				throw new CutePyException(getErrorMsg(")"));
 			}
 		} else {
-			throwCutePyException("(");
+			throw new CutePyException(getErrorMsg("("));
 		}
 	}
 
@@ -309,18 +315,18 @@ public class SyntaxAnalyser {
 					if (currentToken.recognizedStrEquals("#}")) {
 						loadNextTokenFromLex();
 					} else {
-						throwCutePyException("#}");
+						throw new CutePyException(getErrorMsg("#}"));
 					}
 				} else if (isStatement()) {
 					statement();
 				} else {
-					throwCutePyException("#{");
+					throw new CutePyException(getErrorMsg("#{"));
 				}
 			} else {
-				throwCutePyException(":");
+				throw new CutePyException(getErrorMsg(":"));
 			}
 		} else {
-			throwCutePyException("else");
+			throw new CutePyException(getErrorMsg("else"));
 		}
 
 	}
@@ -340,21 +346,21 @@ public class SyntaxAnalyser {
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 						} else {
-							throwCutePyException("#}");
+							throw new CutePyException(getErrorMsg("#}"));
 						}
 					} else if (isStatement()) {
 						statement();
 					} else {
-						throwCutePyException("#{");
+						throw new CutePyException(getErrorMsg("#{"));
 					}
 				} else {
-					throwCutePyException(":");
+					throw new CutePyException(getErrorMsg(":"));
 				}
 			} else {
-				throwCutePyException(")");
+				throw new CutePyException(getErrorMsg(")"));
 			}
 		} else {
-			throwCutePyException("(");
+			throw new CutePyException(getErrorMsg("("));
 		}
 	}
 
@@ -367,11 +373,11 @@ public class SyntaxAnalyser {
 				if (isID(currentToken)) {
 					loadNextTokenFromLex();
 				} else {
-					throwCutePyException("identifier after ','");
+					throw new CutePyException(getErrorMsg("identifier after ','"));
 				}
 			}
 		}
-		// doesnt need to throw exception here
+		// dont need to throw exception here
 	}
 
 	private void expression() throws CutePyException {
@@ -403,13 +409,13 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(")");
+				throw new CutePyException(getErrorMsg(")"));
 			}
 		} else if (isID(currentToken)) {
 			loadNextTokenFromLex();
 			idTail();
 		} else {
-			throwCutePyException("<identifier> or <integer> or '('");
+			throw new CutePyException(getErrorMsg("<identifier> or <integer> or '('"));
 		}
 	}
 
@@ -431,17 +437,20 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException(")");
+				throw new CutePyException(getErrorMsg(")"));
 			}
 		}
+		// dont need to throw exception here
 	}
 
 	private void actualParList() throws CutePyException {
 		System.out.println("actualParList() " + currentToken.getRecognizedStr());
-		expression();
-		while (currentToken.recognizedStrEquals(",")) {
-			loadNextTokenFromLex();
+		if (isExpression()) {
 			expression();
+			while (currentToken.recognizedStrEquals(",")) {
+				loadNextTokenFromLex();
+				expression();
+			}			
 		}
 	}
 
@@ -463,7 +472,7 @@ public class SyntaxAnalyser {
 
 	private void boolTerm() throws CutePyException {
 		System.out.println("boolTerm() " + currentToken.getRecognizedStr());
-		boolFactor(); // isos kati edo paizei
+		boolFactor();
 		while (currentToken.recognizedStrEquals("and")) {
 			loadNextTokenFromLex();
 			boolFactor();
@@ -480,10 +489,10 @@ public class SyntaxAnalyser {
 				if (currentToken.recognizedStrEquals("]")) {
 					loadNextTokenFromLex();
 				} else {
-					throwCutePyException("]");
+					throw new CutePyException(getErrorMsg("]"));
 				}
 			} else {
-				throwCutePyException("[");
+				throw new CutePyException(getErrorMsg("["));
 			}
 
 		} else if (currentToken.recognizedStrEquals("[")) {
@@ -492,18 +501,18 @@ public class SyntaxAnalyser {
 			if (currentToken.recognizedStrEquals("]")) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException("]");
+				throw new CutePyException(getErrorMsg("]"));
 			}
 		} else if (isExpression()) {
 			expression();
 			if (CharTypes.REL_OPS.contains((currentToken.getRecognizedStr()))) {
 				loadNextTokenFromLex();
 			} else {
-				throwCutePyException("<relation operator>");
+				throw new CutePyException(getErrorMsg("<relation operator>"));
 			}
 			expression();
 		} else {
-			throwCutePyException("'not [condition]' or '[condition]' or 'expression relOp expression'");
+			throw new CutePyException(getErrorMsg("'not [condition]' or '[condition]' or 'expression relOp expression'"));
 		}
 	}
 
@@ -514,7 +523,7 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throwCutePyException(args[i]);
+					throw new CutePyException(getErrorMsg(args[i]));
 				}
 			}
 			mainFunctionCall();
@@ -532,11 +541,11 @@ public class SyntaxAnalyser {
 				if (currentToken.getRecognizedStr().equals(args[i])) {
 					loadNextTokenFromLex();
 				} else {
-					throwCutePyException(args[i]);
+					throw new CutePyException(getErrorMsg(args[i]));
 				}
 			}
 		} else {
-			throwCutePyException("<identifier>");
+			throw new CutePyException(getErrorMsg("<identifier>"));
 		}
 	}
 
@@ -551,9 +560,8 @@ public class SyntaxAnalyser {
 		System.out.println(recognisedCode);
 	}
 
-	private void throwCutePyException(String expected) throws CutePyException {
-		throw new CutePyException("[Error in line " + currentToken.getLineNum() + "]"
-				+ " expected '" + expected + "' but found '" + currentToken.getRecognizedStr() + "'");
+	private String getErrorMsg(String expected) {
+		return "[Error in line " + currentToken.getLineNum() + "]"
+				+ " expected '" + expected + "' but found '" + currentToken.getRecognizedStr() + "'";
 	}
-
 }

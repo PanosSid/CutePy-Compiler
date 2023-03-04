@@ -252,7 +252,7 @@ public class LexAnalyser {
 		} else if (c.equals(' ') || c.equals('\t')) {
 			return getAssignmentWithSpace();
 		} else {
-			throw new CutePyException("[Error in line"+lineNum+"]: found '='. Relation operator is '==', ...>");					
+			throw new CutePyException("[Error in line"+lineNum+"]: found '='. Relation operator is '==', ...>");	// TODO Better error msg			
 		}
 	}
 	
