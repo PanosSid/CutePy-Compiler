@@ -29,7 +29,7 @@ public class TestSyntaxErrors {
 				+ "\t emptyFunc();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("[Error in line " +3+ "] there must be at least one simple or structured statement ", thrown.getMessage());	
+		Assertions.assertEquals("[Error in line 3] expected 'at least one simple or structured statement' but found '#}'", thrown.getMessage());	
 		
 	}
 	
@@ -56,7 +56,7 @@ public class TestSyntaxErrors {
 				+ "	"
 				);
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("[Error in line " +8+ "] expected '(' but found x", thrown.getMessage());	
+		Assertions.assertEquals("[Error in line " +8+ "] expected '(' but found 'x'", thrown.getMessage());	
 		
 	}
 }
