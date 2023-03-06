@@ -20,13 +20,13 @@ public class TestSyntaxErrors {
 	}
 	
 	@Test
-	public void testEmptyFunction() throws Exception {
+	public void testmain_Function() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def emptyFunc():\n"
+				+ "def main_Func():\n"
 				+ "#{\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line 3] expected 'at least one simple or structured statement' but found '#}'", thrown.getMessage());	
@@ -36,11 +36,11 @@ public class TestSyntaxErrors {
 	@Test
 	public void testDefMainFuncThrowsException() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc(:\n"
+				+ "def main_Func(:\n"
 				+ "#{\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line 1] expected ')' but found ':'", thrown.getMessage());	
@@ -50,15 +50,16 @@ public class TestSyntaxErrors {
 	@Test
 	public void testDefMainFuncThrowsException2() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc():\n"
+				+ "def main_Func():\n"
 				+ "#{\n"
 				+ "	  print(1);\n"
-				+ "def mainFunc2():\n"
+				+ "def main_Func2():\n"
 				+ "#{\n"
 				+ "	  print(1);\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
+				+ "\t main_Func2();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line 4] expected '#}' but found 'def'", thrown.getMessage());	
@@ -71,7 +72,7 @@ public class TestSyntaxErrors {
 				+ "#{\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line 1] expected 'def' but found 'mainFunc'", thrown.getMessage());	
@@ -85,10 +86,10 @@ public class TestSyntaxErrors {
 				+ "#{\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("[Error in line 1] expected '<identifier>' but found '253'", thrown.getMessage());	
+		Assertions.assertEquals("[Error in line 1] expected '<identifier> that starts with 'main_'' but found '253'", thrown.getMessage());	
 		
 	}
 	
@@ -156,7 +157,7 @@ public class TestSyntaxErrors {
 //				+ "print(1);\r\n"
 //				+ "#}"
 //				+ "if __name__ == \"__main__\":\r\n"
-//				+ "\t emptyFunc();\r\n"
+//				+ "\t main_Func();\r\n"
 //				
 //				);	
 //		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
@@ -167,11 +168,11 @@ public class TestSyntaxErrors {
 	@Test
 	public void testStatementThrowsException() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ " def emptyFunc():\n"
+				+ " def main_Func():\n"
 				+ "#{\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t emptyFunc();\r\n"
+				+ "\t main_Func();\r\n"
 				);	
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line 3] expected 'at least one simple or structured statement' but found '#}'", thrown.getMessage());	
@@ -180,16 +181,129 @@ public class TestSyntaxErrors {
 //	@Test
 //	public void testSimpleStatementThrowsException() throws Exception {
 //		setUpSyntaxAnalyser(""
-//				+ " def emptyFunc():\n"
+//				+ " def main_Func():\n"
 //				+ "#{\n"
 //				+ "# 222\n"
 //				+ "#}\n"
 //				+ "if __name__ == \"__main__\":\r\n"
-//				+ "\t emptyFunc();\r\n"
+//				+ "\t main_Func();\r\n"
 //				);	
 //		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 //		Assertions.assertEquals("[Error in line 3] expected 'at least one simple or structured statement' but found '#}'", thrown.getMessage());	
 //	}
+	
+	@Test
+	public void testAssignmentStatThrowsException1() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "x + 5 "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected '=' but found '+'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testAssignmentStatThrowsException2() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "x = #declare y "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected '= <identifier> or <integer>' but found '= #'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testAssignmentStatThrowsException3() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "x = int(5);"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected 'input' but found '5'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testAssignmentStatThrowsException4() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "x = int(input())"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected ';' but found '#}'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testPrintStatThrowsException1() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "print); "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected '(' but found ')'", thrown.getMessage());	
+	}
+	@Test
+	public void testPrintStatThrowsException2() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "print(6) "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected ';' but found '#}'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testReturnStatThrowsException1() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "return1); "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected '=' but found ')'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testReturnStatThrowsException2() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ " def main_Func():\n"
+				+ "#{\n"
+				+ "return(4+5) "
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_Func();\r\n"
+				);	
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("[Error in line 3] expected ';' but found '#}'", thrown.getMessage());	
+	}
+	
+	
 	
 	
 	@Test

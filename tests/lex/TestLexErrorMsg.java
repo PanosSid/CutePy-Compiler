@@ -49,8 +49,7 @@ public class TestLexErrorMsg {
 		reader.setFileContents(" /4");
 		LexAnalyser lex = new LexAnalyser(reader);
 		Exception thrown = assertThrows(CutePyException.class, () -> lex.getToken());
-		Assertions.assertEquals("[Error in line " + 1 + "]: Char after division char '/' is " + 4
-				+ " not '/'. The division operator is '//'.", thrown.getMessage());
+		Assertions.assertEquals("[Error in line 1]: Expected the division operator '//' but found '/4'", thrown.getMessage());
 	}
 
 	@Test

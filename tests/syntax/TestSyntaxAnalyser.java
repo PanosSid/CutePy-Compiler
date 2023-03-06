@@ -20,14 +20,14 @@ public class TestSyntaxAnalyser {
 	}
 	
 	@Test
-	public void testMainFunctionCall() throws Exception {
+	public void testmain_FunctionCall() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFuncCall():\n"
+				+ "def main_FuncCall():\n"
 				+ "#{\n"
 				+ "\tprint(100);\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFuncCall();\r\n"
+				+ "\t main_FuncCall();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(7);
@@ -35,16 +35,16 @@ public class TestSyntaxAnalyser {
 	}
 	
 	@Test
-	public void testDefMainFunction() throws Exception {
+	public void testDefmain_Function() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{ statement1 = 1;\n"
 				+ "#}\n"
-				+ "def mainFunc2():\n"
+				+ "def main_Func2():\n"
 				+ "#{ statement2 = 2;\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(9);
@@ -53,18 +53,18 @@ public class TestSyntaxAnalyser {
 	}
 	
 	@Test
-	public void testMainFunctionWithoutSubFuncs() throws Exception {
+	public void testmain_FunctionWithoutSubFuncs() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\t#declare x1\n"
 				+ "\t#declare y1, y2\n"
-				+ "\tx1 = y1 + y2\n"
+				+ "\tx1 = y1 + y2;\n"
 				+ "\tprint(x1);\n"
 				+ "\treturn(-x1);\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
@@ -268,7 +268,7 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testIfStat() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\tif (x == 5):\r\n"
 				+ "\t#{\r\n"
@@ -277,7 +277,7 @@ public class TestSyntaxAnalyser {
 				+ "\t#}\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(11);
@@ -288,7 +288,7 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testIfElseMultipleStat() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\tif (x == 5):\r\n"
 				+ "\t#{\r\n"
@@ -301,7 +301,7 @@ public class TestSyntaxAnalyser {
 				+ "\t#}"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 //		syntax.setCurrentToken();
 		syntax.analyzeSyntax();
@@ -313,7 +313,7 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testIfElseOneStat() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "if (x == 5):\r\n"
 				+ "\tx = 2 * 5;\r\n"
@@ -321,7 +321,7 @@ public class TestSyntaxAnalyser {
 				+ "\treturn(0);\r\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(10);
@@ -332,7 +332,7 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testIfMultipleStatElseOne() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "if (x == 5):\r\n"
 				+ "\t#{\r\n"
@@ -342,7 +342,7 @@ public class TestSyntaxAnalyser {
 				+ "\treturn(0);\r\n"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(12);
@@ -353,13 +353,13 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testBoolTerms() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\tif ( not [x > 0] and [x == 0] or [x <= 0]):\r\n"
 				+ "\t\treturn(-1);"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(7);
@@ -370,13 +370,13 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testBoolTermSmall() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\tif ([x == 0] or [x <= 0]):\r\n"
 				+ "\t\treturn(-1);"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
+				+ "\t main_Func1();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(7);
@@ -388,17 +388,17 @@ public class TestSyntaxAnalyser {
 	@Test
 	public void testMultipleFunctionCalls() throws Exception {
 		setUpSyntaxAnalyser(""
-				+ "def mainFunc1():\n"
+				+ "def main_Func1():\n"
 				+ "#{\n"
 				+ "\treturn(1);"
 				+ "#}\n"
-				+ "def mainFunc2():\n"
+				+ "def main_Func2():\n"
 				+ "#{\n"
 				+ "\treturn(2);"
 				+ "#}\n"
 				+ "if __name__ == \"__main__\":\r\n"
-				+ "\t mainFunc1();\r\n"
-				+ "\t mainFunc2();\r\n"
+				+ "\t main_Func1();\r\n"
+				+ "\t main_Func2();\r\n"
 				);
 		syntax.analyzeSyntax();
 		Token expectedCurrentTk = new EOFToken(10);

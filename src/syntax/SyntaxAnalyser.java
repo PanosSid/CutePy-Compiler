@@ -42,7 +42,7 @@ public class SyntaxAnalyser {
 		System.out.println("defMainFunction() " + currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
-			if (isID(currentToken)) {
+			if (isMainFuncId()) {
 				loadNextTokenFromLex();
 				String args[] = { "(", ")", ":", "#{" };
 				for (int i = 0; i < args.length; i++) {
@@ -64,7 +64,7 @@ public class SyntaxAnalyser {
 					throw new CutePyException(getErrorMsg("#}"));
 				}
 			} else {
-				throw new CutePyException(getErrorMsg("<identifier>"));
+				throw new CutePyException(getErrorMsg("<identifier> that starts with 'main_'"));
 			}
 		} else {
 			throw new CutePyException(getErrorMsg("def"));
@@ -77,7 +77,7 @@ public class SyntaxAnalyser {
 		System.out.println("defFunction() " + currentToken.getRecognizedStr());
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
-			if (isID(currentToken)) {
+			if (isID(currentToken) && !isMainFuncId()) {
 				loadNextTokenFromLex();
 				if (currentToken.recognizedStrEquals("(")) {
 					loadNextTokenFromLex();
@@ -105,7 +105,7 @@ public class SyntaxAnalyser {
 					throw new CutePyException(getErrorMsg("("));
 				}
 			} else {
-				throw new CutePyException(getErrorMsg("<identifier>"));
+				throw new CutePyException(getErrorMsg("<identifier> that does not start with 'main_'"));
 			}
 		} else {
 			throw new CutePyException(getErrorMsg("def"));
@@ -178,6 +178,7 @@ public class SyntaxAnalyser {
 			loadNextTokenFromLex();
 			whileStat();
 		} else {
+			// TODO will never be reached ?
 			throw new CutePyException(getErrorMsg("expected a stuctured statement 'if' or 'while'"));
 		}
 	}
@@ -194,6 +195,8 @@ public class SyntaxAnalyser {
 				expression();
 				if (currentToken.recognizedStrEquals(";")) {
 					loadNextTokenFromLex();
+				} else {
+					throw new CutePyException(getErrorMsg(";"));
 				}
 			} else if (currentToken.recognizedStrEquals("int")) {
 				loadNextTokenFromLex();
@@ -534,7 +537,7 @@ public class SyntaxAnalyser {
 	}
 
 	public void mainFunctionCall() throws CutePyException {
-		if (isID(currentToken)) {
+		if (isMainFuncId()) {
 			loadNextTokenFromLex();
 			String args[] = { "(", ")", ";" };
 			for (int i = 0; i < args.length; i++) {
@@ -545,7 +548,7 @@ public class SyntaxAnalyser {
 				}
 			}
 		} else {
-			throw new CutePyException(getErrorMsg("<identifier>"));
+			throw new CutePyException(getErrorMsg("<identifier> that starts with 'main_'"));
 		}
 	}
 
@@ -557,7 +560,11 @@ public class SyntaxAnalyser {
 	private void loadNextTokenFromLex() throws CutePyException {
 		currentToken = lex.getToken();
 		recognisedCode += currentToken.getRecognizedStr() + "\n";
-		System.out.println(recognisedCode);
+//		System.out.println(recognisedCode);
+	}
+	
+	private boolean isMainFuncId() {
+		return isID(currentToken) && currentToken.getRecognizedStr().startsWith("main_");
 	}
 
 	private String getErrorMsg(String expected) {

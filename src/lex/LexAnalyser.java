@@ -150,9 +150,6 @@ public class LexAnalyser {
 			Character c = sourceReader.readNext();
 			if (c.equals('\n'))
 				return true;
-			else {
-				return false;
-			}
 		}
 		return false;
 	}
@@ -184,18 +181,15 @@ public class LexAnalyser {
 		return new Token(processedStr, "number", lineNum);
 	}
 	
-	// TODO parsed number is integer so the negative check is not needed
 	private boolean isNumberOutOfBounds() {
 		try {
 			Integer parsedNum = Integer.parseInt(processedStr);
-			return (parsedNum < (-Math.pow(2, 32) - 1)
-					|| parsedNum > (Math.pow(2, 32) - 1));
+			return (parsedNum > (Math.pow(2, 32) - 1));
 		} catch (NumberFormatException e) { 
 			return true;
 		}
 	}
 	
-
 	private Token getAddOperatorToken() throws CutePyException {
 		return new Token(processedStr, "addOperator", lineNum);
 	}
@@ -207,7 +201,7 @@ public class LexAnalyser {
 	private Token getMulOperatorDivToken() throws CutePyException {
 		Character c = readChar();
 		if (!c.equals('/')) {
-			throw new CutePyException("[Error in line "+lineNum+"]: Char after division char '/' is "+c+" not '/'. The division operator is '//'.");
+			throw new CutePyException("[Error in line "+lineNum+"]: Expected the division operator '//' but found '/"+c+"'");
 		}
 		return new Token(processedStr, "mulOperator", lineNum);
 	}
