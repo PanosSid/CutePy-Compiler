@@ -17,15 +17,17 @@ public class FileReader {
 		this.filePointer = 0;
 	}
 	
-	public void initFileContents2(String fileName) {
+	public void initFileContents(String fileName) throws IOException {
 		this.fileName = fileName;
-		try {
-			byte[] content = Files.readAllBytes(Paths.get(fileName));
-			fileContents = new String(content) +EOF;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
+		byte[] content = Files.readAllBytes(Paths.get(fileName));
+		fileContents = new String(content) +EOF;
+//		try {
+//			byte[] content = Files.readAllBytes(Paths.get(fileName));
+//			fileContents = new String(content) +EOF;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			System.exit(-1);
+//		}
 	}
 	
 	public String getFileName() {

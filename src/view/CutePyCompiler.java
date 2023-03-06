@@ -1,5 +1,6 @@
 package view;
 
+import java.io.IOException;
 import exceptions.CutePyException;
 import lex.FileReader;
 import lex.LexAnalyser;
@@ -17,25 +18,33 @@ public class CutePyCompiler {
 	}
 	
 	public void compile(String filePath) {
-		reader.initFileContents2(filePath);	
 		try {
+			checkForCpyExtension(filePath);
+			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
-			System.out.println("Compilation successfully completed");
+			System.out.println("Compilation of '"+filePath+"' successfully completed");
 		} catch (CutePyException e) {
-			System.out.println("Compilation FAILED");
+			System.out.println("Compilation of '"+filePath+"'FAILED");
 			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println("Compilation of '"+filePath+"'FAILED");
+			e.printStackTrace();
 		}
-
 	}
 	
-	public static void main(String[] args) {
-		String TEST_FILES_PATH = "D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\tests\\acceptance\\";
+	private void checkForCpyExtension(String filePath) throws CutePyException {
+		String fileName = filePath.substring(filePath.lastIndexOf("\\")+1);
+		String extention = fileName.substring(fileName.lastIndexOf(".")+1);
+		if (!extention.equals("cpy")) {
+			throw new CutePyException("File extention must be 'cpy' but was '"+extention+"', for file "+fileName);
+		}
+	}
+	
+	public static void main(String[] args) {	
 		CutePyCompiler cpyCompiler = new CutePyCompiler();
-//		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy");
-		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy");
-//		cpyCompiler.compile(args[1]);
-		
-		
+		for (int i = 0; i < args.length; i++) {
+			cpyCompiler.compile(args[i]);
+		}		
 	}
 
 }
