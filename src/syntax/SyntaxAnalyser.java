@@ -1,6 +1,11 @@
 package syntax;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import exceptions.CutePyException;
+import intermediatecode.QuadManager;
 import lex.CharTypes;
 import lex.FileReader;
 import lex.LexAnalyser;
@@ -9,14 +14,29 @@ import lex.Token;
 public class SyntaxAnalyser {
 	private LexAnalyser lex;
 	private Token currentToken;
+	private QuadManager quadManager;
 	private String recognisedCode = ""; // used for debugging
 
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
+		quadManager = new QuadManager();
+	}
+	
+	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager) {
+		this.lex = lex;
+		this.quadManager = quadManager;
 	}
 
+	public QuadManager getQuadManager() {
+		return quadManager;
+	}
+	
 	public Token getCurrentToken() {
 		return currentToken;
+	}
+	
+	public void setCurrentToken(Token currentToken) {
+		this.currentToken = currentToken;
 	}
 
 	public void analyzeSyntax() throws CutePyException {
@@ -43,6 +63,7 @@ public class SyntaxAnalyser {
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isMainFuncId()) {
+				String mainFuncName = currentToken.getRecognizedStr();
 				loadNextTokenFromLex();
 				String args[] = { "(", ")", ":", "#{" };
 				for (int i = 0; i < args.length; i++) {
@@ -52,12 +73,13 @@ public class SyntaxAnalyser {
 						throw new CutePyException(getErrorMsg(args[i]));
 					}
 				}
+				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				declarations();
 				while (currentToken.recognizedStrEquals("def")) {
 					defFunction();
 				}
 				statements();
-
+				quadManager.genQuad("end_block", mainFuncName, "_", "_");
 				if (currentToken.getRecognizedStr().equals("#}")) {
 					loadNextTokenFromLex();
 				} else {
@@ -78,6 +100,7 @@ public class SyntaxAnalyser {
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isID(currentToken) && !isMainFuncId()) {
+				String funcName = currentToken.getRecognizedStr(); 
 				loadNextTokenFromLex();
 				if (currentToken.recognizedStrEquals("(")) {
 					loadNextTokenFromLex();
@@ -90,11 +113,13 @@ public class SyntaxAnalyser {
 							throw new CutePyException(getErrorMsg(args[i]));
 						}
 					}
+					quadManager.genQuad("begin_block", funcName, "_", "_");
 					declarations();
 					while (currentToken.recognizedStrEquals("def")) {
 						defFunction();
 					}
 					statements();
+					quadManager.genQuad("end_block", funcName, "_", "_");
 
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
@@ -152,7 +177,7 @@ public class SyntaxAnalyser {
 	private void simpleStatement() throws CutePyException {
 		System.out.println("simpleStatement() " + currentToken.getRecognizedStr());
 		if (isID(currentToken)) {
-			loadNextTokenFromLex();
+			
 			assignmentStat();
 		} else if (currentToken.recognizedStrEquals("print")) {
 			printStat();
@@ -186,15 +211,19 @@ public class SyntaxAnalyser {
 	private boolean isStructuredStatement() {
 		return currentToken.recognizedStrEquals("if") || currentToken.recognizedStrEquals("while");
 	}
-
+	
+	// TODO dikos mou autosxediasmos gia ton endiameso kodika
 	private void assignmentStat() throws CutePyException {
 		System.out.println("assignmentStat() " + currentToken.getRecognizedStr());
+		String aPlace = currentToken.getRecognizedStr();
+		loadNextTokenFromLex();
 		if (currentToken.recognizedStrEquals("=")) {
 			loadNextTokenFromLex();
 			if (isExpression()) {
-				expression();
+				String ePlace = expression();
 				if (currentToken.recognizedStrEquals(";")) {
 					loadNextTokenFromLex();
+					quadManager.genQuad(":=", ePlace, "_", aPlace);
 				} else {
 					throw new CutePyException(getErrorMsg(";"));
 				}
@@ -208,6 +237,7 @@ public class SyntaxAnalyser {
 						throw new CutePyException(getErrorMsg(nextTks[i]));
 					}
 				}
+				quadManager.genQuad("in", aPlace, "_", "_");
 			} else {
 				throw new CutePyException(getErrorMsg("'= expresion' or '= int(input());'"));
 			}
@@ -235,7 +265,7 @@ public class SyntaxAnalyser {
 				throw new CutePyException(getErrorMsg(args1[i]));
 			}
 		}
-		expression();
+		String ePlace = expression();
 		String args2[] = { ")", ";" };
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args2[i])) {
@@ -244,6 +274,7 @@ public class SyntaxAnalyser {
 				throw new CutePyException(getErrorMsg(args2[i]));
 			}
 		}
+		quadManager.genQuad("out", "_", "_", ePlace);
 	}
 
 	private void returnStat() throws CutePyException {
@@ -256,7 +287,7 @@ public class SyntaxAnalyser {
 				throw new CutePyException(getErrorMsg(args1[i]));
 			}
 		}
-		expression();
+		String ePlace = expression();
 		String args2[] = { ")", ";" };
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args2[i])) {
@@ -265,6 +296,7 @@ public class SyntaxAnalyser {
 				throw new CutePyException(getErrorMsg(args2[i]));
 			}
 		}
+		quadManager.genQuad("ret", "_", "_", ePlace);
 	}
 
 	private void ifStat() throws CutePyException {
@@ -383,40 +415,53 @@ public class SyntaxAnalyser {
 		// dont need to throw exception here
 	}
 
-	private void expression() throws CutePyException {
+	private String expression() throws CutePyException {
 		System.out.println("expression() " + currentToken.getRecognizedStr());
 		optionalSign();
-		term();
+		String t1Place = term();
 		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			loadNextTokenFromLex();
-			term();
+			String t2Place =term();
+			String w = quadManager.newTemp();
+			quadManager.genQuad("+", t1Place, t2Place, w);
+			t1Place = w;
 		}
+		return t1Place;
 	}
 
-	private void term() throws CutePyException {
+	private String term() throws CutePyException {
 		System.out.println("term() " + currentToken.getRecognizedStr());
-		factor();
+		String f1Place = factor();
 		while (CharTypes.MUL_OPS.contains(currentToken.getRecognizedStr())) {
 			loadNextTokenFromLex();
-			factor();
+			String f2Place = factor();
+			String w = quadManager.newTemp();
+			quadManager.genQuad("*", f1Place, f2Place, w);
+			f1Place = w;
 		}
+		return f1Place;
 	}
 
-	private void factor() throws CutePyException {
+	private String factor() throws CutePyException {
 		System.out.println("factor() " + currentToken.getRecognizedStr());
 		if (isInteger(currentToken.getRecognizedStr())) {
+			String fPlace = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
+			return fPlace;
 		} else if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
-			expression();
+			String ePlace = expression();
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
+				return ePlace;
 			} else {
 				throw new CutePyException(getErrorMsg(")"));
 			}
 		} else if (isID(currentToken)) {
+			String fPlace = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
 			idTail();
+			return fPlace; 	//TODO check maybe its is not correct !!
 		} else {
 			throw new CutePyException(getErrorMsg("<identifier> or <integer> or '('"));
 		}
@@ -464,33 +509,44 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void condition() throws CutePyException {
+	public Map<String, List<Integer>> condition() throws CutePyException {
 		System.out.println("condition() " + currentToken.getRecognizedStr());
-		boolTerm();
+		Map<String, List<Integer>> boolTermMap = boolTerm();
 		while (currentToken.recognizedStrEquals("or")) {
 			loadNextTokenFromLex();
 			boolFactor();
 		}
+		return boolTermMap;
 	}
 
-	private void boolTerm() throws CutePyException {
+	private Map<String, List<Integer>> boolTerm() throws CutePyException {
 		System.out.println("boolTerm() " + currentToken.getRecognizedStr());
-		boolFactor();
+		Map<String, List<Integer>> boolFactor1Map = boolFactor(); 	
+		Map<String, List<Integer>> boolTermMap =  boolFactor1Map;	
 		while (currentToken.recognizedStrEquals("and")) {
 			loadNextTokenFromLex();
-			boolFactor();
+			quadManager.backpatch(boolTermMap.get("true"), quadManager.nextQuad());
+			Map<String, List<Integer>> boolFactor2Map = boolFactor();
+			boolTermMap.put("false", quadManager.mergeList(boolTermMap.get("false"), boolFactor2Map.get("false")));
+			boolTermMap.put("true", boolFactor2Map.get("true"));
 		}
+		return boolTermMap;
 	}
 
-	private void boolFactor() throws CutePyException {
+	private Map<String, List<Integer>> boolFactor() throws CutePyException {
 		System.out.println("boolFactor() " + currentToken.getRecognizedStr());
+		
 		if (currentToken.recognizedStrEquals("not")) {
 			loadNextTokenFromLex();
 			if (currentToken.recognizedStrEquals("[")) {
 				loadNextTokenFromLex();
-				condition();
+				Map<String, List<Integer>> conditionMap = condition();
 				if (currentToken.recognizedStrEquals("]")) {
 					loadNextTokenFromLex();
+					Map<String, List<Integer>> boolFactorMap = new HashMap<String, List<Integer>>();
+					boolFactorMap.put("true", conditionMap.get("false"));
+					boolFactorMap.put("false", conditionMap.get("true"));
+					return boolFactorMap;
 				} else {
 					throw new CutePyException(getErrorMsg("]"));
 				}
@@ -500,20 +556,28 @@ public class SyntaxAnalyser {
 
 		} else if (currentToken.recognizedStrEquals("[")) {
 			loadNextTokenFromLex();
-			condition();
+			Map<String, List<Integer>> conditionMap = condition();
 			if (currentToken.recognizedStrEquals("]")) {
 				loadNextTokenFromLex();
+				return conditionMap;
 			} else {
 				throw new CutePyException(getErrorMsg("]"));
 			}
 		} else if (isExpression()) {
-			expression();
+			String e1Place = expression();
+			String relOp = currentToken.getRecognizedStr();
 			if (CharTypes.REL_OPS.contains((currentToken.getRecognizedStr()))) {
 				loadNextTokenFromLex();
 			} else {
 				throw new CutePyException(getErrorMsg("<relation operator>"));
 			}
-			expression();
+			String e2Place = expression();
+			Map<String, List<Integer>> boolFactorMap = new HashMap<String, List<Integer>>();
+			boolFactorMap.put("true", quadManager.makeList(quadManager.nextQuad()));
+			quadManager.genQuad(relOp, e1Place, e2Place, "_");
+			boolFactorMap.put("false", quadManager.makeList(quadManager.nextQuad()));
+			quadManager.genQuad("jump", "_", "_", "_");
+			return boolFactorMap;
 		} else {
 			throw new CutePyException(getErrorMsg("'not [condition]' or '[condition]' or 'expression relOp expression'"));
 		}
@@ -538,6 +602,8 @@ public class SyntaxAnalyser {
 
 	public void mainFunctionCall() throws CutePyException {
 		if (isMainFuncId()) {
+			String mainFuncName = currentToken.getRecognizedStr();
+			quadManager.genQuad("call", mainFuncName, "_", "_");
 			loadNextTokenFromLex();
 			String args[] = { "(", ")", ";" };
 			for (int i = 0; i < args.length; i++) {
