@@ -1,8 +1,8 @@
 package acceptance;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
-
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import view.CutePyCompiler;
  * Acceptance testing for Lex and Syntax analyzer (PHASE 1)
  */
 public class TestAcceptancePhase1 {
-	private String TEST_FILES_PATH = System.getProperty("user.dir")+"\\tests\\acceptance\\";
+	private String TEST_FILES_PATH = System.getProperty("user.dir")+File.separator+"tests"+File.separator +"acceptance"+File.separator ;
 	private CutePyCompiler cpyCompiler = new CutePyCompiler();
 	private ByteArrayOutputStream outContent;
 //	private final PrintStream originalOut = System.out;
