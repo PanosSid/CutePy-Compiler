@@ -164,7 +164,6 @@ public class TestIntermediateCode {
 		setUpSyntaxAnalyser(""
 				+ " >b and c>d or e>f \n"
 				);
-//		syntax.analyzeSyntax();
 		syntax.setCurrentToken(new Token("a", "identifier", 1));
 		syntax.condition();
 		String expectedIntermedCode = ""
@@ -174,6 +173,28 @@ public class TestIntermediateCode {
 				+ "103: jump, _, _, 104\n"
 				+ "104: >, e, f, _\n"
 				+ "105: jump, _, _, _\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
+	@Test
+	public void testConditionIntermed2() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ " >b or a>c and [b>c or a>1] and b!=1 \n"
+				);
+		syntax.setCurrentToken(new Token("a", "identifier", 1));
+		syntax.condition();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, _\n"
+				+ "101: jump, _, _, 102\n"
+				+ "102: >, a, c, 104\n"
+				+ "103: jump, _, _, _\n"
+				+ "104: >, b, c, 108\n"
+				+ "105: jump, _, _, 106\n"
+				+ "106: >, a, 1, 108\n"
+				+ "107: jump, _, _, _\n"
+				+ "108: !=, b, 1, _\n"
+				+ "109: jump, _, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}

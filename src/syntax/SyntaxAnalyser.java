@@ -514,7 +514,12 @@ public class SyntaxAnalyser {
 		Map<String, List<Integer>> boolTermMap = boolTerm();
 		while (currentToken.recognizedStrEquals("or")) {
 			loadNextTokenFromLex();
-			boolFactor();
+//			boolFactor();	//TODO CHECK THIS must be boolTerm();
+			
+			quadManager.backpatch(boolTermMap.get("false"), quadManager.nextQuad());
+			Map<String, List<Integer>> boolTerm2Map = boolTerm();
+			boolTermMap.put("true", quadManager.mergeList(boolTermMap.get("true"), boolTerm2Map.get("true")));
+			boolTermMap.put("false", boolTerm2Map.get("false"));
 		}
 		return boolTermMap;
 	}
