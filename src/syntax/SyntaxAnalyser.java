@@ -194,7 +194,7 @@ public class SyntaxAnalyser {
 				|| currentToken.recognizedStrEquals("return");
 	}
 
-	private void structuredStatement() throws CutePyException {
+	public void structuredStatement() throws CutePyException {
 		System.out.println("structuredStatement() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("if")) {
 			loadNextTokenFromLex();
@@ -366,25 +366,32 @@ public class SyntaxAnalyser {
 
 	}
 
-	private void whileStat() throws CutePyException {
+	public void whileStat() throws CutePyException {
 		System.out.println("whileStat() " + currentToken.getRecognizedStr());
+		int whileQuad = quadManager.nextQuad();
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
-			condition();
+			Map<String, List<Integer>> conditionMap = condition();
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
 				if (currentToken.recognizedStrEquals(":")) {
 					loadNextTokenFromLex();
 					if (currentToken.recognizedStrEquals("#{")) {
 						loadNextTokenFromLex();
+						quadManager.backpatch(conditionMap.get("true"), quadManager.nextQuad());
 						statements();
+						quadManager.genQuad("jump", "_", "_", whileQuad+"");
+						quadManager.backpatch(conditionMap.get("false"), quadManager.nextQuad());
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 						} else {
 							throw new CutePyException(getErrorMsg("#}"));
 						}
 					} else if (isStatement()) {
+						quadManager.backpatch(conditionMap.get("true"), quadManager.nextQuad());
 						statement();
+						quadManager.genQuad("jump", "_", "_", whileQuad+"");
+						quadManager.backpatch(conditionMap.get("false"), quadManager.nextQuad());
 					} else {
 						throw new CutePyException(getErrorMsg("#{"));
 					}

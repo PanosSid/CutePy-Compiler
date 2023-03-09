@@ -199,4 +199,41 @@ public class TestIntermediateCode {
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
 	
+	@Test
+	public void testWhileIntermed1() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ /*while*/ " (a>b):\r\n"	
+				+ " 	b=b+1; \n"
+				);
+		syntax.setCurrentToken(new Token("while", "keyword", 1));
+		syntax.structuredStatement();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, 102\n"
+				+ "101: jump, _, _, 105\n"
+				+ "102: +, b, 1, T_1\n"
+				+ "103: :=, T_1, _, b\n"
+				+ "104: jump, _, _, 100\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
+	@Test
+	public void testWhileIntermed2() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ /*while*/ " (a>b):\r\n"
+				+ "#{\n"	
+				+ " 	b=b+1; \n"
+				+ "#}\n"
+				);
+		syntax.setCurrentToken(new Token("while", "keyword", 1));
+		syntax.structuredStatement();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, 102\n"
+				+ "101: jump, _, _, 105\n"
+				+ "102: +, b, 1, T_1\n"
+				+ "103: :=, T_1, _, b\n"
+				+ "104: jump, _, _, 100\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
 }
