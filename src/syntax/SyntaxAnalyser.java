@@ -303,26 +303,35 @@ public class SyntaxAnalyser {
 		System.out.println("ifStat() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
-			condition();
+			Map<String, List<Integer>> conditionMap = condition();
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
+				quadManager.backpatch(conditionMap.get("true"), quadManager.nextQuad());
 				if (currentToken.recognizedStrEquals(":")) {
 					loadNextTokenFromLex();
 					if (currentToken.recognizedStrEquals("#{")) {
 						loadNextTokenFromLex();
 						statements();
+						List<Integer> ifList = quadManager.makeList(quadManager.nextQuad());
+						quadManager.genQuad("jump", "_", "_", "_");
+						quadManager.backpatch(conditionMap.get("false"), quadManager.nextQuad());
 						if (currentToken.recognizedStrEquals("#}")) {
 							loadNextTokenFromLex();
 							if (currentToken.recognizedStrEquals("else")) {
 								elsePart();
+								quadManager.backpatch(ifList, quadManager.nextQuad());
 							}
 						} else {
 							throw new CutePyException(getErrorMsg("#}"));
 						}
 					} else if (isStatement()) {
 						statement();
+						List<Integer> ifList = quadManager.makeList(quadManager.nextQuad());
+						quadManager.genQuad("jump", "_", "_", "_");
+						quadManager.backpatch(conditionMap.get("false"), quadManager.nextQuad());
 						if (currentToken.recognizedStrEquals("else")) {
 							elsePart();
+							quadManager.backpatch(ifList, quadManager.nextQuad());
 						}
 					} else {
 						throw new CutePyException(getErrorMsg("#{"));
@@ -427,10 +436,11 @@ public class SyntaxAnalyser {
 		optionalSign();
 		String t1Place = term();
 		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
+			String addOp = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
 			String t2Place =term();
 			String w = quadManager.newTemp();
-			quadManager.genQuad("+", t1Place, t2Place, w);
+			quadManager.genQuad(addOp, t1Place, t2Place, w);
 			t1Place = w;
 		}
 		return t1Place;

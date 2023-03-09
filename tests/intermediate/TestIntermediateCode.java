@@ -236,4 +236,52 @@ public class TestIntermediateCode {
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
+	
+	@Test
+	public void testifIntermed1() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ /*if*/"(a>b):\n"
+				+ " 	b=b+1;\n"
+				+ "else:\n"
+				+ " 	b=b-2;\n"
+				);
+		syntax.setCurrentToken(new Token("if", "keyword", 1));
+		syntax.structuredStatement();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, 102\n"
+				+ "101: jump, _, _, 105\n"
+				+ "102: +, b, 1, T_1\n"
+				+ "103: :=, T_1, _, b\n"
+				+ "104: jump, _, _, 107\n"
+				+ "105: -, b, 2, T_2\n"
+				+ "106: :=, T_2, _, b\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
+	@Test
+	public void testifIntermed2() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ /*if*/"(a>b):\n"
+				+ "#{\n"
+				+ " 	b=b+1;\n"
+				+ "#}\n"
+				+ "else:\n"
+				+ "#{\n"
+				+ " 	b=b-2;\n"
+				+ "#}\n"
+				);
+		syntax.setCurrentToken(new Token("if", "keyword", 1));
+		syntax.structuredStatement();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, 102\n"
+				+ "101: jump, _, _, 105\n"
+				+ "102: +, b, 1, T_1\n"
+				+ "103: :=, T_1, _, b\n"
+				+ "104: jump, _, _, 107\n"
+				+ "105: -, b, 2, T_2\n"
+				+ "106: :=, T_2, _, b\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
 }
