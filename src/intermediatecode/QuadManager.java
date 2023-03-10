@@ -1,7 +1,7 @@
 package intermediatecode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class QuadManager {
 	public QuadManager() {
 		currentLabel = 99;
 		tempCounter = 0;
-		intermedCodeMap = new HashMap<Integer, Quad>();
+		intermedCodeMap = new LinkedHashMap<Integer, Quad>();
 
 	}
 

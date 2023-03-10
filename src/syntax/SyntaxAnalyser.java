@@ -73,11 +73,11 @@ public class SyntaxAnalyser {
 						throw new CutePyException(getErrorMsg(args[i]));
 					}
 				}
-				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				declarations();
 				while (currentToken.recognizedStrEquals("def")) {
 					defFunction();
 				}
+				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				statements();
 				quadManager.genQuad("end_block", mainFuncName, "_", "_");
 				if (currentToken.getRecognizedStr().equals("#}")) {
@@ -113,11 +113,11 @@ public class SyntaxAnalyser {
 							throw new CutePyException(getErrorMsg(args[i]));
 						}
 					}
-					quadManager.genQuad("begin_block", funcName, "_", "_");
 					declarations();
 					while (currentToken.recognizedStrEquals("def")) {
 						defFunction();
 					}
+					quadManager.genQuad("begin_block", funcName, "_", "_");
 					statements();
 					quadManager.genQuad("end_block", funcName, "_", "_");
 
@@ -296,7 +296,7 @@ public class SyntaxAnalyser {
 				throw new CutePyException(getErrorMsg(args2[i]));
 			}
 		}
-		quadManager.genQuad("ret", "_", "_", ePlace);
+		quadManager.genQuad("ret", ePlace, "_", "_");
 	}
 
 	private void ifStat() throws CutePyException {
@@ -438,7 +438,7 @@ public class SyntaxAnalyser {
 		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			String addOp = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
-			String t2Place =term();
+			String t2Place = term();
 			String w = quadManager.newTemp();
 			quadManager.genQuad(addOp, t1Place, t2Place, w);
 			t1Place = w;
@@ -450,10 +450,11 @@ public class SyntaxAnalyser {
 		System.out.println("term() " + currentToken.getRecognizedStr());
 		String f1Place = factor();
 		while (CharTypes.MUL_OPS.contains(currentToken.getRecognizedStr())) {
+			String mulOp = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
 			String f2Place = factor();
 			String w = quadManager.newTemp();
-			quadManager.genQuad("*", f1Place, f2Place, w);
+			quadManager.genQuad(mulOp, f1Place, f2Place, w);
 			f1Place = w;
 		}
 		return f1Place;
@@ -477,7 +478,10 @@ public class SyntaxAnalyser {
 		} else if (isID(currentToken)) {
 			String fPlace = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
-			idTail();
+			String idTailPlace = idTail(fPlace);
+			if (idTailPlace != null) {
+				return idTailPlace;
+			}
 			return fPlace; 	//TODO check maybe its is not correct !!
 		} else {
 			throw new CutePyException(getErrorMsg("<identifier> or <integer> or '('"));
@@ -494,28 +498,39 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void idTail() throws CutePyException {
+	private String idTail(String funcName) throws CutePyException {
 		System.out.println("idTail() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
 			actualParList();
 			if (currentToken.recognizedStrEquals(")")) {
 				loadNextTokenFromLex();
+				String tmp = quadManager.newTemp();
+				quadManager.genQuad("par", tmp, "ret", "_");
+				quadManager.genQuad("call", funcName, "_", "_");
+				return tmp;
 			} else {
 				throw new CutePyException(getErrorMsg(")"));
 			}
 		}
+		return null;
 		// dont need to throw exception here
 	}
 
 	private void actualParList() throws CutePyException {
 		System.out.println("actualParList() " + currentToken.getRecognizedStr());
 		if (isExpression()) {
-			expression();
-			while (currentToken.recognizedStrEquals(",")) {
-				loadNextTokenFromLex();
-				expression();
-			}			
+			String expressionPlace1 = expression();
+			if (currentToken.recognizedStrEquals(",")) {
+				while (currentToken.recognizedStrEquals(",")) {
+					loadNextTokenFromLex();
+					String expressionPlace2 = expression();
+					quadManager.genQuad("par", expressionPlace1, "cv", "_");
+					quadManager.genQuad("par", expressionPlace2, "cv", "_");
+				}
+			} else {
+				quadManager.genQuad("par", expressionPlace1, "cv", "_");				
+			}
 		}
 	}
 
