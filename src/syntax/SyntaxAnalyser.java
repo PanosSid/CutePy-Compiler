@@ -331,8 +331,8 @@ public class SyntaxAnalyser {
 						quadManager.backpatch(conditionMap.get("false"), quadManager.nextQuad());
 						if (currentToken.recognizedStrEquals("else")) {
 							elsePart();
-							quadManager.backpatch(ifList, quadManager.nextQuad());
 						}
+						quadManager.backpatch(ifList, quadManager.nextQuad());
 					} else {
 						throw new CutePyException(getErrorMsg("#{"));
 					}
