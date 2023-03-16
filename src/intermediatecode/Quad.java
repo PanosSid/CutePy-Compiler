@@ -1,5 +1,11 @@
 package intermediatecode;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import lex.CharTypes;
+
 public class Quad {
 	private String operator;
 	private String operand1;
@@ -11,6 +17,14 @@ public class Quad {
 		this.operand1 = operand1;
 		this.operand2 = operand2;
 		this.operand3 = operand3;
+	}
+
+	public Quad(String quadStr) {
+		String fields[] = quadStr.split(",", 4);
+		operator = fields[0].trim();
+		operand1 = fields[1].trim();
+		operand2 = fields[2].trim();
+		operand3 = fields[3].trim();
 	}
 
 	public String getOperator() {
@@ -29,15 +43,21 @@ public class Quad {
 		return operand3;
 	}
 
-	public String getOperandsThatAreVars() {
+	public List<String> getOperandsThatAreVars() {
+		List<String> varOperators = new ArrayList<String>();
+		varOperators.addAll(Arrays.asList("+","-",":="));
+		varOperators.addAll(CharTypes.MUL_OPS);
+		varOperators.addAll(CharTypes.REL_OPS);		
+		List<String> notVars = Arrays.asList("_", "ret", "cv" );
+		List<String> varList = new ArrayList<String>();
 		String operands[] = {operand1, operand2, operand3};
-		String vars = "";
 		for (int i = 0; i < operands.length; i++) {
-			if (!isNumeric(operands[i])) {
-				vars += operands[i]+", ";
+			if (varOperators.contains(operator) &&
+					(!isNumeric(operands[i]) && !notVars.contains(operands[i]))) {
+				varList.add(operands[i]);
 			}
 		}
-		return operand1;
+		return varList;	
 	}
 	
 	private boolean isNumeric(String str) {

@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import exceptions.CutePyException;
+import intermediatecode.CTransformer;
 import intermediatecode.QuadManager;
 import lex.FileReader;
 import lex.LexAnalyser;
@@ -15,12 +16,14 @@ public class CutePyCompiler {
 	private LexAnalyser lex ;
 	private FileReader reader;
 	private QuadManager quadManager; 
+	private CTransformer cTransformer;
 	
 	public CutePyCompiler() {
 		reader = new FileReader();
 		lex = new LexAnalyser(reader);
 		quadManager = new QuadManager();
 		syntaxAnalyzer = new SyntaxAnalyser(lex, quadManager);
+		cTransformer = new CTransformer(); 
 	}
 	
 	public void compile(String filePath) {
@@ -29,6 +32,8 @@ public class CutePyCompiler {
 			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
 			writeToFile(filePath, "int", quadManager.getIntermediateCode());
+			cTransformer.transformIntermidateCodeToC(quadManager.getIntermedCodeMap());
+			System.out.println(cTransformer.getCcode());
 			System.out.println("Compilation of '"+filePath+"' successfully completed");
 		} catch (CutePyException e) {
 			System.out.println("Compilation of '"+filePath+"'FAILED");

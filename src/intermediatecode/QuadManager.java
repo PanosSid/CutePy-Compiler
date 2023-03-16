@@ -8,7 +8,7 @@ import java.util.Map;
 public class QuadManager {
 	private int currentLabel;
 	private int tempCounter;
-	private Map<Integer, Quad> intermedCodeMap; // mallon hashmap kalitera
+	private Map<Integer, Quad> intermedCodeMap; 
 
 	public QuadManager() {
 		currentLabel = 99;
