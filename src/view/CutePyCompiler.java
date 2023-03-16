@@ -1,7 +1,11 @@
 package view;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+
 import exceptions.CutePyException;
+import intermediatecode.QuadManager;
 import lex.FileReader;
 import lex.LexAnalyser;
 import syntax.SyntaxAnalyser;
@@ -10,11 +14,13 @@ public class CutePyCompiler {
 	private SyntaxAnalyser syntaxAnalyzer;
 	private LexAnalyser lex ;
 	private FileReader reader;
+	private QuadManager quadManager; 
 	
 	public CutePyCompiler() {
 		reader = new FileReader();
 		lex = new LexAnalyser(reader);
-		syntaxAnalyzer = new SyntaxAnalyser(lex);
+		quadManager = new QuadManager();
+		syntaxAnalyzer = new SyntaxAnalyser(lex, quadManager);
 	}
 	
 	public void compile(String filePath) {
@@ -22,6 +28,7 @@ public class CutePyCompiler {
 			checkForCpyExtension(filePath);
 			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
+			writeToFile(filePath, "int", quadManager.getIntermediateCode());
 			System.out.println("Compilation of '"+filePath+"' successfully completed");
 		} catch (CutePyException e) {
 			System.out.println("Compilation of '"+filePath+"'FAILED");
@@ -32,8 +39,20 @@ public class CutePyCompiler {
 		}
 	}
 	
+	public void writeToFile(String filePath, String extension, String data) throws IOException {
+		String fileName = changeFilePathExtenstion(filePath, extension);
+		FileWriter writer = new FileWriter(fileName);
+		writer.write("//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489\n\n");
+		writer.write(data);
+		writer.close();
+	}
+
+	private String changeFilePathExtenstion(String fileName, String extension) {
+		return fileName.substring(0, fileName.lastIndexOf(".")+1) + extension;
+	}
+	
 	private void checkForCpyExtension(String filePath) throws CutePyException {
-		String fileName = filePath.substring(filePath.lastIndexOf("\\")+1);
+		String fileName = filePath.substring(filePath.lastIndexOf(File.separator)+1);
 		String extention = fileName.substring(fileName.lastIndexOf(".")+1);
 		if (!extention.equals("cpy")) {
 			throw new CutePyException("File extention must be 'cpy' but was '"+extention+"', for file "+fileName);
