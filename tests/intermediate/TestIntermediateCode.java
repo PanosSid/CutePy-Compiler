@@ -493,4 +493,66 @@ public class TestIntermediateCode {
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
+	
+	@Test
+	public void testExamsFuncIntermed() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+"def main_exams():  \n"
+				+ "#{  \n"
+				+ "	#declare c,a,b,t\n"
+				+ "	a=1; \n"
+				+ "	while (a+b<1 and b<5): \n"
+				+ "	#{\n"
+				+ "		if (t==1):\n"
+				+ "			c=2; \n"
+				+ "		else :\n"
+				+ "			if (t==2):"
+				+ "				c=4;"
+				+ "			else:\n"
+				+ "				c=0; \n"
+				+ "			\n"
+				+ "		while (a<1): \n"
+				+ "			if (a==2): \n"
+				+ "				while(b==1): \n"
+				+ "					c=2; \n"
+				+ "	#} \n"
+				+ "#} \n"
+				+ "\n"
+				+ "if __name__ == \"__main__\":\n"
+				+ "	main_exams();"
+				);
+		syntax.analyzeSyntax();
+		String expectedIntermedCode = ""
+				+ "100: begin_block, main_exams, _, _\n"
+				+ "101: :=, 1, _, a\n"
+				+ "102: +, a, b, T_1\n"
+				+ "103: <, T_1, 1, 105\n"
+				+ "104: jump, _, _, 127\n"
+				+ "105: <, b, 5, 107\n"
+				+ "106: jump, _, _, 127\n"
+				+ "107: ==, t, 1, 109\n"
+				+ "108: jump, _, _, 111\n"
+				+ "109: :=, 2, _, c\n"
+				+ "110: jump, _, _, 116\n"
+				+ "111: ==, t, 2, 113\n"
+				+ "112: jump, _, _, 115\n"
+				+ "113: :=, 4, _, c\n"
+				+ "114: jump, _, _, 116\n"
+				+ "115: :=, 0, _, c\n"
+				+ "116: <, a, 1, 118\n"
+				+ "117: jump, _, _, 126\n"
+				+ "118: ==, a, 2, 120\n"
+				+ "119: jump, _, _, 125\n"
+				+ "120: ==, b, 1, 122\n"
+				+ "121: jump, _, _, 124\n"
+				+ "122: :=, 2, _, c\n"
+				+ "123: jump, _, _, 120\n"
+				+ "124: jump, _, _, 125\n"
+				+ "125: jump, _, _, 116\n"
+				+ "126: jump, _, _, 102\n"
+				+ "127: end_block, main_exams, _, _\n"
+				+ "128: call, main_exams, _, _\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
 }
