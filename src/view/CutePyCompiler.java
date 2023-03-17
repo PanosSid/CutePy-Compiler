@@ -32,6 +32,7 @@ public class CutePyCompiler {
 			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
 			writeToFile(filePath, "int", quadManager.getIntermediateCode());
+			System.out.println("\n"+quadManager.getIntermediateCode()+"\n");
 			cTransformer.transformIntermidateCodeToC(quadManager.getIntermedCodeMap());
 			System.out.println(cTransformer.getCcode());
 			System.out.println("Compilation of '"+filePath+"' successfully completed");
@@ -68,7 +69,8 @@ public class CutePyCompiler {
 		CutePyCompiler cpyCompiler = new CutePyCompiler();
 		for (int i = 0; i < args.length; i++) {
 			cpyCompiler.compile(args[i]);
-		}		
+		}	
+		cpyCompiler.compile("tests\\intermediate\\validTest.cpy");	
 	}
 
 }

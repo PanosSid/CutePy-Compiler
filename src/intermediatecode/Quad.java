@@ -48,6 +48,7 @@ public class Quad {
 		varOperators.addAll(Arrays.asList("+","-",":="));
 		varOperators.addAll(CharTypes.MUL_OPS);
 		varOperators.addAll(CharTypes.REL_OPS);		
+		varOperators.add("par");		
 		List<String> notVars = Arrays.asList("_", "ret", "cv" );
 		List<String> varList = new ArrayList<String>();
 		String operands[] = {operand1, operand2, operand3};

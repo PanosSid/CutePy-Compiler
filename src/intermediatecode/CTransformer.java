@@ -1,15 +1,16 @@
 package intermediatecode;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Queue;
 
 import lex.CharTypes;
 
 public class CTransformer {
-	private String cCode;
+	private String cCode = "";
+	private Queue<String> funcParams = new LinkedList<String>(); 
 	
 	public CTransformer() {}
 	
@@ -44,7 +45,7 @@ public class CTransformer {
 		for (String variable : varsList) {
 			declareVars += variable+", ";
 		}
-		return declareVars.substring(0, declareVars.length()-2);
+		return declareVars.substring(0, declareVars.length()-2)+";";
 	}
 
 	private String getEquivalentCCode(Integer label, Quad quad) {
@@ -57,11 +58,11 @@ public class CTransformer {
 		} else if (operator.equals(":=")) {
 			cLine = quad.getOperand3() + " = " + quad.getOperand1()+ ";";			
 		} else if (CharTypes.ADD_OPS.contains(operator.charAt(0)) || CharTypes.MUL_OPS.contains(operator)) {
-			cLine = quad.getOperand3() + "=" + quad.getOperand1() + operator + quad.getOperand2() + ";";
+			cLine = quad.getOperand3() + " = " + quad.getOperand1() + " " + operator + " " + quad.getOperand2() + ";";
 		} else if (CharTypes.REL_OPS.contains(operator)) {
-			cLine = "if (" + quad.getOperand1() + operator + quad.getOperand2() +") goto " + quad.getOperand3()+ ";"; 
+			cLine = "if (" + quad.getOperand1() + " " + operator + " " + quad.getOperand2() +") goto L_" + quad.getOperand3()+ ";"; 
 		} else if (operator.equals("jump")) {
-			cLine = "goto "+ quad.getOperand3()+ ";";
+			cLine = "goto L_"+ quad.getOperand3()+ ";";
 		} else if (operator.equals("out")) {
 			cLine = "printf("+quad.getOperand3()+");";
 		} else if (operator.equals("in")) {
@@ -69,9 +70,21 @@ public class CTransformer {
 		} else if (operator.equals("ret")) {
 			cLine = "return "+quad.getOperand1()+";";
 		} else if (operator.equals("par")) {
-			cLine = "par "+quad.getOperand1()+";";	// TODO 
+//			cLine = "par "+quad.getOperand1()+";";
+			if (quad.getOperand2().equals("cv") || quad.getOperand2().equals("ret")) {
+				funcParams.add(quad.getOperand1());
+			}
 		} else if (operator.equals("call")) {
-			cLine = quad.getOperand1()+"()"+";";
+			if (funcParams.isEmpty()) {
+				cLine = quad.getOperand1()+"()"+";";				
+			} else {
+				String tmp = quad.getOperand1()+"(";
+				while (funcParams.size() > 1) {
+					tmp += funcParams.remove()+", ";
+				}
+				tmp = tmp.substring(0, tmp.length()-2) + ");";
+				cLine = funcParams.remove() + " = "+ tmp;
+			}
 //		else if (operator.equals("halt")) {
 		} else {
 			return null;
@@ -82,7 +95,7 @@ public class CTransformer {
 	private String getLblC(Integer label) {
 		return "L_"+label+": ";
 	}
-
+	
 	private void addToCCode(String s, int tabs) {
 		for (int i = 0; i < tabs; i++) {
 			cCode += "\t";
