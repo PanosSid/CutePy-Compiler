@@ -64,9 +64,9 @@ public class CTransformer {
 		} else if (operator.equals("jump")) {
 			cLine = "goto L_"+ quad.getOperand3()+ ";";
 		} else if (operator.equals("out")) {
-			cLine = "printf("+quad.getOperand3()+");";
+			cLine = "printf(\"%d\", "+quad.getOperand3()+");";
 		} else if (operator.equals("in")) {
-			cLine = "scanf(%d, "+quad.getOperand1()+");";
+			cLine = "scanf(\"%d\", &"+quad.getOperand1()+");";
 		} else if (operator.equals("ret")) {
 			cLine = "return "+quad.getOperand1()+";";
 		} else if (operator.equals("par")) {

@@ -433,8 +433,8 @@ public class SyntaxAnalyser {
 
 	private String expression() throws CutePyException {
 		System.out.println("expression() " + currentToken.getRecognizedStr());
-		optionalSign();
-		String t1Place = term();
+		String sign = optionalSign();
+		String t1Place = sign + term();
 		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			String addOp = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
@@ -534,11 +534,15 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void optionalSign() throws CutePyException {
+	private String optionalSign() throws CutePyException {
 		System.out.println("optionalSign " + currentToken.getRecognizedStr());
 		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
+			String sign = currentToken.getRecognizedStr(); 
 			loadNextTokenFromLex();
+			return sign;
 		}
+		return "";
+		
 	}
 
 	public Map<String, List<Integer>> condition() throws CutePyException {
@@ -546,8 +550,6 @@ public class SyntaxAnalyser {
 		Map<String, List<Integer>> boolTermMap = boolTerm();
 		while (currentToken.recognizedStrEquals("or")) {
 			loadNextTokenFromLex();
-//			boolFactor();	//TODO CHECK THIS must be boolTerm();
-			
 			quadManager.backpatch(boolTermMap.get("false"), quadManager.nextQuad());
 			Map<String, List<Integer>> boolTerm2Map = boolTerm();
 			boolTermMap.put("true", quadManager.mergeList(boolTermMap.get("true"), boolTerm2Map.get("true")));

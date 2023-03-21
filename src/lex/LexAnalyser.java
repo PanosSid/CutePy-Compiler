@@ -252,11 +252,12 @@ public class LexAnalyser {
 	
 	private Token getAssignmentWithSpace() throws CutePyException {
 		Character c = readChar();
-		if (Character.isAlphabetic(c) || Character.isDigit(c)) {
+		if (Character.isAlphabetic(c) || Character.isDigit(c) || CharTypes.ADD_OPS.contains(c)) {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
+		} else {
+			throw new CutePyException("[Error in line "+lineNum+"] expected '= <identifier> or <integer>' but found '= "+c+"'");						
 		}
-		throw new CutePyException("[Error in line "+lineNum+"] expected '= <identifier> or <integer>' but found '= "+c+"'");
 	}
 
 	private void resetProcessedStr() {

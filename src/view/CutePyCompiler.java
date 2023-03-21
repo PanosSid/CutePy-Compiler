@@ -70,7 +70,7 @@ public class CutePyCompiler {
 		for (int i = 0; i < args.length; i++) {
 			cpyCompiler.compile(args[i]);
 		}	
-		cpyCompiler.compile("tests\\intermediate\\validTest.cpy");	
+//		cpyCompiler.compile("tests\\intermediate\\validTest.cpy");	
 	}
 
 }
