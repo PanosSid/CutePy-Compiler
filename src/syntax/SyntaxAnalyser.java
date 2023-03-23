@@ -632,10 +632,13 @@ public class SyntaxAnalyser {
 					throw new CutePyException(getErrorMsg(args[i]));
 				}
 			}
+			quadManager.genQuad("begin_block", "main", "_", "_");
 			mainFunctionCall();
 			while (isID(currentToken)) {
 				mainFunctionCall();
 			}
+			quadManager.genQuad("halt", "_", "_", "_");
+			quadManager.genQuad("end_block", "main", "_", "_");
 		}
 	}
 

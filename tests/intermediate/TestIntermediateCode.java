@@ -38,7 +38,10 @@ public class TestIntermediateCode {
 				+ "101: +, 1, 2, T_1\n"
 				+ "102: :=, T_1, _, c\n"
 				+ "103: end_block, main_arithmetic, _, _\n"
-				+ "104: call, main_arithmetic, _, _\n"
+				+ "104: begin_block, main, _, _\n"
+				+ "105: call, main_arithmetic, _, _\n"
+				+ "106: halt, _, _, _\n"
+				+ "107: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -62,7 +65,10 @@ public class TestIntermediateCode {
 				+ "104: +, a, T_3, T_4\n"
 				+ "105: :=, T_4, _, c\n"
 				+ "106: end_block, main_arithmetic, _, _\n"
-				+ "107: call, main_arithmetic, _, _\n"
+				+ "107: begin_block, main, _, _\n"
+				+ "108: call, main_arithmetic, _, _\n"
+				+ "109: halt, _, _, _\n"
+				+ "110: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -82,7 +88,10 @@ public class TestIntermediateCode {
 				+ "100: begin_block, main_arithmetic, _, _\n"
 				+ "101: ret, a, _, _\n"
 				+ "102: end_block, main_arithmetic, _, _\n"
-				+ "103: call, main_arithmetic, _, _\n"
+				+ "103: begin_block, main, _, _\n"
+				+ "104: call, main_arithmetic, _, _\n"
+				+ "105: halt, _, _, _\n"
+				+ "106: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -108,7 +117,10 @@ public class TestIntermediateCode {
 				+ "105: :=, T_4, _, c\n"
 				+ "106: ret, c, _, _\n"
 				+ "107: end_block, main_arithmetic, _, _\n"
-				+ "108: call, main_arithmetic, _, _\n"
+				+ "108: begin_block, main, _, _\n"
+				+ "109: call, main_arithmetic, _, _\n"
+				+ "110: halt, _, _, _\n"
+				+ "111: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -134,7 +146,10 @@ public class TestIntermediateCode {
 				+ "105: :=, T_4, _, c\n"
 				+ "106: out, _, _, c\n"
 				+ "107: end_block, main_arithmetic, _, _\n"
-				+ "108: call, main_arithmetic, _, _\n"
+				+ "108: begin_block, main, _, _\n"
+				+ "109: call, main_arithmetic, _, _\n"
+				+ "110: halt, _, _, _\n"
+				+ "111: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -154,7 +169,10 @@ public class TestIntermediateCode {
 				+ "100: begin_block, main_arithmetic, _, _\n"
 				+ "101: in, x, _, _\n"
 				+ "102: end_block, main_arithmetic, _, _\n"
-				+ "103: call, main_arithmetic, _, _\n"
+				+ "103: begin_block, main, _, _\n"
+				+ "104: call, main_arithmetic, _, _\n"
+				+ "105: halt, _, _, _\n"
+				+ "106: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -305,7 +323,10 @@ public class TestIntermediateCode {
 				+ "105: +, 1, T_1, T_2\n"
 				+ "106: :=, T_2, _, x\n"
 				+ "107: end_block, main_arithmetic, _, _\n"
-				+ "108: call, main_arithmetic, _, _\n"
+				+ "108: begin_block, main, _, _\n"
+				+ "109: call, main_arithmetic, _, _\n"
+				+ "110: halt, _, _, _\n"
+				+ "111: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -337,7 +358,10 @@ public class TestIntermediateCode {
 				+ "112: call, max, _, _\n"
 				+ "113: :=, T_3, _, x\n"
 				+ "114: end_block, main_arithmetic, _, _\n"
-				+ "115: call, main_arithmetic, _, _\n"
+				+ "115: begin_block, main, _, _\n"
+				+ "116: call, main_arithmetic, _, _\n"
+				+ "117: halt, _, _, _\n"
+				+ "118: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -427,7 +451,10 @@ public class TestIntermediateCode {
 				+ "133: jump, _, _, 135\n"
 				+ "134: :=, 1, _, f\n"
 				+ "135: end_block, main_small, _, _\n"
-				+ "136: call, main_small, _, _\n"
+				+ "136: begin_block, main, _, _\n"
+				+ "137: call, main_small, _, _\n"
+				+ "138: halt, _, _, _\n"
+				+ "139: end_block, main, _, _\n"
 				;
 
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
@@ -489,7 +516,10 @@ public class TestIntermediateCode {
 				+ "125: jump, _, _, 116\n"
 				+ "126: jump, _, _, 102\n"
 				+ "127: end_block, main_ifWhile, _, _\n"
-				+ "128: call, main_ifWhile, _, _\n"
+				+ "128: begin_block, main, _, _\n"
+				+ "129: call, main_ifWhile, _, _\n"
+				+ "130: halt, _, _, _\n"
+				+ "131: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
@@ -551,8 +581,64 @@ public class TestIntermediateCode {
 				+ "125: jump, _, _, 116\n"
 				+ "126: jump, _, _, 102\n"
 				+ "127: end_block, main_exams, _, _\n"
-				+ "128: call, main_exams, _, _\n"
+				+ "128: begin_block, main, _, _\n"
+				+ "129: call, main_exams, _, _\n"
+				+ "130: halt, _, _, _\n"
+				+ "131: end_block, main, _, _\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
+	
+	@Test
+	public void testMaxFuncIntermed() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ "def main_max():\n"
+				+ "#{\n"
+				+ "	#declare a,b,c,d,e\n"
+				+ "	def max(x, y):\n"
+				+ "	#{\n"
+				+ "		if (x>y):\n"
+				+ "			return(x);\n"
+				+ "		else:\n"
+				+ "			return(y);\n"
+				+ "	#}\n"
+				+ "	e = max(max(a,b),max(c, d));\n"
+				+ "#}\n"
+				+ "\n"
+				+ "if __name__ == \"__main__\":\n"
+				+ " 	main_max();"
+				);
+		syntax.analyzeSyntax();
+		String expectedIntermedCode = ""
+				+ "100: begin_block, max, _, _\n"
+				+ "101: >, x, y, 103\n"
+				+ "102: jump, _, _, 105\n"
+				+ "103: ret, x, _, _\n"
+				+ "104: jump, _, _, 106\n"
+				+ "105: ret, y, _, _\n"
+				+ "106: end_block, max, _, _\n"
+				+ "107: begin_block, main_max, _, _\n"
+				+ "108: par, a, cv, _\n"
+				+ "109: par, b, cv, _\n"
+				+ "110: par, T_1, ret, _\n"
+				+ "111: call, max, _, _\n"
+				+ "112: par, c, cv, _\n"
+				+ "113: par, d, cv, _\n"
+				+ "114: par, T_2, ret, _\n"
+				+ "115: call, max, _, _\n"
+				+ "116: par, T_1, cv, _\n"
+				+ "117: par, T_2, cv, _\n"
+				+ "118: par, T_3, ret, _\n"
+				+ "119: call, max, _, _\n"
+				+ "120: :=, T_3, _, e\n"
+				+ "121: end_block, main_max, _, _\n"
+				+ "122: begin_block, main, _, _\n"
+				+ "123: call, main_max, _, _\n"
+				+ "124: halt, _, _, _\n"
+				+ "125: end_block, main, _, _\n"			
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
+	
 }
