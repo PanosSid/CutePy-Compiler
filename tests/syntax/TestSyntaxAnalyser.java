@@ -35,6 +35,24 @@ public class TestSyntaxAnalyser {
 	}
 	
 	@Test
+	public void testNegativeNumAssignment() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_FuncCall():\n"
+				+ "#{\n"
+				+ " 	#declare x\n"
+				+ " 	x = -5;\n"
+				+ " 	print(-10);\n"
+				+ " 	return(-10);\n"
+				+ "#}\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "\t main_FuncCall();\r\n"
+				);
+		syntax.analyzeSyntax();
+		Token expectedCurrentTk = new EOFToken(10);
+		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
+	}
+	
+	@Test
 	public void testDefmain_Function() throws Exception {
 		setUpSyntaxAnalyser(""
 				+ "def main_Func1():\n"
