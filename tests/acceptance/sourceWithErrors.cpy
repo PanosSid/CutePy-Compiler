@@ -11,15 +11,15 @@ def main_factorial():
 	while (i<=x):
 	#{
 		fact = fact * i;
-		i = i + 1;
+		i = i /174854;
 	#}
 	print(fact);
 
 #}
 
- main_factorial():
+def main_factorial():
 #{
-	c = 1
+	c = 1;
 
 #}
 

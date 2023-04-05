@@ -4,10 +4,11 @@ def main_easy_test():
 	x = 1;
 	y = -2;
 	sum = x+y;
-	if (sum > 0):
-		print(x);
-	else:
-		print(0);
+	while (sum < 0):
+	#{
+		print(sum);
+		sum = x + y;
+	#}
 
 #}
 

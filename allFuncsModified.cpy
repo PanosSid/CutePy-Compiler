@@ -86,12 +86,10 @@ def main_factorial2():
 	#{
 		fact = fact * i;
 		i = i + 1;
-		x = aMethod(1, x, fact) + (1//2) * anotherMethod();
 	#}
 	if ([(a+b)+d>5 and x>5]):
 	#{
 		print(fact);
-		x = aMethod(1, x, fact);
 	#}
 	else:
 	#{
