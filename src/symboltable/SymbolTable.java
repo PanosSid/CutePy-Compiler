@@ -14,12 +14,13 @@ public class SymbolTable {
 	
 	public SymbolTable() {
 		symbolTable = new Stack<Scope>();
-		symbolTable.add(new Scope());
-		addEntity(new MainFunction("main"));
+		Function main = new MainFunction("main");
+		symbolTable.add(new Scope(main));
+		addEntity(main);
 	}
 	
-	public void addScope() {
-		symbolTable.push(new Scope());
+	public void addScope(Function func) {
+		symbolTable.push(new Scope(func));
 	}
 	
 	public void removeScope() {
@@ -41,9 +42,12 @@ public class SymbolTable {
 		throw new CutePyException("Entity '"+entityName+"' not found in symbol table.");
 	}
 	
-	public void updateFields(String entityName, int uptValue) {
-//		Entity
-		
+	public void updateStartingQuadField(int uptValue) {
+		symbolTable.lastElement().updateStartingQuadOfFunc(uptValue);
+	}
+	
+	public void updateFrameLengthField() {
+		symbolTable.lastElement().updateFrameLengthOfFunc();
 	}
 	
 	public void addFormalParam(String name, String mode) {
@@ -52,12 +56,12 @@ public class SymbolTable {
 	
 	public void addFunction(Function func) {
 		addEntity(func);
-		addScope();
+		addScope(func);
 	}
 	
 	public void addLocalFunction(Function func, List<Parameter> params) {
 		addEntity(func);
-		addScope();
+		addScope(func);
 		for (Parameter p : params) {
 			addEntity(p);
 		}

@@ -1,5 +1,7 @@
 package symboltable.entities;
 
+import java.util.Objects;
+
 public abstract class Function extends Entity {
 	protected int startingQuad;
 	protected int framelength;
@@ -34,8 +36,22 @@ public abstract class Function extends Entity {
 	public String toString() {
 		return "[Function: "+super.name+", SQ=" + startingQuad + ", FL=" + framelength + "]";
 	}
-	
-	
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(framelength, startingQuad);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Function other = (Function) obj;
+		return framelength == other.framelength && startingQuad == other.startingQuad;
+	}
 	
 }

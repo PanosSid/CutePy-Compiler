@@ -6,9 +6,10 @@ import java.util.Objects;
 import symboltable.entities.Entity;
 import symboltable.entities.Function;
 
+
 public class Scope {
 	private LinkedList<Entity> entityList = new LinkedList<Entity>();
-	private Function scopeFunc;
+	private Function scopeFunc; 	// used as a reference to update the fields of the func
 	
 	public Scope(Function scopeFunc) {
 		super();
@@ -42,6 +43,14 @@ public class Scope {
 		return 12 + entityList.size()*4;
 	}
 	
+	public void updateStartingQuadOfFunc(int startingQuad) {
+		scopeFunc.setStartingQuad(startingQuad);
+	}
+	
+	public void updateFrameLengthOfFunc() {
+		scopeFunc.setFramelength(getLengthOfScope());
+	}
+	
 
 	@Override
 	public String toString() {
@@ -68,7 +77,7 @@ public class Scope {
 		Scope other = (Scope) obj;
 		return Objects.equals(entityList, other.entityList);
 	}
-	
+
 	
 	
 }

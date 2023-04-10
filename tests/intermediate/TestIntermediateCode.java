@@ -8,6 +8,7 @@ import intermediatecode.QuadManager;
 import lex.FileReader;
 import lex.LexAnalyser;
 import lex.Token;
+import symboltable.SymbolTable;
 import syntax.SyntaxAnalyser;
 
 public class TestIntermediateCode {
@@ -19,7 +20,7 @@ public class TestIntermediateCode {
 		reader.setFileContents(sourceCode);
 		LexAnalyser lex = new LexAnalyser(reader);
 		quadManager = new QuadManager();
-		syntax = new SyntaxAnalyser(lex, quadManager);
+		syntax = new SyntaxAnalyser(lex, quadManager, new SymbolTable());
 	}
 	
 	@Test

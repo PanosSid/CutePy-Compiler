@@ -9,6 +9,7 @@ import intermediatecode.CTransformer;
 import intermediatecode.QuadManager;
 import lex.FileReader;
 import lex.LexAnalyser;
+import symboltable.SymbolTable;
 import syntax.SyntaxAnalyser;
 
 public class CutePyCompiler {
@@ -17,12 +18,14 @@ public class CutePyCompiler {
 	private FileReader reader;
 	private QuadManager quadManager; 
 	private CTransformer cTransformer;
+	private SymbolTable symbolTable;
 	
 	public CutePyCompiler() {
 		reader = new FileReader();
 		lex = new LexAnalyser(reader);
 		quadManager = new QuadManager();
-		syntaxAnalyzer = new SyntaxAnalyser(lex, quadManager);
+		symbolTable = new SymbolTable();
+		syntaxAnalyzer = new SyntaxAnalyser(lex, quadManager, symbolTable);
 		cTransformer = new CTransformer(); 
 	}
 	

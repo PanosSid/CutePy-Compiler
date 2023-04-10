@@ -90,10 +90,13 @@ public class SyntaxAnalyser {
 					defFunction();
 				}
 				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
+				symbolTable.updateStartingQuadField(quadManager.nextQuad());
 				statements();
 				quadManager.genQuad("end_block", mainFuncName, "_", "_");
+				symbolTable.updateFrameLengthField();
 				if (currentToken.getRecognizedStr().equals("#}")) {
 					loadNextTokenFromLex();
+					symbolTable.removeScope();
 				} else {
 					throw new CutePyException(getErrorMsg("#}"));
 				}
@@ -134,10 +137,10 @@ public class SyntaxAnalyser {
 						defFunction();
 					}
 					quadManager.genQuad("begin_block", funcName, "_", "_");
-					// edo pairno to nextQuad() gia na kano update tin localfunc
+					symbolTable.updateStartingQuadField(quadManager.nextQuad());
 					statements();
 					quadManager.genQuad("end_block", funcName, "_", "_");
-					// edo pairno to frameLength tou scope gia na kano update ti lodcalFunc
+					symbolTable.updateFrameLengthField();
 
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
@@ -667,6 +670,7 @@ public class SyntaxAnalyser {
 			}
 			quadManager.genQuad("halt", "_", "_", "_");
 			quadManager.genQuad("end_block", "main", "_", "_");
+			symbolTable.removeScope();
 		}
 	}
 
