@@ -1,5 +1,6 @@
 package syntax;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,21 +11,31 @@ import lex.CharTypes;
 import lex.FileReader;
 import lex.LexAnalyser;
 import lex.Token;
+import symboltable.SymbolTable;
+import symboltable.entities.EntityFactory;
 
 public class SyntaxAnalyser {
 	private LexAnalyser lex;
 	private Token currentToken;
 	private QuadManager quadManager;
+	private SymbolTable symbolTable;
 	private String recognisedCode = ""; // used for debugging
 
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
 		quadManager = new QuadManager();
+		symbolTable = new SymbolTable();
 	}
 	
 	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager) {
 		this.lex = lex;
 		this.quadManager = quadManager;
+	}
+	
+	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager, SymbolTable symbolTable) {
+		this.lex = lex;
+		this.quadManager = quadManager;
+		this.symbolTable = symbolTable;
 	}
 
 	public QuadManager getQuadManager() {
@@ -73,6 +84,7 @@ public class SyntaxAnalyser {
 						throw new CutePyException(getErrorMsg(args[i]));
 					}
 				}
+				symbolTable.addFunction(EntityFactory.createMainFunction(mainFuncName));
 				declarations();
 				while (currentToken.recognizedStrEquals("def")) {
 					defFunction();
@@ -104,7 +116,11 @@ public class SyntaxAnalyser {
 				loadNextTokenFromLex();
 				if (currentToken.recognizedStrEquals("(")) {
 					loadNextTokenFromLex();
-					idList();
+					List<String> formalParams = idList();
+					symbolTable.addLocalFunction(
+							EntityFactory.createLocalFunction(funcName, formalParams),
+							EntityFactory.createListOfParameters(formalParams)
+							);
 					String args[] = { ")", ":", "#{" };
 					for (int i = 0; i < args.length; i++) {
 						if (currentToken.getRecognizedStr().equals(args[i])) {
@@ -118,11 +134,14 @@ public class SyntaxAnalyser {
 						defFunction();
 					}
 					quadManager.genQuad("begin_block", funcName, "_", "_");
+					// edo pairno to nextQuad() gia na kano update tin localfunc
 					statements();
 					quadManager.genQuad("end_block", funcName, "_", "_");
+					// edo pairno to frameLength tou scope gia na kano update ti lodcalFunc
 
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
+						symbolTable.removeScope();
 					} else {
 						throw new CutePyException(getErrorMsg("#}"));
 					}
@@ -141,13 +160,17 @@ public class SyntaxAnalyser {
 		System.out.println("declarations() " + currentToken.getRecognizedStr());
 		while (currentToken.recognizedStrEquals("#declare")) {
 			loadNextTokenFromLex();
+//			symbolTable.addEntity(EntityFactory.createVariable(currentToken.getRecognizedStr(), symbolTable.getOffsetOfNextEntity()));
 			declerationLine();
 		}
 	}
 
 	private void declerationLine() throws CutePyException {
 		System.out.println("declerationLine() " + currentToken.getRecognizedStr());
-		idList();
+		List<String> vars = idList();
+		for (String var : vars) {
+			symbolTable.addEntity(EntityFactory.createVariable(var, symbolTable.getOffsetOfNextEntity()));
+		}
 	}
 
 	private void statement() throws CutePyException {
@@ -415,19 +438,23 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void idList() throws CutePyException {
+	private List<String> idList() throws CutePyException {
 		System.out.println("idList() " + currentToken.getRecognizedStr());
+		List<String> ids = new ArrayList<String>();
 		if (isID(currentToken)) {
+			ids.add(currentToken.getRecognizedStr());
 			loadNextTokenFromLex();
 			while (currentToken.recognizedStrEquals(",")) {
 				loadNextTokenFromLex();
 				if (isID(currentToken)) {
+					ids.add(currentToken.getRecognizedStr());
 					loadNextTokenFromLex();
 				} else {
 					throw new CutePyException(getErrorMsg("identifier after ','"));
 				}
 			}
 		}
+		return ids;
 		// dont need to throw exception here
 	}
 
@@ -441,6 +468,7 @@ public class SyntaxAnalyser {
 			String t2Place = term();
 			String w = quadManager.newTemp();
 			quadManager.genQuad(addOp, t1Place, t2Place, w);
+			symbolTable.addEntity(EntityFactory.createTemporaryVariable(w, symbolTable.getOffsetOfNextEntity()));
 			t1Place = w;
 		}
 		return t1Place;

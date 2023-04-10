@@ -9,6 +9,12 @@ public class FormalParameter extends Entity {
 	protected DataType datatype;
 	protected ParameterMode mode;
 	
+	public FormalParameter(String name) {
+		super(name);
+		this.mode = ParameterMode.CV;
+		this.datatype = DataType.INTEGER;
+	}
+	
 	public FormalParameter(String name, ParameterMode mode) {
 		super(name);
 		this.mode = mode;

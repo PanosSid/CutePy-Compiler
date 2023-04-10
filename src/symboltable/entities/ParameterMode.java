@@ -1,5 +1,9 @@
 package symboltable.entities;
 
 public enum ParameterMode {
-	CV,RET
+	CV("cv"),RET("ret");
+
+	private ParameterMode(String string) {
+		
+	}
 }

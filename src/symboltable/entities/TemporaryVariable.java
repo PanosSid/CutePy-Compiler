@@ -6,4 +6,13 @@ public class TemporaryVariable extends Variable {
 		super(name);
 	}
 
+	public TemporaryVariable(String name, int offset) {
+		super(name, offset);
+	}
+
+	@Override
+	public String toString() {
+		return "[TempVariable: "+super.name+"/"+ datatype + "/"+ offset+"]";
+	}
+
 }
