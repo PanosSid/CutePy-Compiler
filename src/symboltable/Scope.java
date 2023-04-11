@@ -11,13 +11,17 @@ public class Scope {
 	private LinkedList<Entity> entityList = new LinkedList<Entity>();
 	private Function scopeFunc; 	// used as a reference to update the fields of the func
 	
+	public Scope() {
+		
+	}
+	
 	public Scope(Function scopeFunc) {
 		super();
 		this.scopeFunc = scopeFunc;
+//		entityList.add(scopeFunc);
 	}
 
 	public Scope(Entity... entities) {
-		entityList = new LinkedList<Entity>();
 		for (int i = 0; i < entities.length; i++) {
 			entityList.add(entities[i]);
 		}
@@ -40,7 +44,7 @@ public class Scope {
 	
 	
 	public int getLengthOfScope() {
-		return 12 + entityList.size()*4;
+		return 12 + entityList.size()*4 - countFunctionsInsideScope()*4;
 	}
 	
 	public void updateStartingQuadOfFunc(int startingQuad) {
@@ -51,6 +55,15 @@ public class Scope {
 		scopeFunc.setFramelength(getLengthOfScope());
 	}
 	
+	private int countFunctionsInsideScope() {
+		int count = 0;
+		for (Entity entity : entityList) {
+		    if (entity instanceof Function) {
+		        count++;
+		    }
+		}
+		return count;
+	}
 
 	@Override
 	public String toString() {
@@ -58,7 +71,7 @@ public class Scope {
 		for (Entity entity : entityList) {
 			s += entity + "---";
 		}
-		return s;
+		return (s.length()-3 >0) ? s.substring(0, s.length()-3) : s;
 	}
 
 	@Override

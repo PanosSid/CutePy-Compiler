@@ -14,9 +14,9 @@ public class SymbolTable {
 	
 	public SymbolTable() {
 		symbolTable = new Stack<Scope>();
-		Function main = new MainFunction("main");
-		symbolTable.add(new Scope(main));
-		addEntity(main);
+//		Function main = new MainFunction("main");
+		symbolTable.add(new Scope());
+//		addEntity(main);
 	}
 	
 	public void addScope(Function func) {
@@ -31,7 +31,7 @@ public class SymbolTable {
 		symbolTable.lastElement().addEntity(entity);
 	}
 	
-	public Entity findEntity(String entityName) throws CutePyException {
+	public Entity searchEntity(String entityName) throws CutePyException {
 		for (int i = symbolTable.size() - 1; i >= 0; i--) {
 			Scope scope = symbolTable.get(i);
 			Entity foundEntity = scope.findEntity(entityName);  
