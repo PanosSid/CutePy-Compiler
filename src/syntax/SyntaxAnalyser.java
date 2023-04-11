@@ -486,6 +486,7 @@ public class SyntaxAnalyser {
 			String f2Place = factor();
 			String w = quadManager.newTemp();
 			quadManager.genQuad(mulOp, f1Place, f2Place, w);
+			symbolTable.addEntity(EntityFactory.createTemporaryVariable(w, symbolTable.getOffsetOfNextEntity()));
 			f1Place = w;
 		}
 		return f1Place;
@@ -539,6 +540,7 @@ public class SyntaxAnalyser {
 				String tmp = quadManager.newTemp();
 				quadManager.genQuad("par", tmp, "ret", "_");
 				quadManager.genQuad("call", funcName, "_", "_");
+				symbolTable.addEntity(EntityFactory.createTemporaryVariable(tmp, symbolTable.getOffsetOfNextEntity()));
 				return tmp;
 			} else {
 				throw new CutePyException(getErrorMsg(")"));
