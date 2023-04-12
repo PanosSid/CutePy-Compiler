@@ -113,8 +113,9 @@ public class TestSymbolTable {
 				+ "            return (c);\r\n"
 				+ "        #}\r\n"
 				+ "\r\n"
-				+ "    #$ body of P1 #$\r\n"
-				+ "    y = x;\r\n"
+				+ "		#$ body of P1 #$\r\n"
+				+ "		y = x;\r\n"
+				+ "		return(y);\r\n"
 				+ "    #}\r\n"
 				+ "\r\n"
 				+ "    def P2(x):\r\n"
@@ -163,27 +164,30 @@ public class TestSymbolTable {
 		
 		expectedScopes.add(
 				new Scope(
-						new Parameter("y", 12, ParameterMode.CV),
-						new Variable("x", 16)
+						new Parameter("x", 12, ParameterMode.CV),
+						new Variable("a", 16),
+						new TemporaryVariable("T_3", 20)
 						));
 		ArrayList<FormalParameter> p1Params = new ArrayList<FormalParameter>();
-		p1Params.add(new FormalParameter("a"));
-		p1Params.add(new FormalParameter("b"));
+		p1Params.add(new FormalParameter("x"));
+		p1Params.add(new FormalParameter("y"));
 		
 		ArrayList<FormalParameter> p2Params = new ArrayList<FormalParameter>();
-		p2Params.add(new FormalParameter("c"));
+		p2Params.add(new FormalParameter("x"));
 		expectedScopes.add(
 				new Scope(
 						new Variable("a", 12),
 						new Variable("b", 16),
 						new Variable("c", 20),
 						new LocalFunction("P1", 117, 24, p1Params),
-						new LocalFunction("P2", 120, 24, p2Params)
+						new LocalFunction("P2", 121, 24, p2Params),
+						new TemporaryVariable("T_4", 24),
+						new TemporaryVariable("T_5", 28)
 						));
 		
 		expectedScopes.add(
 				new Scope(
-						(Entity) new MainFunction("main_symbol", 106, 24)
+						(Entity) new MainFunction("main_symbol", 129, 32)
 						));
 		syntax.analyzeSyntax();
 		List<Scope> actualScopes = symbolTable.getCompletedScopes();
