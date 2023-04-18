@@ -20,7 +20,7 @@ public class FakeSymbolTable extends SymbolTable {
 
 	@Override
 	public void removeScope() {
-		completedScopes.add(symbolTable.lastElement());
+		completedScopes.add(scopeStack.lastElement());
 		System.out.println(this);
 		super.removeScope();
 	}
@@ -29,8 +29,5 @@ public class FakeSymbolTable extends SymbolTable {
 	public String toString() {
 		return super.toString();
 	}
-	
-	
-	
-	
+
 }

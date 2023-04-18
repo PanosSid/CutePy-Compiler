@@ -10,30 +10,35 @@ import symboltable.entities.MainFunction;
 import symboltable.entities.Parameter;
 
 public class SymbolTable {
-	protected Stack<Scope> symbolTable = new Stack<Scope>();
+	protected Stack<Scope> scopeStack = new Stack<Scope>();
 	
 	public SymbolTable() {
-		symbolTable = new Stack<Scope>();
+		scopeStack = new Stack<Scope>();
 //		Function main = new MainFunction("main");
-		symbolTable.add(new Scope());
+		scopeStack.add(new Scope());
 //		addEntity(main);
 	}
 	
+	public SymbolTable(Stack<Scope> scopeStack) {
+		super();
+		this.scopeStack = scopeStack;
+	}
+
 	public void addScope(Function func) {
-		symbolTable.push(new Scope(func));
+		scopeStack.push(new Scope(func));
 	}
 	
 	public void removeScope() {
-		symbolTable.pop();
+		scopeStack.pop();
 	}
 	
-	public void addEntity(Entity entity) {
-		symbolTable.lastElement().addEntity(entity);
+	public void addEntity(Entity entity) throws CutePyException {
+		scopeStack.lastElement().addEntity(entity);
 	}
 	
 	public Entity searchEntity(String entityName) throws CutePyException {
-		for (int i = symbolTable.size() - 1; i >= 0; i--) {
-			Scope scope = symbolTable.get(i);
+		for (int i = scopeStack.size() - 1; i >= 0; i--) {
+			Scope scope = scopeStack.get(i);
 			Entity foundEntity = scope.findEntity(entityName);  
 			if (foundEntity != null) {
 				return foundEntity; 
@@ -43,23 +48,23 @@ public class SymbolTable {
 	}
 	
 	public void updateStartingQuadField(int uptValue) {
-		symbolTable.lastElement().updateStartingQuadOfFunc(uptValue);
+		scopeStack.lastElement().updateStartingQuadOfFunc(uptValue);
 	}
 	
 	public void updateFrameLengthField() {
-		symbolTable.lastElement().updateFrameLengthOfFunc();
+		scopeStack.lastElement().updateFrameLengthOfFunc();
 	}
 	
 	public void addFormalParam(String name, String mode) {
 		
 	}
 	
-	public void addFunction(Function func) {
+	public void addFunction(Function func) throws CutePyException {
 		addEntity(func);
 		addScope(func);
 	}
 	
-	public void addLocalFunction(Function func, List<Parameter> params) {
+	public void addLocalFunction(Function func, List<Parameter> params) throws CutePyException {
 		addEntity(func);
 		addScope(func);
 		for (Parameter p : params) {
@@ -68,14 +73,14 @@ public class SymbolTable {
 	}
 		
 	public int getOffsetOfNextEntity() {
-		return symbolTable.lastElement().getLengthOfScope();
+		return scopeStack.lastElement().getLengthOfScope();
 	}
 
 	@Override
 	public String toString() {
 		String s = "SymbolTable\n";
-		for (int i = symbolTable.size() - 1; i >= 0; i--) {
-			s += "Scope "+ i + " "+symbolTable.get(i) +"\n";
+		for (int i = scopeStack.size() - 1; i >= 0; i--) {
+			s += "Scope "+ i + " "+scopeStack.get(i) +"\n";
 		}
 		return s;
 	}

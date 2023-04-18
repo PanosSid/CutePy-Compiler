@@ -73,7 +73,8 @@ public class CutePyCompiler {
 		for (int i = 0; i < args.length; i++) {
 			cpyCompiler.compile(args[i]);
 		}	
-//		cpyCompiler.compile("D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\Class Materials\\Σημειώσεις\\πίνακας συμβόλων παραδείγματα\\symbol.cpy");	
+//		
+		
 	}
 
 }

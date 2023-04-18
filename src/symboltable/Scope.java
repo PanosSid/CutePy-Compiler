@@ -3,6 +3,7 @@ package symboltable;
 import java.util.LinkedList;
 import java.util.Objects;
 
+import exceptions.CutePyException;
 import symboltable.entities.Entity;
 import symboltable.entities.Function;
 
@@ -27,8 +28,11 @@ public class Scope {
 		}
 	}
 	
-	public void addEntity(Entity entity) {
-		// check if an entity with the same name already exists???
+	public void addEntity(Entity entity) throws CutePyException {
+		if (findEntity(entity.getName()) != null) {
+			throw new CutePyException("Duplicate entity with name " + entity.getName());
+			// prosoxi prepei na diaxorisoyme tin addParameter kai tin addEnitty?
+		}
 		entityList.add(entity);
 		
 	}

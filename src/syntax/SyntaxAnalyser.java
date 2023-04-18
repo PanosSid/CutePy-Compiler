@@ -450,6 +450,9 @@ public class SyntaxAnalyser {
 			while (currentToken.recognizedStrEquals(",")) {
 				loadNextTokenFromLex();
 				if (isID(currentToken)) {
+					if (ids.contains(currentToken.getRecognizedStr())) {
+						throw new CutePyException("[Error in line " + currentToken.getLineNum() + "] Duplicate id: "+currentToken.getRecognizedStr());
+					}
 					ids.add(currentToken.getRecognizedStr());
 					loadNextTokenFromLex();
 				} else {
