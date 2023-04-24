@@ -138,7 +138,15 @@ public class SyntaxAnalyser {
 					}
 					quadManager.genQuad("begin_block", funcName, "_", "_");
 					symbolTable.updateStartingQuadField(quadManager.nextQuad());
-					statements();
+					List<String> statements = statements();
+					
+					/*
+					 * TODO you have to keep track of the what the last statement is of a function !!!
+					 * keep in mind the last statement may be inside of a if else{} (or inside while?)
+					 */
+					if (!statements.get(statements.size()-1).equals("return")) {
+						throw new CutePyException("Error: the local function: "+ funcName +" doenst return a value");
+					}
 					quadManager.genQuad("end_block", funcName, "_", "_");
 					symbolTable.updateFrameLengthField();
 
@@ -176,39 +184,47 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void statement() throws CutePyException {
+	private String statement() throws CutePyException {
 		System.out.println("statement() " + currentToken.getRecognizedStr());
+		String s = "";
 		if (isSimpleStatement()) {
-			simpleStatement();
+			s = simpleStatement();
 		} else if (isStructuredStatement()) {
-			structuredStatement();
+			s = structuredStatement();
 		} else {
 			throw new CutePyException(getErrorMsg("at least one simple or structured statement"));
 		}
+		return s;
 
 	}
 
-	private void statements() throws CutePyException {
+	private List<String> statements() throws CutePyException {
 		System.out.println("statements() " + currentToken.getRecognizedStr());
-		statement();
+		List<String> statements = new ArrayList<String>();
+		String s = statement();
+		statements.add(s);
 		while (isStatement()) {
-			statement();
+			s = statement();
+			statements.add(s);
 		}
+		return statements;
 	}
 
 	private boolean isStatement() {
 		return isSimpleStatement() || isStructuredStatement();
 	}
 
-	private void simpleStatement() throws CutePyException {
+	private String simpleStatement() throws CutePyException {
 		System.out.println("simpleStatement() " + currentToken.getRecognizedStr());
 		if (isID(currentToken)) {
-			
 			assignmentStat();
+			return "assignment";
 		} else if (currentToken.recognizedStrEquals("print")) {
 			printStat();
+			return "print";
 		} else if (currentToken.recognizedStrEquals("return")) {
 			returnStat();
+			return "return";
 		} else {
 			// TODO will never be reached ?
 			throw new CutePyException(getErrorMsg("<identifier> or 'print' or 'return'"));
@@ -220,14 +236,16 @@ public class SyntaxAnalyser {
 				|| currentToken.recognizedStrEquals("return");
 	}
 
-	public void structuredStatement() throws CutePyException {
+	public String structuredStatement() throws CutePyException {
 		System.out.println("structuredStatement() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("if")) {
 			loadNextTokenFromLex();
 			ifStat();
+			return "if";
 		} else if (currentToken.recognizedStrEquals("while")) {
 			loadNextTokenFromLex();
 			whileStat();
+			return "while";
 		} else {
 			// TODO will never be reached ?
 			throw new CutePyException(getErrorMsg("expected a stuctured statement 'if' or 'while'"));
