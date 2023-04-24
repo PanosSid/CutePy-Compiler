@@ -46,7 +46,7 @@ public class EntityFactory {
 		return new LocalFunction(name);
 	}
 	
-	public static Function createLocalFunction(String name, List<String> formalParamsNames) {
+	public static Function createLocalFunction(String name, List<String> formalParamsNames){
 		List<FormalParameter> formalParams = new ArrayList<FormalParameter>();
 		for (String fpName : formalParamsNames) {
 			formalParams.add(new FormalParameter(fpName));

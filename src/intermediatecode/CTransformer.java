@@ -71,25 +71,26 @@ public class CTransformer {
 			cLine = "return "+quad.getOperand1()+";";
 		} else if (operator.equals("par")) {
 //			cLine = "par "+quad.getOperand1()+";";
-			if (quad.getOperand2().equals("cv") || quad.getOperand2().equals("ret")) {
-				funcParams.add(quad.getOperand1());
-			}
+//			if (quad.getOperand2().equals("cv") || quad.getOperand2().equals("ret")) {
+//				funcParams.add(quad.getOperand1());
+//			}
 		} else if (operator.equals("call")) {
-			if (funcParams.isEmpty()) {
-				cLine = quad.getOperand1()+"()"+";";				
-			} else {
-				String tmp = quad.getOperand1()+"(";
-				while (funcParams.size() > 1) {
-					tmp += funcParams.remove()+", ";
-				}
-				tmp = tmp.substring(0, tmp.length()-2) + ");";
-				cLine = funcParams.remove() + " = "+ tmp;
-			}
-//		else if (operator.equals("halt")) {
+//			if (funcParams.isEmpty()) {
+//				cLine = quad.getOperand1()+"()"+";";				
+//			} else {
+//				String tmp = quad.getOperand1()+"(";
+//				while (funcParams.size() > 1) {
+//					tmp += funcParams.remove()+", ";
+//				}
+//				tmp = tmp.substring(0, tmp.length()-2) + ");";
+//				cLine = funcParams.remove() + " = "+ tmp;
+//			}
+		} else if (operator.equals("halt")) {
+			cLine = "return 0;";
 		} else {
 			return null;
 		}
-		return getLblC(label) + cLine;
+		return getLblC(label) + cLine + getIntermedAsComment(quad);
 	}
 	
 	private String getLblC(Integer label) {
@@ -101,5 +102,9 @@ public class CTransformer {
 			cCode += "\t";
 		}
 		cCode += s + "\n";
+	}
+	
+	private String getIntermedAsComment(Quad quad) {
+		return "\t// "+quad;
 	}
 }

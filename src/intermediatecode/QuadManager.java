@@ -8,13 +8,21 @@ import java.util.Map;
 public class QuadManager {
 	private int currentLabel;
 	private int tempCounter;
+	private String tempPrefix;
 	private Map<Integer, Quad> intermedCodeMap; 
 
 	public QuadManager() {
 		currentLabel = 99;
 		tempCounter = 0;
 		intermedCodeMap = new LinkedHashMap<Integer, Quad>();
-
+		tempPrefix = "T_";
+	}
+	
+	public QuadManager(int startingLabel) {
+		currentLabel = startingLabel;
+		tempCounter = 0;
+		intermedCodeMap = new LinkedHashMap<Integer, Quad>();
+		tempPrefix = "&";
 	}
 
 	public Map<Integer, Quad> getIntermedCodeMap() {
@@ -36,7 +44,7 @@ public class QuadManager {
 
 	public String newTemp() {
 		tempCounter++;
-		return "T_" + tempCounter;
+		return tempPrefix + tempCounter;
 	}
 
 	public List<Integer> emptyList() {
@@ -69,6 +77,10 @@ public class QuadManager {
 			s += label + ": " + intermedCodeMap.get(label).toString() + "\n";
 		}
 		return s;
+	}
+	
+	public boolean isValidForTransformationToC() {
+		return false;
 	}
 
 }

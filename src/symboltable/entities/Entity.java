@@ -14,5 +14,9 @@ public abstract class Entity {
 	public String getName() {
 		return name;
 	}
+	
+//	public boolean areEntitiesTheSame(Entity other) {
+//		return (name.equals(other.name)) ? true : false;
+//	}
 
 }

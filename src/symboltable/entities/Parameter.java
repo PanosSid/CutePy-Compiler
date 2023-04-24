@@ -31,6 +31,15 @@ public class Parameter extends FormalParameter {
 	public void setOffset(int offset) {
 		this.offset = offset;
 	}
+	
+//	@Override
+//	public boolean areEntitiesTheSame(Entity other) {
+//		if (other.getClass().equals(FormalParameter.class) 
+//				&& super.areEntitiesTheSame(other)) {
+//			return false;
+//		}
+//		return super.areEntitiesTheSame(other);
+//	}
 
 	@Override
 	public String toString() {

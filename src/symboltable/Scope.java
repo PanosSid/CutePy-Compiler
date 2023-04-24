@@ -73,7 +73,7 @@ public class Scope {
 	public String toString() {
 		String s = "";
 		for (Entity entity : entityList) {
-			s += entity + "---";
+			s += entity + " --- ";
 		}
 		return (s.length()-3 >0) ? s.substring(0, s.length()-3) : s;
 	}

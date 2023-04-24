@@ -6,11 +6,11 @@ import java.util.Stack;
 import exceptions.CutePyException;
 import symboltable.entities.Entity;
 import symboltable.entities.Function;
-import symboltable.entities.MainFunction;
 import symboltable.entities.Parameter;
 
 public class SymbolTable {
 	protected Stack<Scope> scopeStack = new Stack<Scope>();
+	private String symbolTableHistory = "";
 	
 	public SymbolTable() {
 		scopeStack = new Stack<Scope>();
@@ -23,12 +23,17 @@ public class SymbolTable {
 		super();
 		this.scopeStack = scopeStack;
 	}
-
+	
+	public String getSymbolTableHistory() {
+		return symbolTableHistory;
+	}
+	
 	public void addScope(Function func) {
 		scopeStack.push(new Scope(func));
 	}
 	
 	public void removeScope() {
+		symbolTableHistory += this+"\n\n";
 		scopeStack.pop();
 	}
 	
@@ -75,13 +80,17 @@ public class SymbolTable {
 	public int getOffsetOfNextEntity() {
 		return scopeStack.lastElement().getLengthOfScope();
 	}
+	
 
 	@Override
 	public String toString() {
 		String s = "SymbolTable\n";
-		for (int i = scopeStack.size() - 1; i >= 0; i--) {
+		for (int i = scopeStack.size() - 1; i > 0; i--) {
 			s += "Scope "+ i + " "+scopeStack.get(i) +"\n";
+			s += "   | \n";
 		}
+		
+		s += "Scope "+ 0 + " "+scopeStack.get(0) +"\n";
 		return s;
 	}
 	

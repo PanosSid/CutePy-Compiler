@@ -30,7 +30,7 @@ public class FormalParameter extends Entity {
 	public void setMode(ParameterMode mode) {
 		this.mode = mode;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(datatype, mode);
