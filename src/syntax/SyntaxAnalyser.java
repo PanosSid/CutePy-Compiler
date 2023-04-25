@@ -20,7 +20,8 @@ public class SyntaxAnalyser {
 	private QuadManager quadManager;
 	private SymbolTable symbolTable;
 	private String recognisedCode = ""; // used for debugging
-
+	private boolean localFunctionhasReturn = false;
+	
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
 		quadManager = new QuadManager();
@@ -112,6 +113,7 @@ public class SyntaxAnalyser {
 	
 	private void defFunction() throws CutePyException {
 		System.out.println("defFunction() " + currentToken.getRecognizedStr());
+		localFunctionhasReturn = false;
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isID(currentToken) && !isMainFuncId()) {
@@ -138,15 +140,8 @@ public class SyntaxAnalyser {
 					}
 					quadManager.genQuad("begin_block", funcName, "_", "_");
 					symbolTable.updateStartingQuadField(quadManager.nextQuad());
-					List<String> statements = statements();
-					
-					/*
-					 * TODO you have to keep track of the what the last statement is of a function !!!
-					 * keep in mind the last statement may be inside of a if else{} (or inside while?)
-					 */
-					if (!statements.get(statements.size()-1).equals("return")) {
-						throw new CutePyException("Error: the local function: "+ funcName +" doenst return a value");
-					}
+					statements();
+					checkIfHasAReturnStat(funcName);
 					quadManager.genQuad("end_block", funcName, "_", "_");
 					symbolTable.updateFrameLengthField();
 
@@ -167,6 +162,13 @@ public class SyntaxAnalyser {
 		}
 	}
 
+	private void checkIfHasAReturnStat(String funcName) throws CutePyException {
+		if (localFunctionhasReturn == false) {
+			throw new CutePyException("Error: the local function: '"+ funcName +"' does not return a value");
+		}
+		localFunctionhasReturn = false;
+	}
+
 	private void declarations() throws CutePyException {
 		System.out.println("declarations() " + currentToken.getRecognizedStr());
 		while (currentToken.recognizedStrEquals("#declare")) {
@@ -184,30 +186,24 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private String statement() throws CutePyException {
+	private void statement() throws CutePyException {
 		System.out.println("statement() " + currentToken.getRecognizedStr());
-		String s = "";
 		if (isSimpleStatement()) {
-			s = simpleStatement();
+			simpleStatement();
 		} else if (isStructuredStatement()) {
-			s = structuredStatement();
+			structuredStatement();
+			
 		} else {
 			throw new CutePyException(getErrorMsg("at least one simple or structured statement"));
 		}
-		return s;
-
 	}
 
-	private List<String> statements() throws CutePyException {
+	private void statements() throws CutePyException {
 		System.out.println("statements() " + currentToken.getRecognizedStr());
-		List<String> statements = new ArrayList<String>();
-		String s = statement();
-		statements.add(s);
+		statement();
 		while (isStatement()) {
-			s = statement();
-			statements.add(s);
+			statement();
 		}
-		return statements;
 	}
 
 	private boolean isStatement() {
@@ -341,6 +337,7 @@ public class SyntaxAnalyser {
 			}
 		}
 		quadManager.genQuad("ret", ePlace, "_", "_");
+		localFunctionhasReturn = true;
 	}
 
 	private void ifStat() throws CutePyException {

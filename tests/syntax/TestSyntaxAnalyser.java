@@ -435,6 +435,7 @@ public class TestSyntaxAnalyser {
 				+ "	#{\r\n"
 				+ "		i = 2;\r\n"
 				+ "		i = i + 2;\r\n"
+				+ "		return(i);"
 				+ "	#}\r\n"
 				+ "\r\n"
 				+ "	i = i * 1;\r\n"
@@ -451,8 +452,6 @@ public class TestSyntaxAnalyser {
 		Assertions.assertEquals(expectedCurrentTk, syntax.getCurrentToken());
 		
 	}
-	
-	
 	
 	
 }

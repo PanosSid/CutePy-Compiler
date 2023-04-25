@@ -6,8 +6,10 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import exceptions.CutePyException;
+import lex.EOFToken;
 import lex.FileReader;
 import lex.LexAnalyser;
+import lex.Token;
 
 public class TestSyntaxErrors {
 	private SyntaxAnalyser syntax;
@@ -330,6 +332,102 @@ public class TestSyntaxErrors {
 				);
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
 		Assertions.assertEquals("[Error in line " +8+ "] expected '(' but found 'x'", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testLocalFunctionsReturns() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_primes():\r\n"
+				+ "#{\r\n"
+				+ "	#declare i\r\n"
+				+ "\r\n"
+				+ "		def isPrime(x):\r\n"
+				+ "		#{\r\n"
+				+ "			i = 2;\r\n"
+				+ "			i = i + 2;\r\n"
+				+ "			def isPrime22():"
+				+ "			#{\r\n"
+				+ "				k = k +1;"
+				+ "				return(k);"
+				+ "			#}\r\n"
+				+ "		#}\r\n"
+				+ "\r\n"
+				+ "	i = i * 1;\r\n"
+				+ "\r\n"
+				+ "#}\r\n"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "	"
+				);
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
 		
+	}
+	
+	@Test
+	public void testLocalFunctionsReturns2() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_primes():\r\n"
+				+ "#{\r\n"
+				+ "	#declare i\r\n"
+				+ "\r\n"
+				+ "	def isPrime(x):\r\n"
+				+ "	#{\r\n"
+				+ "		i = 2;\r\n"
+				+ "		i = i + 2;\r\n"
+				+ "		def isPrime22():"
+				+ "		#{\r\n"
+				+ " 		if (i>0):\n"
+				+ "				i = i + 1;\n"
+				+ "			else:\n"
+				+ "				return(k);\n"
+				+ "		#}\r\n"
+				+ "	#}\r\n"
+				+ "\r\n"
+				+ "	i = i * 1;\r\n"
+				+ "\r\n"
+				+ "#}\r\n"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "	"
+				);
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
+	}
+	
+	@Test
+	public void testLocalFunctionsReturns3() throws Exception {
+		setUpSyntaxAnalyser(""
+				+ "def main_primes():\r\n"
+				+ "#{\r\n"
+				+ "	#declare i\r\n"
+				+ "\r\n"
+				+ "	def isPrime(x):\r\n"
+				+ "	#{\r\n"
+				+ "		i = 2;\r\n"
+				+ "		i = i + 2;\r\n"
+				+ "		def isPrime22():"
+				+ "		#{\r\n"
+				+ " 		if (i>0):\n"
+				+ "				i = i + 1;\n"
+				+ "		#}\r\n"
+				+ "	#}\r\n"
+				+ "		return(k);\n"
+				+ "\r\n"
+				+ "	i = i * 1;\r\n"
+				+ "\r\n"
+				+ "#}\r\n"
+				+ "\r\n"
+				+ "if __name__ == \"__main__\":\r\n"
+				+ "#$ call of main functions #$\r\n"
+				+ "	main_primes();\r\n"
+				+ "	"
+				);
+		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
 	}
 }
