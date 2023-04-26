@@ -46,5 +46,24 @@ public class LocalFunction extends Function {
 		return Objects.equals(formalParams, other.formalParams);
 	}
 	
+	private String getFormalParmasAsStr() {
+		if (formalParams.size() > 0) {
+			String s= "";
+			for (FormalParameter fp : formalParams) {
+				s += fp.getName() +", ";
+			}
+			return s.substring(0, s.lastIndexOf(","));
+		}
+		return ""; 
+	}
+
+	@Override
+	public String toString() {
+//		return "LocalFunction [formalParams=" + formalParams + "]";
+		return "[LocalFunction: "+super.name+", SQ=" + startingQuad + ", FL=" + framelength + ", FPs =<"+getFormalParmasAsStr()+">]";
+	}
+	
+	
+	
 	
 }

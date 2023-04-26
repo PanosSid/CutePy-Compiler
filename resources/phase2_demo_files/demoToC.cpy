@@ -38,12 +38,12 @@ def main_firstToTen():
 	
 	if (a > 10):
 	#{
-		print(0);	#$ 
+		print(0);	#$ a won #$
 		print(a);
 	#} 
 	else:
 	#{
-		print(1);
+		print(1);	#$ b won #$
 		print(b);
 	#} 
 #}

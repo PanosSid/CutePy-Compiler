@@ -82,5 +82,9 @@ public class QuadManager {
 	public boolean isValidForTransformationToC() {
 		return false;
 	}
-
+	
+	@Override
+	public String toString() {
+		return getIntermediateCode();
+	}
 }

@@ -47,6 +47,11 @@ public class FormalParameter extends Entity {
 		FormalParameter other = (FormalParameter) obj;
 		return datatype == other.datatype && mode == other.mode;
 	}
+
+	@Override
+	public String toString() {
+		return super.name;
+	}
 	
-		
+	
 }
