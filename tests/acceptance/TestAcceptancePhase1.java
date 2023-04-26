@@ -29,14 +29,14 @@ public class TestAcceptancePhase1 {
 	
 	@Test
 	public void testAllFunctions() {
-		cpyCompiler.compile(TEST_FILES_PATH+"allFuncs.cpy");
+		cpyCompiler.compile(TEST_FILES_PATH+"allFuncs.cpy", false);
 		Assertions.assertTrue(outContent.toString().contains("Compilation of '"+TEST_FILES_PATH+"allFuncs.cpy' successfully completed")); 	// TODO DELETE IT, THIS IS TEMPORARY
 //		Assertions.assertEquals("Compilation successfully completed", outContent.toString());
 	}
 	
 	@Test
 	public void testAllFunctionsModified() {
-		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy");
+		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy", false);
 		Assertions.assertTrue(outContent.toString().contains("Compilation of '"+TEST_FILES_PATH+"allFuncsModified.cpy' successfully completed")); 	// TODO DELETE IT, THIS IS TEMPORARY
 //		Assertions.assertEquals("Compilation successfully completed", outContent.toString());
 		
@@ -44,7 +44,7 @@ public class TestAcceptancePhase1 {
 	
 	@Test
 	public void testSourceWithErrors() {
-		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy");
+		cpyCompiler.compile(TEST_FILES_PATH+"sourceWithErrors.cpy", false);
 		Assertions.assertTrue(outContent.toString().contains("Compilation of '"+TEST_FILES_PATH+"sourceWithErrors.cpy"+"'FAILED")); 	// TODO DELETE IT, THIS IS TEMPORARY
 //		Assertions.assertEquals("Compilation successfully completed", outContent.toString());
 		

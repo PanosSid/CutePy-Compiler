@@ -1,16 +1,13 @@
 package intermediatecode;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import lex.CharTypes;
 
 public class CTransformer {
 	private String cCode = "";
-	private Queue<String> funcParams = new LinkedList<String>(); 
 	
 	public CTransformer() {}
 	

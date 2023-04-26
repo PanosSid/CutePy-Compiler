@@ -3,6 +3,9 @@ package view;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import exceptions.CutePyException;
 import intermediatecode.CTransformer;
@@ -29,16 +32,18 @@ public class CutePyCompiler {
 		cTransformer = new CTransformer(); 
 	}
 	
-	public void compile(String filePath) {
+	public void compile(String filePath, boolean cflag) {
 		try {
 			checkForCpyExtension(filePath);
 			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
 			writeToFile(filePath, "int", quadManager.getIntermediateCode());
 			System.out.println("\n"+quadManager.getIntermediateCode()+"\n");
-			cTransformer.transformIntermidateCodeToC(quadManager.getIntermedCodeMap());
+			if (cflag) {
+				transformToC(filePath);			
+//				System.out.println(cTransformer.getCcode());
+			}
 			writeToFile(filePath, "symb", symbolTable.getSymbolTableHistory());
-			System.out.println(cTransformer.getCcode());
 			System.out.println("Compilation of '"+filePath+"' successfully completed");
 		} catch (CutePyException e) {
 			System.out.println("Compilation of '"+filePath+"'FAILED");
@@ -56,6 +61,11 @@ public class CutePyCompiler {
 		writer.write(data);
 		writer.close();
 	}
+	
+	public void transformToC(String filePath) throws IOException {
+		cTransformer.transformIntermidateCodeToC(quadManager.getIntermedCodeMap());
+		writeToFile(filePath, "c", cTransformer.getCcode());
+	}
 
 	private String changeFilePathExtenstion(String fileName, String extension) {
 		return fileName.substring(0, fileName.lastIndexOf(".")+1) + extension;
@@ -69,15 +79,14 @@ public class CutePyCompiler {
 		}
 	}
 	
+	
 	public static void main(String[] args) {	
 		CutePyCompiler cpyCompiler = new CutePyCompiler();
-		for (int i = 0; i < args.length; i++) {
-			cpyCompiler.compile(args[i]);
-		}	
-//		cpyCompiler.compile("D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\project-Compilers\\CutePy-Compiler\\question.cpy");	
-//		cpyCompiler.compile("D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\Class Materials\\Σημειώσεις\\πίνακας συμβόλων παραδείγματα\\symbol.cpy");
-//		cpyCompiler.compile("D:\\Panos\\CSE UOI\\10o εξάμηνο\\Μεταφραστές\\Class Materials\\Σημειώσεις\\πίνακας συμβόλων παραδείγματα\\paradeigma3.cpy");
-		cpyCompiler.compile("testSymbol.cpy");
+		List<String> argsList = new ArrayList<String>(Arrays.asList(args));
+		boolean cFlag = argsList.remove("-c");
+		for (String programPath : argsList) {
+			cpyCompiler.compile(programPath, cFlag);
+		}
 		
 	}
 
