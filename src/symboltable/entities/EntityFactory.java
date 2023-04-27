@@ -67,6 +67,4 @@ public class EntityFactory {
 		return new MainFunction(name);
 	}
 
-	
-	
 }

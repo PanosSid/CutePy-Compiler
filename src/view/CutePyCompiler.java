@@ -38,10 +38,8 @@ public class CutePyCompiler {
 			reader.initFileContents(filePath);	
 			syntaxAnalyzer.analyzeSyntax();
 			writeToFile(filePath, "int", quadManager.getIntermediateCode());
-			System.out.println("\n"+quadManager.getIntermediateCode()+"\n");
 			if (cflag) {
 				transformToC(filePath);			
-//				System.out.println(cTransformer.getCcode());
 			}
 			writeToFile(filePath, "symb", symbolTable.getSymbolTableHistory());
 			System.out.println("Compilation of '"+filePath+"' successfully completed");

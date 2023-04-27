@@ -67,21 +67,9 @@ public class CTransformer {
 		} else if (operator.equals("ret")) {
 			cLine = "return "+quad.getOperand1()+";";
 		} else if (operator.equals("par")) {
-//			cLine = "par "+quad.getOperand1()+";";
-//			if (quad.getOperand2().equals("cv") || quad.getOperand2().equals("ret")) {
-//				funcParams.add(quad.getOperand1());
-//			}
+			// do nothing
 		} else if (operator.equals("call")) {
-//			if (funcParams.isEmpty()) {
-//				cLine = quad.getOperand1()+"()"+";";				
-//			} else {
-//				String tmp = quad.getOperand1()+"(";
-//				while (funcParams.size() > 1) {
-//					tmp += funcParams.remove()+", ";
-//				}
-//				tmp = tmp.substring(0, tmp.length()-2) + ");";
-//				cLine = funcParams.remove() + " = "+ tmp;
-//			}
+			// do nothing
 		} else if (operator.equals("halt")) {
 			cLine = "return 0;";
 		} else {

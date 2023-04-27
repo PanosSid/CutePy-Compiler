@@ -21,13 +21,6 @@ public class FileReader {
 		this.fileName = fileName;
 		byte[] content = Files.readAllBytes(Paths.get(fileName));
 		fileContents = new String(content) +EOF;
-//		try {
-//			byte[] content = Files.readAllBytes(Paths.get(fileName));
-//			fileContents = new String(content) +EOF;
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.exit(-1);
-//		}
 	}
 	
 	public String getFileName() {
