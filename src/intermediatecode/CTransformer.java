@@ -42,7 +42,8 @@ public class CTransformer {
 		for (String variable : varsList) {
 			declareVars += variable+", ";
 		}
-		return declareVars.substring(0, declareVars.length()-2)+";";
+		String d = declareVars.substring(0, declareVars.length()-2)+";"; 
+		return d.replaceAll("&", "T_");
 	}
 
 	private String getEquivalentCCode(Integer label, Quad quad) {
@@ -64,6 +65,7 @@ public class CTransformer {
 			cLine = "printf(\"%d\", "+quad.getOperand3()+");";
 		} else if (operator.equals("in")) {
 			cLine = "scanf(\"%d\", &"+quad.getOperand1()+");";
+			return getLblC(label) + cLine + getIntermedAsComment(quad);
 		} else if (operator.equals("ret")) {
 			cLine = "return "+quad.getOperand1()+";";
 		} else if (operator.equals("par")) {
@@ -75,7 +77,7 @@ public class CTransformer {
 		} else {
 			return null;
 		}
-		return getLblC(label) + cLine + getIntermedAsComment(quad);
+		return getLblC(label) + cLine.replaceAll("&", "T_") + getIntermedAsComment(quad);
 	}
 	
 	private String getLblC(Integer label) {

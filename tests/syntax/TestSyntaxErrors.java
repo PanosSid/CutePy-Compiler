@@ -6,10 +6,8 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import exceptions.CutePyException;
-import lex.EOFToken;
 import lex.FileReader;
 import lex.LexAnalyser;
-import lex.Token;
 
 public class TestSyntaxErrors {
 	private SyntaxAnalyser syntax;

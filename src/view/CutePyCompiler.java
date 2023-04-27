@@ -39,6 +39,7 @@ public class CutePyCompiler {
 			syntaxAnalyzer.analyzeSyntax();
 			writeToFile(filePath, "int", quadManager.getIntermediateCode());
 			if (cflag) {
+				quadManager.setTempPrefix("T_");
 				transformToC(filePath);			
 			}
 			writeToFile(filePath, "symb", symbolTable.getSymbolTableHistory());

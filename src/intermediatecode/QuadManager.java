@@ -24,6 +24,10 @@ public class QuadManager {
 		intermedCodeMap = new LinkedHashMap<Integer, Quad>();
 		tempPrefix = "&";
 	}
+	
+	public void setTempPrefix(String prefix) {
+		tempPrefix = prefix;	
+	}
 
 	public Map<Integer, Quad> getIntermedCodeMap() {
 		return intermedCodeMap;
@@ -87,4 +91,6 @@ public class QuadManager {
 	public String toString() {
 		return getIntermediateCode();
 	}
+
+	
 }
