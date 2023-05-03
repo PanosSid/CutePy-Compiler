@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import exceptions.CutePyException;
+import finalcode.FinalCodeManager;
 import intermediatecode.QuadManager;
 import lex.CharTypes;
 import lex.FileReader;
@@ -19,6 +20,8 @@ public class SyntaxAnalyser {
 	private Token currentToken;
 	private QuadManager quadManager;
 	private SymbolTable symbolTable;
+	private FinalCodeManager finManager;
+	
 	private String recognisedCode = ""; // used for debugging
 	private boolean localFunctionhasReturn = false;
 	
@@ -37,6 +40,14 @@ public class SyntaxAnalyser {
 		this.lex = lex;
 		this.quadManager = quadManager;
 		this.symbolTable = symbolTable;
+	}
+
+	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager, SymbolTable symbolTable,
+			FinalCodeManager finManager) {
+		this.lex = lex;
+		this.quadManager = quadManager;
+		this.symbolTable = symbolTable;
+		this.finManager = finManager;
 	}
 
 	public QuadManager getQuadManager() {

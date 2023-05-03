@@ -14,9 +14,7 @@ public class SymbolTable {
 	
 	public SymbolTable() {
 		scopeStack = new Stack<Scope>();
-//		Function main = new MainFunction("main");
 		scopeStack.add(new Scope());
-//		addEntity(main);
 	}
 	
 	public SymbolTable(Stack<Scope> scopeStack) {
@@ -24,6 +22,9 @@ public class SymbolTable {
 		this.scopeStack = scopeStack;
 	}
 	
+	public void setScopeStack(Stack<Scope> scopeStack) {
+		this.scopeStack = scopeStack;
+	}
 	public String getSymbolTableHistory() {
 		return symbolTableHistory;
 	}
@@ -46,6 +47,7 @@ public class SymbolTable {
 			Scope scope = scopeStack.get(i);
 			Entity foundEntity = scope.findEntity(entityName);  
 			if (foundEntity != null) {
+				foundEntity.setFoundScope(i);
 				return foundEntity; 
 			}
 		}
@@ -79,6 +81,10 @@ public class SymbolTable {
 		
 	public int getOffsetOfNextEntity() {
 		return scopeStack.lastElement().getLengthOfScope();
+	}
+	
+	public int getLastScopeNum() {
+		return scopeStack.size()-1;
 	}
 	
 

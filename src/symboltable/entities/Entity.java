@@ -1,8 +1,8 @@
 package symboltable.entities;
 
 public abstract class Entity {
-	
 	protected String name;
+	private int foundScope = -1;
 	
 	public Entity() {}
 	
@@ -14,5 +14,14 @@ public abstract class Entity {
 	public String getName() {
 		return name;
 	}
+	
+	public int getFoundScope() {
+		return foundScope;
+	}
+	
+	public void setFoundScope(int foundScope) {
+		this.foundScope = foundScope;
+	}
+	
 
 }

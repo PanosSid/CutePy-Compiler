@@ -1,0 +1,25 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+100: begin_block, f2, _, _
+101: ret, 2, _, _
+102: end_block, f2, _, _
+103: begin_block, f4, _, _
+104: +, a, 1, T_1
+105: :=, T_1, _, a
+106: ret, 4, _, _
+107: end_block, f4, _, _
+108: begin_block, f3, _, _
+109: par, T_2, ret, _
+110: call, f4, _, _
+111: out, _, _, T_2
+112: ret, 3, _, _
+113: end_block, f3, _, _
+114: begin_block, main_f1, _, _
+115: par, T_3, ret, _
+116: call, f2, _, _
+117: out, _, _, T_3
+118: end_block, main_f1, _, _
+119: begin_block, main, _, _
+120: call, main_f1, _, _
+121: halt, _, _, _
+122: end_block, main, _, _

@@ -1,0 +1,38 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+SymbolTable
+Scope 2 
+   | 
+Scope 1 [Variable: a/INTEGER/12] --- [LocalFunction: f2, SQ=101, FL=12, FPs =<>] -
+   | 
+Scope 0 [Function: main_f1, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 3 [TempVariable: T_1/INTEGER/12] -
+   | 
+Scope 2 [LocalFunction: f4, SQ=104, FL=16, FPs =<>] -
+   | 
+Scope 1 [Variable: a/INTEGER/12] --- [LocalFunction: f2, SQ=101, FL=12, FPs =<>] --- [LocalFunction: f3, SQ=0, FL=0, FPs =<>] -
+   | 
+Scope 0 [Function: main_f1, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 2 [LocalFunction: f4, SQ=104, FL=16, FPs =<>] --- [TempVariable: T_2/INTEGER/12] -
+   | 
+Scope 1 [Variable: a/INTEGER/12] --- [LocalFunction: f2, SQ=101, FL=12, FPs =<>] --- [LocalFunction: f3, SQ=109, FL=16, FPs =<>] -
+   | 
+Scope 0 [Function: main_f1, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 1 [Variable: a/INTEGER/12] --- [LocalFunction: f2, SQ=101, FL=12, FPs =<>] --- [LocalFunction: f3, SQ=109, FL=16, FPs =<>] --- [TempVariable: T_3/INTEGER/16] -
+   | 
+Scope 0 [Function: main_f1, SQ=115, FL=20] -
+
+
+SymbolTable
+Scope 0 [Function: main_f1, SQ=115, FL=20] -
+
+
