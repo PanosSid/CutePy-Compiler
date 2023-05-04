@@ -1,4 +1,4 @@
-package symbolatable;
+package symboltable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +21,7 @@ import symboltable.entities.Parameter;
 import symboltable.entities.ParameterMode;
 import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
+import syntax.FakeFinalCodeManager;
 import syntax.SyntaxAnalyser;
 
 public class TestSymbolTable {
@@ -32,7 +33,7 @@ public class TestSymbolTable {
 		reader.setFileContents(sourceCode);
 		LexAnalyser lex = new LexAnalyser(reader);
 		symbolTable = new FakeSymbolTable();
-		syntax = new SyntaxAnalyser(lex,  new QuadManager(), symbolTable);
+		syntax = new SyntaxAnalyser(lex,  new QuadManager(), symbolTable, new FakeFinalCodeManager());
 	}
 	
 	

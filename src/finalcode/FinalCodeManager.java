@@ -19,6 +19,8 @@ public class FinalCodeManager {
 	private String finalCode = ".data\n\n.text\n\n";
 	private SymbolTable symbolTable;
 	
+	public FinalCodeManager() {}
+	
 	public FinalCodeManager(SymbolTable symbolTable) {
 		this.symbolTable = symbolTable;
 	}

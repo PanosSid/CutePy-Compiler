@@ -3,10 +3,12 @@ package syntax;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import intermediatecode.QuadManager;
 import lex.EOFToken;
 import lex.FileReader;
 import lex.LexAnalyser;
 import lex.Token;
+import symboltable.SymbolTable;
 
 public class TestSyntaxAnalyser {
 	
@@ -16,7 +18,7 @@ public class TestSyntaxAnalyser {
 		FileReader reader = new FileReader();
 		reader.setFileContents(sourceCode);
 		LexAnalyser lex = new LexAnalyser(reader);
-		syntax = new SyntaxAnalyser(lex);
+		syntax = new SyntaxAnalyser(lex, new QuadManager(), new SymbolTable(), new FakeFinalCodeManager());
 	}
 	
 	@Test
