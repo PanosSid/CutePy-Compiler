@@ -1,21 +1,19 @@
 package finalcode;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import exceptions.CutePyException;
-import lex.FileReader;
-import lex.LexAnalyser;
 import symboltable.Scope;
 import symboltable.SymbolTable;
 import symboltable.entities.Entity;
 import symboltable.entities.FormalParameter;
 import symboltable.entities.LocalFunction;
 import symboltable.entities.MainFunction;
+import symboltable.entities.Parameter;
 import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
 
@@ -54,7 +52,7 @@ public class TestFinalCode {
 				new TemporaryVariable("T_1", 12)
 				));
 		symbolTable.setScopeStack(scopes);
-		finManager.gnlvcode("a");
+		finManager.gnvlcode("a");
 		String expectedFinalCode = ""
 				+ ".data\n"
 				+ "\n"
@@ -106,7 +104,7 @@ public class TestFinalCode {
 				new TemporaryVariable("T_1", 12)	// we are on scope 5
 				));
 		symbolTable.setScopeStack(scopes);
-		finManager.gnlvcode("a");
+		finManager.gnvlcode("a");
 		String expectedFinalCode = ""
 				+ ".data\n"
 				+ "\n"
@@ -119,5 +117,37 @@ public class TestFinalCode {
 		
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
+	
+	@Test
+	public void testLoadvrFor1stCase() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f1")));
+		scopes.push(new Scope(
+				new Variable("var", 12),	/* not this !!*/
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("pbyvalue", 12),
+				new Variable("var", 16),
+				new TemporaryVariable("T_1", 20)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.loadvr("var", "t1");
+		finManager.loadvr("pbyvalue", "t2");
+		finManager.loadvr("T_1", "t3");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tlw t1, -16(sp)\n"
+				+ "\tlw t2, -12(sp)\n"
+				+ "\tlw t3, -20(sp)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
+	
 	
 }

@@ -3,6 +3,11 @@ package finalcode;
 import exceptions.CutePyException;
 import symboltable.SymbolTable;
 import symboltable.entities.Entity;
+import symboltable.entities.EntityWithOffset;
+import symboltable.entities.FormalParameter;
+import symboltable.entities.Parameter;
+import symboltable.entities.ParameterMode;
+import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
 
 public class FinalCodeManager {
@@ -32,6 +37,44 @@ public class FinalCodeManager {
 		
 	}
 	
+	public void loadvr(String varName, String reg) throws CutePyException {
+		Entity entity = symbolTable.searchEntity(varName);
+		if (entity instanceof TemporaryVariable ||
+				isLocalVariable(entity) || isParamPassedByValue(entity)) {
+			addToFinalCode("lw "+reg+", -"+ ((EntityWithOffset) entity).getOffset() + "(sp)");
+		} else if (isAncestorsLocalVariable(entity) || isAncestorsParameter(entity)) {
+			  
+		}
+			 
+	}
+	
+	private boolean isAncestorsParameter(Entity entity)  {
+		return false;
+	}
+	
+	private boolean isAncestorsLocalVariable(Entity entity) throws CutePyException {
+		if (entity.getFoundScope() - symbolTable.getLastScopeNum() < 0 /* different scopes*/  
+				&& entity instanceof Variable) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isLocalVariable(Entity entity) throws CutePyException {
+		if (entity.getFoundScope() - symbolTable.getLastScopeNum() == 0
+				&& entity instanceof Variable) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isParamPassedByValue(Entity entity) {
+		if (entity instanceof Parameter &&
+				((Parameter) entity).getMode().equals(ParameterMode.CV)) {
+			return true;
+		}
+		return false;
+	}
 	
 	private void addToFinalCode(String str) {
 		finalCode += "\t"+str+"\n"; 

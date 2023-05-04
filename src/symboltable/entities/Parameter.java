@@ -7,7 +7,7 @@ import java.util.Objects;
  * @author Panos
  * 
  */
-public class Parameter extends FormalParameter {
+public class Parameter extends FormalParameter implements EntityWithOffset{
 	private int offset;
 	
 	public Parameter(String name, ParameterMode mode) {

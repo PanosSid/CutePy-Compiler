@@ -2,7 +2,7 @@ package symboltable.entities;
 
 import java.util.Objects;
 
-public class Variable extends Entity {
+public class Variable extends Entity implements EntityWithOffset{
 	protected DataType datatype;
 	protected int offset;
 
