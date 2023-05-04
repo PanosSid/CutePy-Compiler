@@ -48,6 +48,7 @@ public class SyntaxAnalyser {
 		this.quadManager = quadManager;
 		this.symbolTable = symbolTable;
 		this.finManager = finManager;
+		finManager.initMainFinalCode();
 	}
 
 	public QuadManager getQuadManager() {
@@ -101,6 +102,7 @@ public class SyntaxAnalyser {
 				while (currentToken.recognizedStrEquals("def")) {
 					defFunction();
 				}
+				int fCodeStartingLbl = quadManager.nextQuad();
 				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				symbolTable.updateStartingQuadField(quadManager.nextQuad());
 				statements();
@@ -108,6 +110,7 @@ public class SyntaxAnalyser {
 				symbolTable.updateFrameLengthField();
 				if (currentToken.getRecognizedStr().equals("#}")) {
 					loadNextTokenFromLex();
+					finManager.genFinalCode(fCodeStartingLbl, quadManager.getIntermedCodeMap());
 					symbolTable.removeScope();
 				} else {
 					throw new CutePyException(getErrorMsg("#}"));
@@ -149,6 +152,7 @@ public class SyntaxAnalyser {
 					while (currentToken.recognizedStrEquals("def")) {
 						defFunction();
 					}
+					int fCodeStartingLbl = quadManager.nextQuad();
 					quadManager.genQuad("begin_block", funcName, "_", "_");
 					symbolTable.updateStartingQuadField(quadManager.nextQuad());
 					statements();
@@ -158,6 +162,7 @@ public class SyntaxAnalyser {
 
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
+						finManager.genFinalCode(fCodeStartingLbl, quadManager.getIntermedCodeMap());
 						symbolTable.removeScope();
 					} else {
 						throw new CutePyException(getErrorMsg("#}"));
@@ -694,6 +699,7 @@ public class SyntaxAnalyser {
 					throw new CutePyException(getErrorMsg(args[i]));
 				}
 			}
+			int fCodeStartingLbl = quadManager.nextQuad();
 			quadManager.genQuad("begin_block", "main", "_", "_");
 			mainFunctionCall();
 			while (isID(currentToken)) {
@@ -701,7 +707,10 @@ public class SyntaxAnalyser {
 			}
 			quadManager.genQuad("halt", "_", "_", "_");
 			quadManager.genQuad("end_block", "main", "_", "_");
+			finManager.genFinalCode(fCodeStartingLbl, quadManager.getIntermedCodeMap());
 			symbolTable.removeScope();
+			
+			System.out.println(finManager.getFinalCode());
 		}
 	}
 

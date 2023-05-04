@@ -17,22 +17,18 @@ import symboltable.entities.Parameter;
 import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
 
-public class TestFinalCode {
+public class TestFinalCodeManager {
 	private SymbolTable symbolTable;
 	private FinalCodeManager finManager;
 	
-	public TestFinalCode() {
+	public TestFinalCodeManager() {
 		symbolTable = new SymbolTable();
 		finManager = new FinalCodeManager(symbolTable);;
 	}
-//	private void setUpSyntaxAnalyser(String sourceCode) {
-//		FileReader reader = new FileReader();
-//		reader.setFileContents(sourceCode);
-//		LexAnalyser lex = new LexAnalyser(reader);
-//		SymbolTable symbolTable = new SymbolTable();
-////		finManager = new FinalCodeManager(symbolTable);
-////		syntax = new SyntaxAnalyser(lex,  new QuadManager(), symbolTable, finManager);
-//	}
+
+	private String getInitFCode() {
+		return ".data\n\n.text\n\nL0:\n\tj main\n\n";
+	}
 	
 	@Test
 	public void testGnlvcode() throws CutePyException {

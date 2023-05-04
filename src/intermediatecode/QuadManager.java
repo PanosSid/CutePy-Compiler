@@ -19,7 +19,7 @@ public class QuadManager {
 	}
 	
 	public QuadManager(int startingLabel) {
-		currentLabel = startingLabel;
+		currentLabel = startingLabel-1;
 		tempCounter = 0;
 		intermedCodeMap = new LinkedHashMap<Integer, Quad>();
 		tempPrefix = "&";
