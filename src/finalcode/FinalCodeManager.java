@@ -47,6 +47,19 @@ public class FinalCodeManager {
 			addToFinalCode("lw "+reg+", (t0)");
 		} else {
 			throw new CutePyException("FinalCodeManager.laodvr("+varName+","+reg+") unknwon load case");
+		}		 
+	}
+	
+	public void storerv(String reg, String varName) throws CutePyException {
+		Entity entity = symbolTable.searchEntity(varName);
+		if (entity instanceof TemporaryVariable ||
+				isLocalVariable(entity) || isParamPassedByValue(entity)) {
+			addToFinalCode("sw "+reg+", -"+ ((EntityWithOffset) entity).getOffset() + "(sp)");
+		} else if (isAncestorsLocalVariable(entity) || isAncestorsParamByValue(entity)) {
+			gnvlcode(varName);
+			addToFinalCode("sw "+reg+", (t0)");
+		} else {
+			throw new CutePyException("FinalCodeManager.storerv("+varName+","+reg+") unknwon store case");
 		}
 			 
 	}

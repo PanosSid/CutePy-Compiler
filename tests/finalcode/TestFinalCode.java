@@ -219,4 +219,104 @@ public class TestFinalCode {
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
 	
+	@Test
+	public void testStorervFor1stCase() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f1")));
+		scopes.push(new Scope(
+				new Variable("var", 12),	/* not this !!*/
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("pbyvalue", 12),
+				new Variable("var", 16),
+				new TemporaryVariable("T_1", 20)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.storerv("t1", "var");
+		finManager.storerv("t2", "pbyvalue");
+		finManager.storerv("t3", "T_1");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tsw t1, -16(sp)\n"
+				+ "\tsw t2, -12(sp)\n"
+				+ "\tsw t3, -20(sp)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
+	
+	@Test
+	public void testStorervFor2ndCase1() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f")));
+		scopes.push(new Scope(
+				new LocalFunction("f1", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("x", 12),
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new LocalFunction("f3", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Variable("a", 12)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.storerv("t1", "x");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tlw t0, -8(sp)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\taddi t0, t0, -12\n"
+				+ "\tsw t1, (t0)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
+	
+	@Test
+	public void testStorervFor2ndCase2() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f")));
+		scopes.push(new Scope(
+				new Variable("ancestorVar", 12),
+				new LocalFunction("f1", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("x", 12),
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new LocalFunction("f3", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Variable("a", 12)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.storerv("t1", "ancestorVar");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tlw t0, -8(sp)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\taddi t0, t0, -12\n"
+				+ "\tsw t1, (t0)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
 }
