@@ -23,7 +23,7 @@ public class FinalCodeManager {
 	}
 	
 	public void gnvlcode(String variableName) throws CutePyException {
-		Variable entity = (Variable) symbolTable.searchEntity(variableName);
+		Entity entity =  symbolTable.searchEntity(variableName);
 		int foundScope = entity.getFoundScope();
 		int lastScope = symbolTable.getLastScopeNum();
 		int scopesToClimb = lastScope - foundScope;
@@ -32,7 +32,7 @@ public class FinalCodeManager {
 		for (int i = 0; i < scopesToClimb-1; i++) {
 			addToFinalCode("lw t0, -8(t0)");
 		}
-		addToFinalCode("addi t0, t0, "+entity.getOffset());
+		addToFinalCode("addi t0, t0, -"+ ((EntityWithOffset) entity).getOffset());
 		
 		
 	}
@@ -42,13 +42,20 @@ public class FinalCodeManager {
 		if (entity instanceof TemporaryVariable ||
 				isLocalVariable(entity) || isParamPassedByValue(entity)) {
 			addToFinalCode("lw "+reg+", -"+ ((EntityWithOffset) entity).getOffset() + "(sp)");
-		} else if (isAncestorsLocalVariable(entity) || isAncestorsParameter(entity)) {
-			  
+		} else if (isAncestorsLocalVariable(entity) || isAncestorsParamByValue(entity)) {
+			gnvlcode(varName);
+			addToFinalCode("lw "+reg+", (t0)");
+		} else {
+			throw new CutePyException("FinalCodeManager.laodvr("+varName+","+reg+") unknwon load case");
 		}
 			 
 	}
 	
-	private boolean isAncestorsParameter(Entity entity)  {
+	private boolean isAncestorsParamByValue(Entity entity) throws CutePyException  {
+		if (entity instanceof Parameter && !isOnTheLastScope(entity) &&
+				((Parameter) entity).getMode().equals(ParameterMode.CV)) {
+			return true;
+		}
 		return false;
 	}
 	
@@ -61,19 +68,23 @@ public class FinalCodeManager {
 	}
 	
 	private boolean isLocalVariable(Entity entity) throws CutePyException {
-		if (entity.getFoundScope() - symbolTable.getLastScopeNum() == 0
+		if (isOnTheLastScope(entity)
 				&& entity instanceof Variable) {
 			return true;
 		}
 		return false;
 	}
-	
-	private boolean isParamPassedByValue(Entity entity) {
-		if (entity instanceof Parameter &&
+
+	private boolean isParamPassedByValue(Entity entity) throws CutePyException {
+		if (entity instanceof Parameter && isOnTheLastScope(entity) &&
 				((Parameter) entity).getMode().equals(ParameterMode.CV)) {
 			return true;
 		}
 		return false;
+	}
+	
+	private boolean isOnTheLastScope(Entity entity) throws CutePyException {
+		return entity.getFoundScope() - symbolTable.getLastScopeNum() == 0;
 	}
 	
 	private void addToFinalCode(String str) {

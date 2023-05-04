@@ -60,7 +60,7 @@ public class TestFinalCode {
 				+ "\n"
 				+ "\tlw t0, -8(sp)\n"
 				+ "\tlw t0, -8(t0)\n"
-				+ "\taddi t0, t0, 12\n";
+				+ "\taddi t0, t0, -12\n";
 		
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
@@ -113,7 +113,7 @@ public class TestFinalCode {
 				+ "\tlw t0, -8(sp)\n"
 				+ "\tlw t0, -8(t0)\n"
 				+ "\tlw t0, -8(t0)\n"
-				+ "\taddi t0, t0, 16\n";
+				+ "\taddi t0, t0, -16\n";
 		
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
@@ -149,5 +149,74 @@ public class TestFinalCode {
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
 	
+	@Test
+	public void testLoadvrFor2ndCase1() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f")));
+		scopes.push(new Scope(
+				new LocalFunction("f1", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("x", 12),
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new LocalFunction("f3", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Variable("a", 12)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.loadvr("x", "t1");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tlw t0, -8(sp)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\taddi t0, t0, -12\n"
+				+ "\tlw t1, (t0)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
+	
+	@Test
+	public void testLoadvrFor2ndCase2() throws CutePyException {
+		Stack<Scope> scopes = new Stack<Scope>();
+		scopes.push(new Scope((Entity) new MainFunction("main_f")));
+		scopes.push(new Scope(
+				new Variable("ancestorVar", 12),
+				new LocalFunction("f1", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Parameter("x", 12),
+				new LocalFunction("f2", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new LocalFunction("f3", 101, 12, new ArrayList<FormalParameter>())
+				));
+		scopes.push(new Scope(
+				new Variable("a", 12)
+				));
+		symbolTable.setScopeStack(scopes);
+		
+		finManager.loadvr("ancestorVar", "t1");
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tlw t0, -8(sp)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -8(t0)\n"
+				+ "\taddi t0, t0, -12\n"
+				+ "\tlw t1, (t0)\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
 	
 }
