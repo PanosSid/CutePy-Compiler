@@ -115,6 +115,23 @@ public class TestFinalCodeManager {
 	}
 	
 	@Test
+	public void testLoadvrForInteger() throws CutePyException {
+		finManager.loadvr("100", "t1");
+		finManager.loadvr("200", "t2");
+		
+		
+		String expectedFinalCode = ""
+				+ ".data\n"
+				+ "\n"
+				+ ".text\n"
+				+ "\n"
+				+ "\tli t1, 100\n"
+				+ "\tli t2, 200\n"
+				;
+		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
+	}
+	
+	@Test
 	public void testLoadvrFor1stCase() throws CutePyException {
 		Stack<Scope> scopes = new Stack<Scope>();
 		scopes.push(new Scope((Entity) new MainFunction("main_f1")));

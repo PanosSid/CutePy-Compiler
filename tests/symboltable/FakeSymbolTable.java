@@ -3,9 +3,6 @@ package symboltable;
 import java.util.ArrayList;
 import java.util.List;
 
-import symboltable.Scope;
-import symboltable.SymbolTable;
-
 public class FakeSymbolTable extends SymbolTable {
 	private List<Scope> completedScopes;
 	

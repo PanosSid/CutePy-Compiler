@@ -11,8 +11,6 @@ import exceptions.CutePyException;
 import intermediatecode.QuadManager;
 import lex.FileReader;
 import lex.LexAnalyser;
-import symboltable.Scope;
-import symboltable.SymbolTable;
 import symboltable.entities.Entity;
 import symboltable.entities.FormalParameter;
 import symboltable.entities.LocalFunction;

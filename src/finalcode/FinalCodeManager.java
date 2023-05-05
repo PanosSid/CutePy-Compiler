@@ -2,14 +2,13 @@ package finalcode;
 
 import java.util.Map;
 
-import org.junit.platform.commons.util.StringUtils;
-
 import exceptions.CutePyException;
 import intermediatecode.Quad;
 import lex.CharTypes;
 import symboltable.SymbolTable;
 import symboltable.entities.Entity;
 import symboltable.entities.EntityWithOffset;
+import symboltable.entities.Function;
 import symboltable.entities.Parameter;
 import symboltable.entities.ParameterMode;
 import symboltable.entities.TemporaryVariable;
@@ -30,7 +29,7 @@ public class FinalCodeManager {
 	}
 	
 	public void initMainFinalCode() {
-		finalCode += "L0:\n\tj main\n\n";
+		finalCode += "L0:\n\tj main\n";
 	}
 	
 	public void genFinalCode(int startingLabel, Map<Integer, Quad> intermedCode) throws CutePyException {
@@ -45,26 +44,31 @@ public class FinalCodeManager {
 		String operator = quad.getOperator();
 		if (operator.equals("begin_block")) {
 			if (quad.getOperand1().equals("main")) {
-				finalCode += "\nmain:\n";
+				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
 				addToFinalCode("addi sp, sp, 12");
 				addToFinalCode("mv gp, sp");
+			} else {
+				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
+				addToFinalCode("sw ra, -0(sp)");
 			}
 		} else if (operator.equals("end_block")) {
-			
-		} else if (operator.equals(":=")) {
-			addLabelToFinalCode(label);
-			if (isNumber(quad.getOperand1())){ 	//TODO move this logic to loadvr (and maybe to storevr ?)!!! 
-				addToFinalCode("li t0, "+quad.getOperand1());
-				storerv("t0", quad.getOperand3());
+			if (quad.getOperand1().equals("main")) {
+				addLabelToFinalCode(label, quad);
 			} else {
-				loadvr(quad.getOperand1(), "t0");		
-				storerv("t0", quad.getOperand3());				
-				
+				addLabelToFinalCode(label, quad);
+				addToFinalCode("lw ra, (sp)");
+				addToFinalCode("jr ra");
 			}
+			
+//			finalCode += "\n\t\t\t\t#----- "+label+": "+quad+"\n";
+		} else if (operator.equals(":=")) {
+			addLabelToFinalCode(label, quad);
+			loadvr(quad.getOperand1(), "t0");		
+			storerv("t0", quad.getOperand3());				
 		} else if (CharTypes.ADD_OPS.contains(operator.charAt(0)) || CharTypes.MUL_OPS.contains(operator)) {
-//			loadvr(quad.getOperand1(),"t1");
-//			loadvr(quad.getOperand2(),"t2");
-//			if (operator.equals("+")) {
+			loadvr(quad.getOperand1(),"t1");
+			loadvr(quad.getOperand2(),"t2");
+			if (operator.equals("+")) {
 //				addToFinalCode("add t1,t2,t1");
 //			} else if (quad.getOperand1().equals("-")) {
 //				addToFinalCode("sub t1,t2,t1");
@@ -72,7 +76,7 @@ public class FinalCodeManager {
 //				addToFinalCode("mul t1,t2,t1");
 //			} else if  (quad.getOperand1().equals("//")) {
 //				addToFinalCode("div t1,t2,t1");
-//			}
+			}
 //			storerv("t1",quad.getOperand3());
 		} else if (CharTypes.REL_OPS.contains(operator)) {
 			 
@@ -87,9 +91,25 @@ public class FinalCodeManager {
 		} else if (operator.equals("par")) {
 			
 		} else if (operator.equals("call")) { 	// TODO impement this for main_ funcs to run tests !!!!
-			addLabelToFinalCode(label);
-			addToFinalCode("not implemented yet");
+			addLabelToFinalCode(label, quad);
+			Function entity = (Function) symbolTable.searchEntity(quad.getOperand1());
+			
+			if (quad.getOperand1().startsWith("main_")) {
+				addToFinalCode("addi fp, sp, "+entity.getFramelength());
+				addToFinalCode("sw sp, -4(fp)");
+				addToFinalCode("addi sp, sp, "+ entity.getFramelength());
+				addToFinalCode("jal "+quad.getOperand1());
+				addToFinalCode("addi sp, sp, -"+entity.getFramelength());
+			}
+//			else if () {
+//				
+//			}
+			
+			
+			
+//			addToFinalCode("not implemented yet");
 		} else if (operator.equals("halt")) {
+			addLabelToFinalCode(label, quad);
 			addToFinalCode("li a0, 0");
 			addToFinalCode("li a7, 93");
 			addToFinalCode("ecall");
@@ -101,7 +121,7 @@ public class FinalCodeManager {
 	        return false;
 	    }
 	    try {
-	        int n = Integer.parseInt(operand1);
+	        Integer.parseInt(operand1);
 	    } catch (NumberFormatException nfe) {
 	        return false;
 	    }
@@ -124,6 +144,10 @@ public class FinalCodeManager {
 	}
 	
 	public void loadvr(String varName, String reg) throws CutePyException {
+		if (isNumber(varName)) {
+			addToFinalCode("li "+reg+", "+varName);
+			return;
+		}		
 		Entity entity = symbolTable.searchEntity(varName);
 		if (entity instanceof TemporaryVariable ||
 				isLocalVariable(entity) || isParamPassedByValue(entity)) {
@@ -190,7 +214,11 @@ public class FinalCodeManager {
 		finalCode += "\t"+str+"\n"; 
 	}
 	
-	private void addLabelToFinalCode(int lbl) {
-		finalCode += "\nL"+lbl+":\n";
+	private void addLabelToFinalCode(int lbl, Quad quad) {
+		finalCode += "\nL"+lbl+":\t\t\t# "+lbl+": "+quad+"\n";
+	}
+	
+	private void addLabelToFinalCodeFunc(String funcName, int lbl, Quad quad) {
+		finalCode += "\n"+funcName+":\t\t\t# "+lbl+": "+quad+"\n";
 	}
 }
