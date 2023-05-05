@@ -643,5 +643,36 @@ public class TestIntermediateCode {
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
 	
-	
+	@Test
+	public void testFuncWithNegVarInCondition() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ "def main_negs():\n"
+				+ "#{\n"
+				+ "	#declare x, i\n"
+				+ "	i = 1;\n"
+				+ "	x = 2;\n"
+				+ "	if (i > -x):\n"
+				+ "		print(i);\n"
+				+ "	print(-x);\n"
+				+ "#}\n"
+				+ "\n"
+				+ "if __name__ == \"__main__\":\n"
+				+ "	main_negs();"
+				);
+		syntax.analyzeSyntax();
+		String expectedIntermedCode = ""
+				+ "100: begin_block, main_negs, _, _\n"
+				+ "101: :=, 1, _, i\n"
+				+ "102: :=, 2, _, x\n"
+				+ "103: >, i, -x, 105\n"
+				+ "104: out, _, _, i\n"
+				+ "105: out, _, _, -x\n"
+				+ "108: end_block, main_negs, _, _\n"
+				+ "109: begin_block, main, _, _\n"
+				+ "110: call, main_negs, _, _\n"
+				+ "111: halt, _, _, _\n"
+				+ "112: end_block, main, _, _"			
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
 }

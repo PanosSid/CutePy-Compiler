@@ -38,6 +38,7 @@ public class TestAcceptancePhase1 {
 	public void testAllFunctionsModified() {
 		cpyCompiler.compile(TEST_FILES_PATH+"allFuncsModified.cpy", false);
 		Assertions.assertTrue(outContent.toString().contains("Compilation of '"+TEST_FILES_PATH+"allFuncsModified.cpy' successfully completed")); 	// TODO DELETE IT, THIS IS TEMPORARY
+		
 //		Assertions.assertEquals("Compilation successfully completed", outContent.toString());
 		
 	}
