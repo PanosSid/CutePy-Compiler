@@ -1,5 +1,7 @@
 package finalcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import exceptions.CutePyException;
@@ -15,9 +17,11 @@ import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
 
 public class FinalCodeManager {
-	private String finalCode = ".data\n\nstr_nl: .asciz\n\n.text\n\n";
+	private String finalCode = ".data\n\nstr_nl: .asciz \"\\n\"\n\n.text\n\n";
 	private SymbolTable symbolTable;
-	private String compiledFuncName;
+	private String compiledFuncName; 	// used to determine the relation between the callee and called function
+	private String funcNameToBeCalled;
+	private int paramNum = 1;
 	
 	public FinalCodeManager() {}
 	
@@ -34,8 +38,23 @@ public class FinalCodeManager {
 	}
 	
 	public void genFinalCode(int startingLabel, Map<Integer, Quad> intermedCode) throws CutePyException {
-		for (Integer key : intermedCode.keySet()) {
+//		for (Integer key : intermedCode.keySet()) {
+		List<Integer> keys = new ArrayList<>(intermedCode.keySet());
+		
+		for (int i = 0; i < keys.size(); i++) {
+			Integer key = keys.get(i);
 			if (key >= startingLabel) {
+				if (intermedCode.get(key).getOperator().equals("par")) {
+					int j = i;
+					Integer key2 = keys.get(j);
+					Quad quad  = intermedCode.get(key2);
+					while (!quad.getOperator().equals("call")) {
+						j++;
+						key2 = keys.get(j);
+						quad = intermedCode.get(key2);
+					}
+					funcNameToBeCalled= quad.getOperand1();
+				}
 				transformQuadToFinalCode(key ,intermedCode.get(key)); 
 			}
 		}
@@ -50,22 +69,27 @@ public class FinalCodeManager {
 //				addLabelToFinalCode(label, quad);
 				addToFinalCode("addi sp, sp, 12");
 				addToFinalCode("mv gp, sp");
+				return;
 			} else {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
 //				addLabelToFinalCode(label, quad);
 				addToFinalCode("sw ra, -0(sp)");
+				return;
 			}
-		} else if (operator.equals("end_block")) {
+		}
+		
+		addLabelToFinalCode(label, quad);
+		if (operator.equals("end_block")) {
 			if (quad.getOperand1().equals("main")) {
-				addLabelToFinalCode(label, quad);
+				
 			} else {
-				addLabelToFinalCode(label, quad);
+				
 				addToFinalCode("lw ra, (sp)");
 				addToFinalCode("jr ra");
 			}
 			
 		} else if (operator.equals(":=")) {
-			addLabelToFinalCode(label, quad);
+
 			loadvr(quad.getOperand1(), "t0");		
 			storerv("t0", quad.getOperand3());				
 		} else if (CharTypes.ADD_OPS.contains(operator.charAt(0)) || CharTypes.MUL_OPS.contains(operator)) {
@@ -99,29 +123,44 @@ public class FinalCodeManager {
 			}
 		} else if (operator.equals("jump")) {
 			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
-			addLabelToFinalCode(label, quad);
 			addToFinalCode("j "+quad.getOperand3());
 		} else if (operator.equals("out")) {
-			addLabelToFinalCode(label, quad);
-			addToFinalCode("li a0, "+quad.getOperand3());
+			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand3());
+			addToFinalCode("lw a0, -"+entity.getOffset()+"(sp)");
 			addToFinalCode("li a7, 1");
 			addToFinalCode("ecall");
+			addToFinalCode("la a0, str_nl"); 	// go to next line !!!
+			addToFinalCode("li a7, 4");
+			addToFinalCode("ecall");
 		} else if (operator.equals("in")) {
-			addLabelToFinalCode(label, quad);
 			addToFinalCode("li a7, 7");
 			addToFinalCode("ecall");
-		} else if (operator.equals("ret")) {
+		} else if (operator.equals("ret")) {	//TODO κάτι έχω κάνει λάθος εδώ
 			loadvr(quad.getOperand1(), "t1");
 			addToFinalCode("lw t0, -8(sp)" );
 			addToFinalCode("sw t1, (t0)" );
-			addToFinalCode("lw ra, (sp)" );
-			addToFinalCode("jr ra" );
+//			addToFinalCode("lw ra, (sp)" );
+//			addToFinalCode("jr ra" );
 		} else if (operator.equals("par")) {
-//			Function entity = (Function) symbolTable.searchEntity(quad.getOperand1());	// this must be the function  that will be called later!!!
-//			addToFinalCode("addi fp, sp, "+entity.getFramelength());
+			Function funcToBeCalled = (Function) symbolTable.searchEntity(funcNameToBeCalled);	// this must be the function  that will be called later!!!
+			if (paramNum == 1) {
+				addToFinalCode("addi fp, sp, "+funcToBeCalled.getFramelength());
+			}
 			
-		} else if (operator.equals("call")) { 	
-			addLabelToFinalCode(label, quad);
+			if (quad.getOperand2().equals("cv")) {
+				loadvr(quad.getOperand1(), "t0");
+				addToFinalCode("sw t0, -"+(12+4*paramNum)+"(fp)");
+			} else if (quad.getOperand2().equals("ret")) {
+				TemporaryVariable tempVar = (TemporaryVariable) symbolTable.searchEntity(quad.getOperand1());
+				addToFinalCode("addi t0, sp, -"+tempVar.getOffset());
+				addToFinalCode("sw t0, -"+8+"(fp)");
+			} else {
+				throw new CutePyException("Unknown type of parameter with name "+quad.getOperand1());
+			}
+
+			paramNum ++;
+		} else if (operator.equals("call")) {
+			paramNum = 1;
 			Function entity = (Function) symbolTable.searchEntity(quad.getOperand1());
 			
 			if (quad.getOperand1().startsWith("main_")) {
@@ -147,7 +186,6 @@ public class FinalCodeManager {
 			addToFinalCode("addi sp, sp, -"+entity.getFramelength());
 			
 		} else if (operator.equals("halt")) {
-			addLabelToFinalCode(label, quad);
 			addToFinalCode("li a0, 0");
 			addToFinalCode("li a7, 93");
 			addToFinalCode("ecall");

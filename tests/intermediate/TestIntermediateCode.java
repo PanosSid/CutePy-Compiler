@@ -675,4 +675,34 @@ public class TestIntermediateCode {
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
+	
+	@Test
+	public void testAssignANegNum() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ "def main_neg_assign():\n"
+				+ "#{\n"
+				+ "	#declare x,y\n"
+				+ "	x = -1;\n"
+				+ "	y = -x;\n"
+				+ "#}\n"
+				+ "\n"
+				+ "if __name__ == \"__main__\":\n"
+				+ "	main_neg_assign();"
+				);
+		syntax.analyzeSyntax();
+		String expectedIntermedCode = ""
+				+ "100: begin_block, main_neg_assign, _, _\n"
+				+ "101: :=, 1, _, x\n"
+				+ "102: :=, 2, _, x\n"
+				+ "103: >, i, -x, 105\n"
+				+ "104: out, _, _, i\n"
+				+ "105: out, _, _, -x\n"
+				+ "108: end_block, main_neg_assign, _, _\n"
+				+ "109: begin_block, main, _, _\n"
+				+ "110: call, main_neg_assign, _, _\n"
+				+ "111: halt, _, _, _\n"
+				+ "112: end_block, main, _, _"			
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
 }
