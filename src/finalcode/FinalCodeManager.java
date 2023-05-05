@@ -15,8 +15,9 @@ import symboltable.entities.TemporaryVariable;
 import symboltable.entities.Variable;
 
 public class FinalCodeManager {
-	private String finalCode = ".data\n\n.text\n\n";
+	private String finalCode = ".data\n\nstr_nl: .asciz\n\n.text\n\n";
 	private SymbolTable symbolTable;
+	private String compiledFuncName;
 	
 	public FinalCodeManager() {}
 	
@@ -43,12 +44,15 @@ public class FinalCodeManager {
 	private void transformQuadToFinalCode(int label, Quad quad) throws CutePyException {
 		String operator = quad.getOperator();
 		if (operator.equals("begin_block")) {
+			compiledFuncName = quad.getOperand1();
 			if (quad.getOperand1().equals("main")) {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
+//				addLabelToFinalCode(label, quad);
 				addToFinalCode("addi sp, sp, 12");
 				addToFinalCode("mv gp, sp");
 			} else {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
+//				addLabelToFinalCode(label, quad);
 				addToFinalCode("sw ra, -0(sp)");
 			}
 		} else if (operator.equals("end_block")) {
@@ -60,7 +64,6 @@ public class FinalCodeManager {
 				addToFinalCode("jr ra");
 			}
 			
-//			finalCode += "\n\t\t\t\t#----- "+label+": "+quad+"\n";
 		} else if (operator.equals(":=")) {
 			addLabelToFinalCode(label, quad);
 			loadvr(quad.getOperand1(), "t0");		
@@ -69,28 +72,55 @@ public class FinalCodeManager {
 			loadvr(quad.getOperand1(),"t1");
 			loadvr(quad.getOperand2(),"t2");
 			if (operator.equals("+")) {
-//				addToFinalCode("add t1,t2,t1");
-//			} else if (quad.getOperand1().equals("-")) {
-//				addToFinalCode("sub t1,t2,t1");
-//			} else if  (quad.getOperand1().equals("*")) {
-//				addToFinalCode("mul t1,t2,t1");
-//			} else if  (quad.getOperand1().equals("//")) {
-//				addToFinalCode("div t1,t2,t1");
+				addToFinalCode("add t1,t2,t1");
+			} else if (quad.getOperand1().equals("-")) {
+				addToFinalCode("sub t1,t2,t1");
+			} else if  (quad.getOperand1().equals("*")) {
+				addToFinalCode("mul t1,t2,t1");
+			} else if  (quad.getOperand1().equals("//")) {
+				addToFinalCode("div t1,t2,t1");
 			}
-//			storerv("t1",quad.getOperand3());
+			storerv("t1",quad.getOperand3());
 		} else if (CharTypes.REL_OPS.contains(operator)) {
-			 
+			loadvr(quad.getOperand1(), "t1");
+			loadvr(quad.getOperand2(), "t2");			
+			if (operator.equals("==")) { 
+				addToFinalCode("beq t1, t2, "+quad.getOperand3());
+			} else if (operator.equals("!=")) {
+				addToFinalCode("bne t1, t2, "+quad.getOperand3());
+			} else if (operator.equals(">")) {
+				addToFinalCode("bgt t1, t2, "+quad.getOperand3());
+			} else if (operator.equals("<")) {
+				addToFinalCode("blt t1, t2, "+quad.getOperand3());
+			} else if (operator.equals(">=")) {
+				addToFinalCode("bge t1, t2, "+quad.getOperand3());
+			} else if (operator.equals("<=")) {
+				addToFinalCode("ble t1, t2, "+quad.getOperand3());
+			}
 		} else if (operator.equals("jump")) {
-			
+			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
+			addLabelToFinalCode(label, quad);
+			addToFinalCode("j "+quad.getOperand3());
 		} else if (operator.equals("out")) {
-			
+			addLabelToFinalCode(label, quad);
+			addToFinalCode("li a0, "+quad.getOperand3());
+			addToFinalCode("li a7, 1");
+			addToFinalCode("ecall");
 		} else if (operator.equals("in")) {
-			
+			addLabelToFinalCode(label, quad);
+			addToFinalCode("li a7, 7");
+			addToFinalCode("ecall");
 		} else if (operator.equals("ret")) {
-			
+			loadvr(quad.getOperand1(), "t1");
+			addToFinalCode("lw t0, -8(sp)" );
+			addToFinalCode("sw t1, (t0)" );
+			addToFinalCode("lw ra, (sp)" );
+			addToFinalCode("jr ra" );
 		} else if (operator.equals("par")) {
+//			Function entity = (Function) symbolTable.searchEntity(quad.getOperand1());	// this must be the function  that will be called later!!!
+//			addToFinalCode("addi fp, sp, "+entity.getFramelength());
 			
-		} else if (operator.equals("call")) { 	// TODO impement this for main_ funcs to run tests !!!!
+		} else if (operator.equals("call")) { 	
 			addLabelToFinalCode(label, quad);
 			Function entity = (Function) symbolTable.searchEntity(quad.getOperand1());
 			
@@ -100,14 +130,22 @@ public class FinalCodeManager {
 				addToFinalCode("addi sp, sp, "+ entity.getFramelength());
 				addToFinalCode("jal "+quad.getOperand1());
 				addToFinalCode("addi sp, sp, -"+entity.getFramelength());
+				return;
 			}
-//			else if () {
-//				
-//			}
 			
+			Function calleeEntity = (Function) symbolTable.searchEntity(compiledFuncName);
+			if (calleeEntity.getFoundScope() == entity.getFoundScope()) {
+				addToFinalCode("lw t0, -4(sp)");
+				addToFinalCode("sw t0, -4(fp)");
+			} else if (calleeEntity.getFoundScope() < entity.getFoundScope()) {
+				addToFinalCode("sw sp, -4(fp)");
+			} else {
+				throw new CutePyException("Called and callee functions found in wrong scopes !!!");
+			}
+			addToFinalCode("addi sp, sp, "+ entity.getFramelength());
+			addToFinalCode("jal "+quad.getOperand1());
+			addToFinalCode("addi sp, sp, -"+entity.getFramelength());
 			
-			
-//			addToFinalCode("not implemented yet");
 		} else if (operator.equals("halt")) {
 			addLabelToFinalCode(label, quad);
 			addToFinalCode("li a0, 0");
