@@ -42,9 +42,7 @@ public class FinalCodeManager {
 	}
 	
 	public void genFinalCode(int startingLabel, Map<Integer, Quad> intermedCode) throws CutePyException {
-//		for (Integer key : intermedCode.keySet()) {
-		List<Integer> keys = new ArrayList<>(intermedCode.keySet());
-		
+		List<Integer> keys = new ArrayList<>(intermedCode.keySet());	
 		for (int i = 0; i < keys.size(); i++) {
 			Integer key = keys.get(i);
 			if (key >= startingLabel) {
@@ -97,34 +95,34 @@ public class FinalCodeManager {
 			loadvr(quad.getOperand1(),"t1");
 			loadvr(quad.getOperand2(),"t2");
 			if (operator.equals("+")) {
-				addToFinalCode("add t1,t2,t1");
-			} else if (quad.getOperand1().equals("-")) {
-				addToFinalCode("sub t1,t2,t1");
-			} else if  (quad.getOperand1().equals("*")) {
-				addToFinalCode("mul t1,t2,t1");
-			} else if  (quad.getOperand1().equals("//")) {
-				addToFinalCode("div t1,t2,t1");
+				addToFinalCode("add t1, t1, t2"); 	// add rd r1 r2 = rd = r1 + r2
+			} else if (operator.equals("-")) {
+				addToFinalCode("sub t1, t1, t2");
+			} else if  (operator.equals("*")) {
+				addToFinalCode("mul t1, t1, t2");
+			} else if  (operator.equals("//")) {
+				addToFinalCode("div t1, t1, t2");
 			}
 			storerv("t1",quad.getOperand3());
 		} else if (CharTypes.REL_OPS.contains(operator)) {
 			loadvr(quad.getOperand1(), "t1");
 			loadvr(quad.getOperand2(), "t2");			
 			if (operator.equals("==")) { 
-				addToFinalCode("beq t1, t2, "+quad.getOperand3());
+				addToFinalCode("beq t1, t2, L"+quad.getOperand3());
 			} else if (operator.equals("!=")) {
-				addToFinalCode("bne t1, t2, "+quad.getOperand3());
+				addToFinalCode("bne t1, t2, L"+quad.getOperand3());
 			} else if (operator.equals(">")) {
-				addToFinalCode("bgt t1, t2, "+quad.getOperand3());
+				addToFinalCode("bgt t1, t2, L"+quad.getOperand3());
 			} else if (operator.equals("<")) {
-				addToFinalCode("blt t1, t2, "+quad.getOperand3());
+				addToFinalCode("blt t1, t2, L"+quad.getOperand3());
 			} else if (operator.equals(">=")) {
-				addToFinalCode("bge t1, t2, "+quad.getOperand3());
+				addToFinalCode("bge t1, t2, L"+quad.getOperand3());
 			} else if (operator.equals("<=")) {
-				addToFinalCode("ble t1, t2, "+quad.getOperand3());
+				addToFinalCode("ble t1, t2, L"+quad.getOperand3());
 			}
 		} else if (operator.equals("jump")) {
 			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
-			addToFinalCode("j "+quad.getOperand3());
+			addToFinalCode("j "+"L"+quad.getOperand3());
 		} else if (operator.equals("out")) {
 			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand3());
 			addToFinalCode("lw a0, -"+entity.getOffset()+"(sp)");
@@ -134,9 +132,12 @@ public class FinalCodeManager {
 			addToFinalCode("li a7, 4");
 			addToFinalCode("ecall");
 		} else if (operator.equals("in")) {
-			addToFinalCode("li a7, 7");
+			addToFinalCode("li a7, 5");
 			addToFinalCode("ecall");
-		} else if (operator.equals("ret")) {	//TODO κάτι έχω κάνει λάθος εδώ
+			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand1());
+			addToFinalCode("sw a0, -"+entity.getOffset()+"(sp)");
+			
+		} else if (operator.equals("ret")) {	
 			loadvr(quad.getOperand1(), "t1");
 			addToFinalCode("lw t0, -8(sp)" );
 			addToFinalCode("sw t1, (t0)" );
