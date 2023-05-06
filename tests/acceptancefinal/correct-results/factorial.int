@@ -1,0 +1,19 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+1: begin_block, main_factorial, _, _
+2: in, x, _, _
+3: :=, 1, _, fact
+4: :=, 1, _, i
+5: <=, i, x, 7
+6: jump, _, _, 12
+7: *, fact, i, &1
+8: :=, &1, _, fact
+9: +, i, 1, &2
+10: :=, &2, _, i
+11: jump, _, _, 5
+12: out, _, _, fact
+13: end_block, main_factorial, _, _
+14: begin_block, main, _, _
+15: call, main_factorial, _, _
+16: halt, _, _, _
+17: end_block, main, _, _

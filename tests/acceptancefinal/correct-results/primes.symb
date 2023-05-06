@@ -1,0 +1,30 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+SymbolTable
+Scope 3 [Parameter: x/12/CV] --- [Parameter: y/16/CV] --- [TempVariable: &1/INTEGER/20] --- [TempVariable: &2/INTEGER/24] -
+   | 
+Scope 2 [Parameter: x/12/CV] --- [Variable: i/INTEGER/16] --- [LocalFunction: divides, SQ=2, FL=28, FPs =<x, y>] -
+   | 
+Scope 1 [Variable: i/INTEGER/12] --- [LocalFunction: isPrime, SQ=0, FL=0, FPs =<x>] -
+   | 
+Scope 0 [Function: main_primes, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 2 [Parameter: x/12/CV] --- [Variable: i/INTEGER/16] --- [LocalFunction: divides, SQ=2, FL=28, FPs =<x, y>] --- [TempVariable: &3/INTEGER/20] --- [TempVariable: &4/INTEGER/24] -
+   | 
+Scope 1 [Variable: i/INTEGER/12] --- [LocalFunction: isPrime, SQ=11, FL=28, FPs =<x>] -
+   | 
+Scope 0 [Function: main_primes, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 1 [Variable: i/INTEGER/12] --- [LocalFunction: isPrime, SQ=11, FL=28, FPs =<x>] --- [TempVariable: &5/INTEGER/16] --- [TempVariable: &6/INTEGER/20] --- [TempVariable: &7/INTEGER/24] -
+   | 
+Scope 0 [Function: main_primes, SQ=28, FL=28] -
+
+
+SymbolTable
+Scope 0 [Function: main_primes, SQ=28, FL=28] -
+
+

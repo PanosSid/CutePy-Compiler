@@ -1,0 +1,29 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+1: begin_block, fibonacci, _, _
+2: <=, x, 1, 4
+3: jump, _, _, 6
+4: ret, x, _, _
+5: jump, _, _, 16
+6: -, x, 1, &1
+7: par, &1, cv, _
+8: par, &2, ret, _
+9: call, fibonacci, _, _
+10: -, x, 2, &3
+11: par, &3, cv, _
+12: par, &4, ret, _
+13: call, fibonacci, _, _
+14: +, &2, &4, &5
+15: ret, &5, _, _
+16: end_block, fibonacci, _, _
+17: begin_block, main_fibonacci, _, _
+18: in, x, _, _
+19: par, x, cv, _
+20: par, &6, ret, _
+21: call, fibonacci, _, _
+22: out, _, _, &6
+23: end_block, main_fibonacci, _, _
+24: begin_block, main, _, _
+25: call, main_fibonacci, _, _
+26: halt, _, _, _
+27: end_block, main, _, _

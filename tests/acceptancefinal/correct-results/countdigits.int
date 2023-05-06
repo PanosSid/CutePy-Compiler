@@ -1,0 +1,18 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+1: begin_block, main_countdigits, _, _
+2: in, x, _, _
+3: :=, 0, _, count
+4: >, x, 0, 6
+5: jump, _, _, 11
+6: //, x, 10, &1
+7: :=, &1, _, x
+8: +, count, 1, &2
+9: :=, &2, _, count
+10: jump, _, _, 4
+11: out, _, _, count
+12: end_block, main_countdigits, _, _
+13: begin_block, main, _, _
+14: call, main_countdigits, _, _
+15: halt, _, _, _
+16: end_block, main, _, _

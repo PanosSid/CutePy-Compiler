@@ -1,0 +1,12 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+SymbolTable
+Scope 1 [Variable: x/INTEGER/12] --- [Variable: count/INTEGER/16] --- [TempVariable: &1/INTEGER/20] --- [TempVariable: &2/INTEGER/24] -
+   | 
+Scope 0 [Function: main_countdigits, SQ=2, FL=28] -
+
+
+SymbolTable
+Scope 0 [Function: main_countdigits, SQ=2, FL=28] -
+
+

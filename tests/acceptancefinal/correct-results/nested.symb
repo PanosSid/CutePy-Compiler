@@ -1,0 +1,56 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+SymbolTable
+Scope 5 [Variable: var/INTEGER/12] --- [TempVariable: &1/INTEGER/16] --- [TempVariable: &2/INTEGER/20] -
+   | 
+Scope 4 [LocalFunction: F1111, SQ=2, FL=24, FPs =<>] -
+   | 
+Scope 3 [Variable: var/INTEGER/12] --- [LocalFunction: F111, SQ=0, FL=0, FPs =<>] -
+   | 
+Scope 2 [Parameter: param/12/CV] --- [LocalFunction: F11, SQ=0, FL=0, FPs =<>] -
+   | 
+Scope 1 [Variable: glob/INTEGER/12] --- [LocalFunction: F1, SQ=0, FL=0, FPs =<param>] -
+   | 
+Scope 0 [Function: main_f, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 4 [LocalFunction: F1111, SQ=2, FL=24, FPs =<>] --- [TempVariable: &3/INTEGER/12] -
+   | 
+Scope 3 [Variable: var/INTEGER/12] --- [LocalFunction: F111, SQ=8, FL=16, FPs =<>] -
+   | 
+Scope 2 [Parameter: param/12/CV] --- [LocalFunction: F11, SQ=0, FL=0, FPs =<>] -
+   | 
+Scope 1 [Variable: glob/INTEGER/12] --- [LocalFunction: F1, SQ=0, FL=0, FPs =<param>] -
+   | 
+Scope 0 [Function: main_f, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 3 [Variable: var/INTEGER/12] --- [LocalFunction: F111, SQ=8, FL=16, FPs =<>] --- [TempVariable: &4/INTEGER/16] -
+   | 
+Scope 2 [Parameter: param/12/CV] --- [LocalFunction: F11, SQ=13, FL=20, FPs =<>] -
+   | 
+Scope 1 [Variable: glob/INTEGER/12] --- [LocalFunction: F1, SQ=0, FL=0, FPs =<param>] -
+   | 
+Scope 0 [Function: main_f, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 2 [Parameter: param/12/CV] --- [LocalFunction: F11, SQ=13, FL=20, FPs =<>] --- [TempVariable: &5/INTEGER/16] -
+   | 
+Scope 1 [Variable: glob/INTEGER/12] --- [LocalFunction: F1, SQ=19, FL=20, FPs =<param>] -
+   | 
+Scope 0 [Function: main_f, SQ=0, FL=0] -
+
+
+SymbolTable
+Scope 1 [Variable: glob/INTEGER/12] --- [LocalFunction: F1, SQ=19, FL=20, FPs =<param>] --- [TempVariable: &6/INTEGER/16] -
+   | 
+Scope 0 [Function: main_f, SQ=24, FL=20] -
+
+
+SymbolTable
+Scope 0 [Function: main_f, SQ=24, FL=20] -
+
+
