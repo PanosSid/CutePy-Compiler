@@ -77,6 +77,15 @@ public class FinalCodeManager {
 				addToFinalCode("sw ra, -0(sp)");
 			}
 			return;
+		} else if (operator.equals("jump")) {
+			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
+			if (quad.getOperand3().equals("_")) { 	// we have an empty jump (case if without else)
+				finalCode += "\n#L"+label+":\t\t\t# "+label+": "+quad+"\n";
+			} else {
+				addLabelToFinalCode(label, quad);
+				addToFinalCode("j "+"L"+quad.getOperand3());				
+			}
+			return;
 		}
 		
 		addLabelToFinalCode(label, quad);
@@ -120,12 +129,13 @@ public class FinalCodeManager {
 			} else if (operator.equals("<=")) {
 				addToFinalCode("ble t1, t2, L"+quad.getOperand3());
 			}
-		} else if (operator.equals("jump")) {
-			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
-			addToFinalCode("j "+"L"+quad.getOperand3());
 		} else if (operator.equals("out")) {
-			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand3());
-			addToFinalCode("lw a0, -"+entity.getOffset()+"(sp)");
+			if (isNumber(quad.getOperand3())) {
+				addToFinalCode("li a0, "+quad.getOperand3());
+			} else {
+				EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand3());
+				addToFinalCode("lw a0, -"+entity.getOffset()+"(sp)");
+			}
 			addToFinalCode("li a7, 1");
 			addToFinalCode("ecall");
 			addToFinalCode("la a0, str_nl"); 	// go to next line !!!
@@ -137,12 +147,12 @@ public class FinalCodeManager {
 			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand1());
 			addToFinalCode("sw a0, -"+entity.getOffset()+"(sp)");
 			
-		} else if (operator.equals("ret")) {	
+		} else if (operator.equals("ret")) {	// TODO maybe i need to check if operand1 is number????
 			loadvr(quad.getOperand1(), "t1");
 			addToFinalCode("lw t0, -8(sp)" );
 			addToFinalCode("sw t1, (t0)" );
-//			addToFinalCode("lw ra, (sp)" );
-//			addToFinalCode("jr ra" );
+			addToFinalCode("lw ra, (sp)" );
+			addToFinalCode("jr ra" );
 		} else if (operator.equals("par")) {
 			Function funcToBeCalled = (Function) symbolTable.searchEntity(funcNameToBeCalled);	// this must be the function  that will be called later!!!
 			if (paramNum == 1) {

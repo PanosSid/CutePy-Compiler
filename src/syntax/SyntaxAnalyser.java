@@ -214,7 +214,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void statements() throws CutePyException {
+	public void statements() throws CutePyException {
 		System.out.println("statements() " + currentToken.getRecognizedStr());
 		statement();
 		while (isStatement()) {

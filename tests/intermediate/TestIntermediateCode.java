@@ -306,6 +306,29 @@ public class TestIntermediateCode {
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}
 	
+
+	@Test
+	public void testifIntermedWithoutElse() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ /*if*/"(a>b):\n"
+				+ "#{\n"
+				+ " 	b=b+1;\n"
+				+ "#}\n"
+				+ "print(1);\n"
+				);
+		syntax.setCurrentToken(new Token("if", "keyword", 1));
+		syntax.statements();
+		String expectedIntermedCode = ""
+				+ "100: >, a, b, 102\n"
+				+ "101: jump, _, _, 105\n"
+				+ "102: +, b, 1, T_1\n"
+				+ "103: :=, T_1, _, b\n"				
+				+ "104: jump, _, _, _\n" 		// TODO check if it is appropiate to leave an empty jump
+				+ "105: out, _, _, 1\n"
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
 	@Test
 	public void testCallFuncIntermed() throws CutePyException {
 		setUpSyntaxAnalyser(""
@@ -702,6 +725,44 @@ public class TestIntermediateCode {
 				+ "110: call, main_neg_assign, _, _\n"
 				+ "111: halt, _, _, _\n"
 				+ "112: end_block, main, _, _"			
+				;
+		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
+	}
+	
+	@Test
+	public void testDivides() throws CutePyException {
+		setUpSyntaxAnalyser(""
+				+ "def main_divides():\n"
+				+ "#{\n"
+				+ "	#declare x, y\n"
+				+ "	x = int(input());\n"
+				+ "	y = int(input());\n"
+				+ "	if (y == (y//x) * x):\n"
+				+ "		print(1);\n"
+				+ "	else:\n"
+				+ "		print(0);\n"
+				+ "#}\n"
+				+ "\n"
+				+ "if __name__ == \"__main__\":\n"
+				+ "	main_divides();"
+		);
+		syntax.analyzeSyntax();
+		String expectedIntermedCode = ""
+				+ "100: begin_block, main_divides, _, _\n"
+				+ "101: in, x, _, _\n"
+				+ "102: in, y, _, _\n"
+				+ "103: //, y, x, T_1\n"
+				+ "104: *, T_1, x, T_2\n"
+				+ "105: ==, y, T_2, 107\n"
+				+ "106: jump, _, _, 109\n"
+				+ "107: out, _, _, 1\n"
+				+ "108: jump, _, _, 110\n"
+				+ "109: out, _, _, 0\n"
+				+ "110: end_block, main_divides, _, _\n"
+				+ "111: begin_block, main, _, _\n"
+				+ "112: call, main_divides, _, _\n"
+				+ "113: halt, _, _, _\n"
+				+ "114: end_block, main, _, _\n"			
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());
 	}

@@ -28,7 +28,7 @@ public class CutePyCompiler {
 	public CutePyCompiler() {
 		reader = new FileReader();
 		lex = new LexAnalyser(reader);
-		quadManager = new QuadManager();
+		quadManager = new QuadManager(1);
 		symbolTable = new SymbolTable();
 		finManager = new FinalCodeManager(symbolTable);
 		syntaxAnalyzer = new SyntaxAnalyser(lex, quadManager, symbolTable, finManager);
