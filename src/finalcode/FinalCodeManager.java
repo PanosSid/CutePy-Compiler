@@ -28,7 +28,11 @@ public class FinalCodeManager {
 	public FinalCodeManager(SymbolTable symbolTable) {
 		this.symbolTable = symbolTable;
 	}
-
+	
+	public void emptyFinalCode() {
+		finalCode = "";
+	}
+	
 	public String getFinalCode() {
 		return finalCode;
 	}
@@ -60,7 +64,7 @@ public class FinalCodeManager {
 		}
 	}
 	
-	private void transformQuadToFinalCode(int label, Quad quad) throws CutePyException {
+	public void transformQuadToFinalCode(int label, Quad quad) throws CutePyException {
 		String operator = quad.getOperator();
 		if (operator.equals("begin_block")) {
 			compiledFuncName = quad.getOperand1();
@@ -69,27 +73,24 @@ public class FinalCodeManager {
 //				addLabelToFinalCode(label, quad);
 				addToFinalCode("addi sp, sp, 12");
 				addToFinalCode("mv gp, sp");
-				return;
 			} else {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
 //				addLabelToFinalCode(label, quad);
 				addToFinalCode("sw ra, -0(sp)");
-				return;
 			}
+			return;
 		}
 		
 		addLabelToFinalCode(label, quad);
 		if (operator.equals("end_block")) {
 			if (quad.getOperand1().equals("main")) {
-				
+				// TODO needs something ???
 			} else {
-				
 				addToFinalCode("lw ra, (sp)");
 				addToFinalCode("jr ra");
 			}
 			
 		} else if (operator.equals(":=")) {
-
 			loadvr(quad.getOperand1(), "t0");		
 			storerv("t0", quad.getOperand3());				
 		} else if (CharTypes.ADD_OPS.contains(operator.charAt(0)) || CharTypes.MUL_OPS.contains(operator)) {
@@ -149,7 +150,7 @@ public class FinalCodeManager {
 			
 			if (quad.getOperand2().equals("cv")) {
 				loadvr(quad.getOperand1(), "t0");
-				addToFinalCode("sw t0, -"+(12+4*paramNum)+"(fp)");
+				addToFinalCode("sw t0, -"+(12+4*(paramNum-1))+"(fp)"); 	// paramNum starts from 1 so we need that paramNum-1 
 			} else if (quad.getOperand2().equals("ret")) {
 				TemporaryVariable tempVar = (TemporaryVariable) symbolTable.searchEntity(quad.getOperand1());
 				addToFinalCode("addi t0, sp, -"+tempVar.getOffset());
