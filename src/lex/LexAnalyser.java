@@ -252,7 +252,7 @@ public class LexAnalyser {
 	
 	private Token getAssignmentWithSpace() throws CutePyException {
 		Character c = readChar();
-		if (Character.isAlphabetic(c) || Character.isDigit(c) || CharTypes.ADD_OPS.contains(c)) {
+		if (Character.isAlphabetic(c) || Character.isDigit(c) || CharTypes.ADD_OPS.contains(c) || c.equals('(')) {
 			unReadChar();
 			return new Token(processedStr.trim(), "assignment", lineNum);	// the trim here is important
 		} else {
