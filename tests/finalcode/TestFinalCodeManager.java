@@ -56,8 +56,8 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n";
 		
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
@@ -110,9 +110,9 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -16\n";
 		
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
@@ -198,8 +198,8 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
 				+ "\tlw t1, (t0)\n"
 				;
@@ -235,9 +235,9 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
 				+ "\tlw t1, (t0)\n"
 				;
@@ -305,8 +305,8 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
 				+ "\tsw t1, (t0)\n"
 				;
@@ -342,9 +342,9 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
-				+ "\tlw t0, -8(sp)\n"
-				+ "\tlw t0, -8(t0)\n"
-				+ "\tlw t0, -8(t0)\n"
+				+ "\tlw t0, -4(sp)\n"
+				+ "\tlw t0, -4(t0)\n"
+				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
 				+ "\tsw t1, (t0)\n"
 				;

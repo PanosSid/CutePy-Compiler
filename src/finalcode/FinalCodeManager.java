@@ -222,9 +222,9 @@ public class FinalCodeManager {
 		int lastScope = symbolTable.getLastScopeNum();
 		int scopesToClimb = lastScope - foundScope;
 		
-		addToFinalCode("lw t0, -8(sp)");
+		addToFinalCode("lw t0, -4(sp)");
 		for (int i = 0; i < scopesToClimb-1; i++) {
-			addToFinalCode("lw t0, -8(t0)");
+			addToFinalCode("lw t0, -4(t0)");
 		}
 		addToFinalCode("addi t0, t0, -"+ ((EntityWithOffset) entity).getOffset());
 		
