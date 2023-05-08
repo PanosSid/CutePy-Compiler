@@ -360,7 +360,7 @@ public class TestSyntaxErrors {
 				+ "	"
 				);
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not have a return statement", thrown.getMessage());	
 		
 	}
 	
@@ -394,7 +394,7 @@ public class TestSyntaxErrors {
 				+ "	"
 				);
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not have a return statement", thrown.getMessage());	
 	}
 	
 	@Test
@@ -426,6 +426,6 @@ public class TestSyntaxErrors {
 				+ "	"
 				);
 		Exception thrown = assertThrows(CutePyException.class, () -> syntax.analyzeSyntax());
-		Assertions.assertEquals("Error: the local function: 'isPrime' does not return a value", thrown.getMessage());	
+		Assertions.assertEquals("Error: the local function: 'isPrime' does not have a return statement", thrown.getMessage());	
 	}
 }

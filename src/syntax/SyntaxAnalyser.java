@@ -22,9 +22,9 @@ public class SyntaxAnalyser {
 	private SymbolTable symbolTable;
 	private FinalCodeManager finManager;
 	
-	private String recognisedCode = ""; // used for debugging
 	private boolean localFunctionhasReturn = false;
 	private boolean mainFunctionhasReturn = false;
+	private boolean statementsHasReturn = false;
 	
 	//TODO SHMASIOLOGIKI ANALYSI OI MAIN DEN PREPEI NA EXOUN RETURN !!!!!!!
 	public SyntaxAnalyser(LexAnalyser lex) {
@@ -71,13 +71,11 @@ public class SyntaxAnalyser {
 	}
 
 	private void startRule() throws CutePyException {
-		System.out.println("startRule() " + currentToken.getRecognizedStr());
 		defMainPart();
 		callMainPart();
 	}
 
 	private void defMainPart() throws CutePyException {
-		System.out.println("defMainPart() " + currentToken.getRecognizedStr());
 		defMainFunction();
 		while (currentToken.recognizedStrEquals("def")) {
 			defMainFunction();
@@ -85,8 +83,7 @@ public class SyntaxAnalyser {
 	}
 
 	private void defMainFunction() throws CutePyException {
-		System.out.println("defMainFunction() " + currentToken.getRecognizedStr());
-		mainFunctionhasReturn = false;
+//		mainFunctionhasReturn = false;
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isMainFuncId()) {
@@ -109,9 +106,9 @@ public class SyntaxAnalyser {
 				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				symbolTable.updateStartingQuadField(quadManager.nextQuad());
 				statements();
-//				if (mainFunctionhasReturn == true) {
-//					throw new CutePyException("Error: main function '"+mainFuncName+"' has a return statement");
-//				}
+				if (statementsHasReturn == true) {
+					throw new CutePyException("Error: main function '"+mainFuncName+"' has a return statement");
+				}
 				
 				quadManager.genQuad("end_block", mainFuncName, "_", "_");
 				symbolTable.updateFrameLengthField();
@@ -133,8 +130,6 @@ public class SyntaxAnalyser {
 	}
 	
 	private void defFunction() throws CutePyException {
-		System.out.println("defFunction() " + currentToken.getRecognizedStr());
-		localFunctionhasReturn = false;
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isID(currentToken) && !isMainFuncId()) {
@@ -163,9 +158,12 @@ public class SyntaxAnalyser {
 					quadManager.genQuad("begin_block", funcName, "_", "_");
 					symbolTable.updateStartingQuadField(quadManager.nextQuad());
 					statements();
-					checkIfHasAReturnStat(funcName);
+					if (statementsHasReturn == false) {
+						throw new CutePyException("Error: the local function: '"+ funcName +"' does not have a return statement");
+					}
 					quadManager.genQuad("end_block", funcName, "_", "_");
 					symbolTable.updateFrameLengthField();
+					statementsHasReturn = false;
 
 					if (currentToken.getRecognizedStr().equals("#}")) {
 						loadNextTokenFromLex();
@@ -185,15 +183,7 @@ public class SyntaxAnalyser {
 		}
 	}
 
-	private void checkIfHasAReturnStat(String funcName) throws CutePyException {
-		if (localFunctionhasReturn == false) {
-			throw new CutePyException("Error: the local function: '"+ funcName +"' does not return a value");
-		}
-		localFunctionhasReturn = false;
-	}
-
 	private void declarations() throws CutePyException {
-		System.out.println("declarations() " + currentToken.getRecognizedStr());
 		while (currentToken.recognizedStrEquals("#declare")) {
 			loadNextTokenFromLex();
 			declerationLine();
@@ -201,7 +191,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void declerationLine() throws CutePyException {
-		System.out.println("declerationLine() " + currentToken.getRecognizedStr());
 		List<String> vars = idList();
 		for (String var : vars) {
 			symbolTable.addEntity(EntityFactory.createVariable(var, symbolTable.getOffsetOfNextEntity()));
@@ -209,7 +198,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void statement() throws CutePyException {
-		System.out.println("statement() " + currentToken.getRecognizedStr());
 		if (isSimpleStatement()) {
 			simpleStatement();
 		} else if (isStructuredStatement()) {
@@ -221,7 +209,6 @@ public class SyntaxAnalyser {
 	}
 
 	public void statements() throws CutePyException {
-		System.out.println("statements() " + currentToken.getRecognizedStr());
 		statement();
 		while (isStatement()) {
 			statement();
@@ -233,7 +220,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String simpleStatement() throws CutePyException {
-		System.out.println("simpleStatement() " + currentToken.getRecognizedStr());
 		if (isID(currentToken)) {
 			assignmentStat();
 			return "assignment";
@@ -254,7 +240,6 @@ public class SyntaxAnalyser {
 	}
 
 	public String structuredStatement() throws CutePyException {
-		System.out.println("structuredStatement() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("if")) {
 			loadNextTokenFromLex();
 			ifStat();
@@ -273,7 +258,6 @@ public class SyntaxAnalyser {
 	}
 	
 	private void assignmentStat() throws CutePyException {
-		System.out.println("assignmentStat() " + currentToken.getRecognizedStr());
 		String aPlace = currentToken.getRecognizedStr();
 		loadNextTokenFromLex();
 		if (currentToken.recognizedStrEquals("=")) {
@@ -315,7 +299,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void printStat() throws CutePyException {
-		System.out.println("printStat() " + currentToken.getRecognizedStr());
 		String args1[] = { "print", "(" };
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args1[i])) {
@@ -337,7 +320,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void returnStat() throws CutePyException {
-		System.out.println("returnStat() " + currentToken.getRecognizedStr());
 		String args1[] = { "return", "(" };
 		for (int i = 0; i < args1.length; i++) {
 			if (currentToken.recognizedStrEquals(args1[i])) {
@@ -356,12 +338,10 @@ public class SyntaxAnalyser {
 			}
 		}
 		quadManager.genQuad("ret", ePlace, "_", "_");
-		localFunctionhasReturn = true;
-		mainFunctionhasReturn = true;
+		statementsHasReturn = true;
 	}
 
 	private void ifStat() throws CutePyException {
-		System.out.println("ifStat() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
 			Map<String, List<Integer>> conditionMap = condition();
@@ -409,7 +389,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void elsePart() throws CutePyException {
-		System.out.println("elsePart() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("else")) {
 			loadNextTokenFromLex();
 			if (currentToken.recognizedStrEquals(":")) {
@@ -437,7 +416,6 @@ public class SyntaxAnalyser {
 	}
 
 	public void whileStat() throws CutePyException {
-		System.out.println("whileStat() " + currentToken.getRecognizedStr());
 		int whileQuad = quadManager.nextQuad();
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
@@ -477,7 +455,6 @@ public class SyntaxAnalyser {
 	}
 
 	private List<String> idList() throws CutePyException {
-		System.out.println("idList() " + currentToken.getRecognizedStr());
 		List<String> ids = new ArrayList<String>();
 		if (isID(currentToken)) {
 			ids.add(currentToken.getRecognizedStr());
@@ -500,7 +477,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String expression() throws CutePyException {
-		System.out.println("expression() " + currentToken.getRecognizedStr());
 		String sign = optionalSign();
 		String t1Place = sign + term();
 		while (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
@@ -516,7 +492,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String term() throws CutePyException {
-		System.out.println("term() " + currentToken.getRecognizedStr());
 		String f1Place = factor();
 		while (CharTypes.MUL_OPS.contains(currentToken.getRecognizedStr())) {
 			String mulOp = currentToken.getRecognizedStr();
@@ -531,7 +506,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String factor() throws CutePyException {
-		System.out.println("factor() " + currentToken.getRecognizedStr());
 		if (isInteger(currentToken.getRecognizedStr())) {
 			String fPlace = currentToken.getRecognizedStr();
 			loadNextTokenFromLex();
@@ -559,7 +533,6 @@ public class SyntaxAnalyser {
 	}
 
 	private boolean isInteger(String str) {
-		System.out.println("isInteger() " + currentToken.getRecognizedStr());
 		try {
 			Integer.parseInt(str);
 			return true;
@@ -569,7 +542,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String idTail(String funcName) throws CutePyException {
-		System.out.println("idTail() " + currentToken.getRecognizedStr());
 		if (currentToken.recognizedStrEquals("(")) {
 			loadNextTokenFromLex();
 			actualParList();
@@ -589,7 +561,6 @@ public class SyntaxAnalyser {
 	}
 
 	private void actualParList() throws CutePyException {
-		System.out.println("actualParList() " + currentToken.getRecognizedStr());
 		if (isExpression()) {
 			String expressionPlace1 = expression();
 			if (currentToken.recognizedStrEquals(",")) {
@@ -606,7 +577,6 @@ public class SyntaxAnalyser {
 	}
 
 	private String optionalSign() throws CutePyException {
-		System.out.println("optionalSign " + currentToken.getRecognizedStr());
 		if (CharTypes.ADD_OPS.contains(currentToken.getRecognizedStr().charAt(0))) {
 			String sign = currentToken.getRecognizedStr(); 
 			loadNextTokenFromLex();
@@ -617,7 +587,6 @@ public class SyntaxAnalyser {
 	}
 
 	public Map<String, List<Integer>> condition() throws CutePyException {
-		System.out.println("condition() " + currentToken.getRecognizedStr());
 		Map<String, List<Integer>> boolTermMap = boolTerm();
 		while (currentToken.recognizedStrEquals("or")) {
 			loadNextTokenFromLex();
@@ -630,7 +599,6 @@ public class SyntaxAnalyser {
 	}
 
 	private Map<String, List<Integer>> boolTerm() throws CutePyException {
-		System.out.println("boolTerm() " + currentToken.getRecognizedStr());
 		Map<String, List<Integer>> boolFactor1Map = boolFactor(); 	
 		Map<String, List<Integer>> boolTermMap =  boolFactor1Map;	
 		while (currentToken.recognizedStrEquals("and")) {
@@ -643,9 +611,7 @@ public class SyntaxAnalyser {
 		return boolTermMap;
 	}
 
-	private Map<String, List<Integer>> boolFactor() throws CutePyException {
-		System.out.println("boolFactor() " + currentToken.getRecognizedStr());
-		
+	private Map<String, List<Integer>> boolFactor() throws CutePyException {	
 		if (currentToken.recognizedStrEquals("not")) {
 			loadNextTokenFromLex();
 			if (currentToken.recognizedStrEquals("[")) {
@@ -713,8 +679,6 @@ public class SyntaxAnalyser {
 			quadManager.genQuad("end_block", "main", "_", "_");
 			finManager.genFinalCode(fCodeStartingLbl, quadManager.getIntermedCodeMap());
 			symbolTable.removeScope();
-			
-			System.out.println(finManager.getFinalCode());
 		}
 	}
 
@@ -737,14 +701,11 @@ public class SyntaxAnalyser {
 	}
 
 	public boolean isID(Token token) {
-		System.out.println("isID() " + currentToken.getRecognizedStr());
 		return token.getFamily().equals("identifier");
 	}
 
 	private void loadNextTokenFromLex() throws CutePyException {
 		currentToken = lex.getToken();
-		recognisedCode += currentToken.getRecognizedStr() + "\n";
-//		System.out.println(recognisedCode);
 	}
 	
 	private boolean isMainFuncId() {
