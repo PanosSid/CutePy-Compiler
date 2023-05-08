@@ -67,6 +67,14 @@ public class TestCompilerAcceptance {
 		cpyCompiler.compile(TO_TEST_PATH+fileName+".cpy", false);
 		assertAllGeneratedFiles(fileName);
 	}
+	
+	@Test
+	public void testGoToLimits() throws IOException {
+		CutePyCompiler cpyCompiler = new CutePyCompiler();
+		String fileName = "gotolimits";
+		cpyCompiler.compile(TO_TEST_PATH+fileName+".cpy", false);
+		assertAllGeneratedFiles(fileName);
+	}
 
 	private void assertAllGeneratedFiles(String fileName) throws IOException {
 		for (int i = 0; i < generatedfileTypes.length; i++) {

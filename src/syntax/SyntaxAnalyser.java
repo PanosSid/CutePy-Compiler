@@ -24,7 +24,9 @@ public class SyntaxAnalyser {
 	
 	private String recognisedCode = ""; // used for debugging
 	private boolean localFunctionhasReturn = false;
+	private boolean mainFunctionhasReturn = false;
 	
+	//TODO SHMASIOLOGIKI ANALYSI OI MAIN DEN PREPEI NA EXOUN RETURN !!!!!!!
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
 		quadManager = new QuadManager();
@@ -84,6 +86,7 @@ public class SyntaxAnalyser {
 
 	private void defMainFunction() throws CutePyException {
 		System.out.println("defMainFunction() " + currentToken.getRecognizedStr());
+		mainFunctionhasReturn = false;
 		if (currentToken.getRecognizedStr().equals("def")) {
 			loadNextTokenFromLex();
 			if (isMainFuncId()) {
@@ -106,6 +109,10 @@ public class SyntaxAnalyser {
 				quadManager.genQuad("begin_block", mainFuncName, "_", "_");
 				symbolTable.updateStartingQuadField(quadManager.nextQuad());
 				statements();
+//				if (mainFunctionhasReturn == true) {
+//					throw new CutePyException("Error: main function '"+mainFuncName+"' has a return statement");
+//				}
+				
 				quadManager.genQuad("end_block", mainFuncName, "_", "_");
 				symbolTable.updateFrameLengthField();
 				if (currentToken.getRecognizedStr().equals("#}")) {
@@ -189,7 +196,6 @@ public class SyntaxAnalyser {
 		System.out.println("declarations() " + currentToken.getRecognizedStr());
 		while (currentToken.recognizedStrEquals("#declare")) {
 			loadNextTokenFromLex();
-//			symbolTable.addEntity(EntityFactory.createVariable(currentToken.getRecognizedStr(), symbolTable.getOffsetOfNextEntity()));
 			declerationLine();
 		}
 	}
@@ -238,7 +244,6 @@ public class SyntaxAnalyser {
 			returnStat();
 			return "return";
 		} else {
-			// TODO will never be reached ?
 			throw new CutePyException(getErrorMsg("<identifier> or 'print' or 'return'"));
 		}
 	}
@@ -259,7 +264,6 @@ public class SyntaxAnalyser {
 			whileStat();
 			return "while";
 		} else {
-			// TODO will never be reached ?
 			throw new CutePyException(getErrorMsg("expected a stuctured statement 'if' or 'while'"));
 		}
 	}
@@ -268,7 +272,6 @@ public class SyntaxAnalyser {
 		return currentToken.recognizedStrEquals("if") || currentToken.recognizedStrEquals("while");
 	}
 	
-	// TODO dikos mou autosxediasmos gia ton endiameso kodika
 	private void assignmentStat() throws CutePyException {
 		System.out.println("assignmentStat() " + currentToken.getRecognizedStr());
 		String aPlace = currentToken.getRecognizedStr();
@@ -354,6 +357,7 @@ public class SyntaxAnalyser {
 		}
 		quadManager.genQuad("ret", ePlace, "_", "_");
 		localFunctionhasReturn = true;
+		mainFunctionhasReturn = true;
 	}
 
 	private void ifStat() throws CutePyException {
@@ -376,8 +380,8 @@ public class SyntaxAnalyser {
 							loadNextTokenFromLex();
 							if (currentToken.recognizedStrEquals("else")) {
 								elsePart();
-								quadManager.backpatch(ifList, quadManager.nextQuad());
 							}
+							quadManager.backpatch(ifList, quadManager.nextQuad());
 						} else {
 							throw new CutePyException(getErrorMsg("#}"));
 						}
@@ -679,41 +683,10 @@ public class SyntaxAnalyser {
 			}
 			String e2Place = expression();
 			Map<String, List<Integer>> boolFactorMap = new HashMap<String, List<Integer>>();
-			boolFactorMap.put("true", quadManager.makeList(quadManager.nextQuad()));
-			/*
-			 * TODO before this maybe i have to check if e1Place of e2Place is a negative variable
-			 * and have to produce genQuad(-, 0, ePalce_without_sign, newTemp());
-			 */
-			boolean hasNegSign = false;
-			String negTempE1 = null;
-			if (e1Place.charAt(0) == '-') {
-				hasNegSign = true;
-				e1Place = e1Place.substring(1);	// ommit the negative sign
-				negTempE1 = quadManager.newTemp();
-				quadManager.genQuad("-", "0", e1Place, negTempE1);
-			}
-			negTempE1 = e1Place;
-			
-			String negTempE2 = null;
-			if (e2Place.charAt(0) == '-') {
-				hasNegSign = true;
-				e2Place = e2Place.substring(1);	// ommit the negative sign
-				negTempE2 = quadManager.newTemp();
-				quadManager.genQuad("-", "0", e2Place, negTempE2);
-			}
-//			negTempE2 = e2Place;
-			
-			if (hasNegSign == true) {
-				quadManager.genQuad(relOp, negTempE1, negTempE2, "_");
-				boolFactorMap.put("false", quadManager.makeList(quadManager.nextQuad()));
-				quadManager.genQuad("jump", "_", "_", "_");			
-			} else {
-				/* this part of code was beforethe negative sign checks */
-				quadManager.genQuad(relOp, e1Place, e2Place, "_");
-				boolFactorMap.put("false", quadManager.makeList(quadManager.nextQuad()));
-				quadManager.genQuad("jump", "_", "_", "_");				
-			}
-			
+			boolFactorMap.put("true", quadManager.makeList(quadManager.nextQuad()));	
+			quadManager.genQuad(relOp, e1Place, e2Place, "_");
+			boolFactorMap.put("false", quadManager.makeList(quadManager.nextQuad()));
+			quadManager.genQuad("jump", "_", "_", "_");				
 			return boolFactorMap;
 		} else {
 			throw new CutePyException(getErrorMsg("'not [condition]' or '[condition]' or 'expression relOp expression'"));

@@ -19,6 +19,7 @@ public class TestIntermediateCode {
 	private void setUpSyntaxAnalyser(String sourceCode) {
 		FileReader reader = new FileReader();
 		reader.setFileContents(sourceCode);
+		reader.replaceNegativeVars();
 		LexAnalyser lex = new LexAnalyser(reader);
 		quadManager = new QuadManager();
 		SymbolTable symb = new SymbolTable();
@@ -323,7 +324,7 @@ public class TestIntermediateCode {
 				+ "101: jump, _, _, 105\n"
 				+ "102: +, b, 1, T_1\n"
 				+ "103: :=, T_1, _, b\n"				
-				+ "104: jump, _, _, _\n" 		// TODO check if it is appropiate to leave an empty jump
+				+ "104: jump, _, _, 105\n"
 				+ "105: out, _, _, 1\n"
 				;
 		Assertions.assertEquals(expectedIntermedCode, quadManager.getIntermediateCode());

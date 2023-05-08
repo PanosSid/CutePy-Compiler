@@ -68,30 +68,23 @@ public class FinalCodeManager {
 			compiledFuncName = quad.getOperand1();
 			if (quad.getOperand1().equals("main")) {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
-//				addLabelToFinalCode(label, quad);
 				addToFinalCode("addi sp, sp, 12");
 				addToFinalCode("mv gp, sp");
 			} else {
 				addLabelToFinalCodeFunc(quad.getOperand1(), label, quad);
-//				addLabelToFinalCode(label, quad);
 				addToFinalCode("sw ra, -0(sp)");
 			}
 			return;
 		} else if (operator.equals("jump")) {
-			// prosoxi mipos kanei jumb se label poy exoume onomasei me string?
-			if (quad.getOperand3().equals("_")) { 	// we have an empty jump (case if without else)
-				finalCode += "\n#L"+label+":\t\t\t# "+label+": "+quad+"\n";
-			} else {
-				addLabelToFinalCode(label, quad);
-				addToFinalCode("j "+"L"+quad.getOperand3());				
-			}
+			addLabelToFinalCode(label, quad);
+			addToFinalCode("j "+"L"+quad.getOperand3());				
 			return;
 		}
 		
 		addLabelToFinalCode(label, quad);
 		if (operator.equals("end_block")) {
 			if (quad.getOperand1().equals("main")) {
-				// TODO needs something ???
+
 			} else {
 				addToFinalCode("lw ra, (sp)");
 				addToFinalCode("jr ra");
@@ -130,12 +123,7 @@ public class FinalCodeManager {
 				addToFinalCode("ble t1, t2, L"+quad.getOperand3());
 			}
 		} else if (operator.equals("out")) {
-			if (isNumber(quad.getOperand3())) {
-				addToFinalCode("li a0, "+quad.getOperand3());
-			} else {
-				EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand3());
-				addToFinalCode("lw a0, -"+entity.getOffset()+"(sp)");
-			}
+			loadvr(quad.getOperand3(), "a0");
 			addToFinalCode("li a7, 1");
 			addToFinalCode("ecall");
 			addToFinalCode("la a0, str_nl"); 	// go to next line !!!
@@ -147,7 +135,7 @@ public class FinalCodeManager {
 			EntityWithOffset entity = (EntityWithOffset) symbolTable.searchEntity(quad.getOperand1());
 			addToFinalCode("sw a0, -"+entity.getOffset()+"(sp)");
 			
-		} else if (operator.equals("ret")) {	// TODO maybe i need to check if operand1 is number????
+		} else if (operator.equals("ret")) {
 			loadvr(quad.getOperand1(), "t1");
 			addToFinalCode("lw t0, -8(sp)" );
 			addToFinalCode("sw t1, (t0)" );
@@ -248,14 +236,17 @@ public class FinalCodeManager {
 		}		 
 	}
 	
-	public void storerv(String reg, String varName) throws CutePyException {
+	public void storerv(String reg, String varName) throws CutePyException {	
 		Entity entity = symbolTable.searchEntity(varName);
 		if (entity instanceof TemporaryVariable ||
 				isLocalVariable(entity) || isParamPassedByValue(entity)) {
 			addToFinalCode("sw "+reg+", -"+ ((EntityWithOffset) entity).getOffset() + "(sp)");
 		} else if (isAncestorsLocalVariable(entity) || isAncestorsParamByValue(entity)) {
+			// here you have to protect the data of reg from overwriting from gnvlcode
+			// so move them to another reg and restore the data
+			addToFinalCode("mv t5, "+reg);
 			gnvlcode(varName);
-			addToFinalCode("sw "+reg+", (t0)");
+			addToFinalCode("sw t5, ("+reg+")");
 		} else {
 			throw new CutePyException("FinalCodeManager.storerv("+varName+","+reg+") unknwon store case");
 		}

@@ -305,10 +305,11 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
+				+ "\tmv t5, t1\n"
 				+ "\tlw t0, -4(sp)\n"
 				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
-				+ "\tsw t1, (t0)\n"
+				+ "\tsw t5, (t1)\n"
 				;
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
@@ -342,11 +343,12 @@ public class TestFinalCodeManager {
 				+ "\n"
 				+ ".text\n"
 				+ "\n"
+				+ "\tmv t5, t1\n"
 				+ "\tlw t0, -4(sp)\n"
 				+ "\tlw t0, -4(t0)\n"
 				+ "\tlw t0, -4(t0)\n"
 				+ "\taddi t0, t0, -12\n"
-				+ "\tsw t1, (t0)\n"
+				+ "\tsw t5, (t1)\n"
 				;
 		Assertions.assertEquals(expectedFinalCode, finManager.getFinalCode());
 	}
