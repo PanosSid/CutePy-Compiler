@@ -183,8 +183,8 @@ L35:			# 35: out, _, _, -99999
 	li a7, 4
 	ecall
 
-L36:			# 36: jump, _, _, 57
-	j L57
+L36:			# 36: jump, _, _, 55
+	j L55
 
 L37:			# 37: -, x, lower_limit, &3
 	lw t1, -12(sp)
@@ -214,8 +214,8 @@ L41:			# 41: out, _, _, 0
 	li a7, 4
 	ecall
 
-L42:			# 42: jump, _, _, 57
-	j L57
+L42:			# 42: jump, _, _, 55
+	j L55
 
 L43:			# 43: -, x, lower_limit, &5
 	lw t1, -12(sp)
@@ -252,41 +252,25 @@ L49:			# 49: :=, &7, _, r
 	lw t0, -44(sp)
 	sw t0, -16(sp)
 
-L50:			# 50: jump, _, _, 56
-	j L56
+L50:			# 50: jump, _, _, 54
+	j L54
 
-L51:			# 51: out, _, _, x
-	lw a0, -12(sp)
-	li a7, 1
-	ecall
-	la a0, str_nl
-	li a7, 4
-	ecall
-
-L52:			# 52: out, _, _, upper_limit
-	lw a0, -20(sp)
-	li a7, 1
-	ecall
-	la a0, str_nl
-	li a7, 4
-	ecall
-
-L53:			# 53: par, &8, ret, _
+L51:			# 51: par, &8, ret, _
 	addi fp, sp, 16
 	addi t0, sp, -48
 	sw t0, -8(fp)
 
-L54:			# 54: call, goToUpper, _, _
+L52:			# 52: call, goToUpper, _, _
 	sw sp, -4(fp)
 	addi sp, sp, 16
 	jal goToUpper
 	addi sp, sp, -16
 
-L55:			# 55: :=, &8, _, r
+L53:			# 53: :=, &8, _, r
 	lw t0, -48(sp)
 	sw t0, -16(sp)
 
-L56:			# 56: out, _, _, r
+L54:			# 54: out, _, _, r
 	lw a0, -16(sp)
 	li a7, 1
 	ecall
@@ -294,24 +278,24 @@ L56:			# 56: out, _, _, r
 	li a7, 4
 	ecall
 
-L57:			# 57: end_block, main_gotolimits, _, _
+L55:			# 55: end_block, main_gotolimits, _, _
 	lw ra, (sp)
 	jr ra
 
-main:			# 58: begin_block, main, _, _
+main:			# 56: begin_block, main, _, _
 	addi sp, sp, 12
 	mv gp, sp
 
-L59:			# 59: call, main_gotolimits, _, _
+L57:			# 57: call, main_gotolimits, _, _
 	addi fp, sp, 52
 	sw sp, -4(fp)
 	addi sp, sp, 52
 	jal main_gotolimits
 	addi sp, sp, -52
 
-L60:			# 60: halt, _, _, _
+L58:			# 58: halt, _, _, _
 	li a0, 0
 	li a7, 93
 	ecall
 
-L61:			# 61: end_block, main, _, _
+L59:			# 59: end_block, main, _, _

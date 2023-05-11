@@ -1,0 +1,12 @@
+//SIDIROPOULOS PANAGIOTIS AM:4489 cse84489
+
+SymbolTable
+Scope 1 [Variable: a/INTEGER/12] --- [Variable: b/INTEGER/16] --- [Variable: i_a/INTEGER/20] --- [Variable: i_b/INTEGER/24] --- [TempVariable: &1/INTEGER/28] --- [TempVariable: &2/INTEGER/32] --- [TempVariable: &3/INTEGER/36] --- [TempVariable: &4/INTEGER/40] -
+   | 
+Scope 0 [Function: main_firstToTen, SQ=2, FL=44] -
+
+
+SymbolTable
+Scope 0 [Function: main_firstToTen, SQ=2, FL=44] -
+
+

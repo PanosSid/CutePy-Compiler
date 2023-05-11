@@ -33,8 +33,6 @@ def main_gotolimits():
 			if ((x - lower_limit) < (upper_limit - x)):
 				r = goToLower();  
 			else:#{
-				print(x);
-				print(upper_limit);
 				r = goToUpper();
 			#}
 			print(r);	

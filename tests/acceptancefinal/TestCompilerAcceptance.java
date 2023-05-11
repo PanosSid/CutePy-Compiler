@@ -75,6 +75,22 @@ public class TestCompilerAcceptance {
 		cpyCompiler.compile(TO_TEST_PATH+fileName+".cpy", false);
 		assertAllGeneratedFiles(fileName);
 	}
+	
+	@Test
+	public void testNegativeVars() throws IOException {
+		CutePyCompiler cpyCompiler = new CutePyCompiler();
+		String fileName = "negativeVars";
+		cpyCompiler.compile(TO_TEST_PATH+fileName+".cpy", false);
+		assertAllGeneratedFiles(fileName);
+	}
+	
+	@Test
+	public void testDemoToC() throws IOException {
+		CutePyCompiler cpyCompiler = new CutePyCompiler();
+		String fileName = "demoToC";
+		cpyCompiler.compile(TO_TEST_PATH+fileName+".cpy", true);
+		assertAllGeneratedFiles(fileName);
+	}
 
 	private void assertAllGeneratedFiles(String fileName) throws IOException {
 		for (int i = 0; i < generatedfileTypes.length; i++) {
