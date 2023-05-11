@@ -22,28 +22,14 @@ public class SyntaxAnalyser {
 	private SymbolTable symbolTable;
 	private FinalCodeManager finManager;
 	
-	private boolean localFunctionhasReturn = false;
-	private boolean mainFunctionhasReturn = false;
 	private boolean statementsHasReturn = false;
 	
-	//TODO SHMASIOLOGIKI ANALYSI OI MAIN DEN PREPEI NA EXOUN RETURN !!!!!!!
 	public SyntaxAnalyser(LexAnalyser lex) {
 		this.lex = lex;
 		quadManager = new QuadManager();
 		symbolTable = new SymbolTable();
 	}
 	
-	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager) {
-		this.lex = lex;
-		this.quadManager = quadManager;
-	}
-	
-	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager, SymbolTable symbolTable) {
-		this.lex = lex;
-		this.quadManager = quadManager;
-		this.symbolTable = symbolTable;
-	}
-
 	public SyntaxAnalyser(LexAnalyser lex, QuadManager quadManager, SymbolTable symbolTable,
 			FinalCodeManager finManager) {
 		this.lex = lex;
@@ -53,10 +39,6 @@ public class SyntaxAnalyser {
 		finManager.initMainFinalCode();
 	}
 
-	public QuadManager getQuadManager() {
-		return quadManager;
-	}
-	
 	public Token getCurrentToken() {
 		return currentToken;
 	}
@@ -526,7 +508,7 @@ public class SyntaxAnalyser {
 			if (idTailPlace != null) {
 				return idTailPlace;
 			}
-			return fPlace; 	//TODO check maybe its is not correct !!
+			return fPlace; 
 		} else {
 			throw new CutePyException(getErrorMsg("<identifier> or <integer> or '('"));
 		}
