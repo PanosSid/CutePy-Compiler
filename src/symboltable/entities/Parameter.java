@@ -62,7 +62,4 @@ public class Parameter extends FormalParameter implements EntityWithOffset{
 		Parameter other = (Parameter) obj;
 		return offset == other.offset;
 	}
-	
-	
-
 }

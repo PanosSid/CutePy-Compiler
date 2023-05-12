@@ -84,13 +84,10 @@ public class CutePyCompiler {
 	
 	
 	public static void main(String[] args) {	
-		CutePyCompiler cpyCompiler = new CutePyCompiler();
 		List<String> argsList = new ArrayList<String>(Arrays.asList(args));
 		boolean cFlag = argsList.remove("-c");
-		for (String programPath : argsList) {
-			cpyCompiler.compile(programPath, cFlag);
-		}
-		
+		CutePyCompiler cpyCompiler = new CutePyCompiler();
+		cpyCompiler.compile(argsList.get(0), cFlag);	
 	}
 
 }

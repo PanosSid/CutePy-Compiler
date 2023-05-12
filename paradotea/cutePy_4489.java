@@ -1,4 +1,3 @@
-package phase3_final;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -84,15 +83,11 @@ public class cutePy_4489 {
 		}
 	}
 	
-	
 	public static void main(String[] args) {	
-		cutePy_4489 cpyCompiler = new cutePy_4489();
 		List<String> argsList = new ArrayList<String>(Arrays.asList(args));
 		boolean cFlag = argsList.remove("-c");
-		for (String programPath : argsList) {
-			cpyCompiler.compile(programPath, cFlag);
-		}
-		
+		cutePy_4489 cpyCompiler = new cutePy_4489();
+		cpyCompiler.compile(argsList.get(0), cFlag);	
 	}
 
 }
